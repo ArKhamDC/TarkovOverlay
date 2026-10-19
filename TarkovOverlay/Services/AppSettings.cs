@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 
 namespace TarkovOverlay.Services;
 
@@ -14,7 +14,7 @@ public sealed class AppSettings
 
     public AppSettings ForData(string dataMode) => new()
     {
-        GameMode = dataMode, Language = Language, RefreshMinutes = RefreshMinutes
+        GameMode = dataMode, Language = Language, UiLanguage = UiLanguage, RefreshMinutes = RefreshMinutes
     };
 
     public void Save()
@@ -22,7 +22,10 @@ public sealed class AppSettings
         try { Directory.CreateDirectory(Dir); File.WriteAllText(FilePath, JsonSerializer.Serialize(this, Options)); }
         catch (Exception ex) { AppLog.Error("[Settings] Не удалось сохранить settings.json", ex); }
     }
-    public string Language { get; set; } = "ru";
+    /// <summary>Язык клиента игры (названия предметов для OCR): auto | ru | en. auto — ищет и по русским, и по английским названиям.</summary>
+    public string Language { get; set; } = "auto";
+    /// <summary>Язык интерфейса оверлея: auto (по языку Windows) | ru | en.</summary>
+    public string UiLanguage { get; set; } = "auto";
     /// <summary>Скрывать оверлей от захвата экрана (чтобы OCR не читал собственные метки).</summary>
     public bool ExcludeOverlayFromCapture { get; set; } = true;
     /// <summary>Сканировать только когда окно игры активно.</summary>
@@ -79,7 +82,9 @@ public sealed class AppSettings
         static string Norm(string? m) => m?.Trim().ToLowerInvariant() switch { "pvp" or "regular" => "pvp", "pve" => "pve", "season" => "season", _ => "" };
         settings.ModeChoice = Norm(settings.ModeChoice) is { Length: > 0 } mc ? mc : (settings.ModeChoice?.Trim().ToLowerInvariant() == "auto" ? "auto" : "auto");
         settings.LastManualMode = Norm(settings.LastManualMode) is { Length: > 0 } lm ? lm : (settings.GameMode == "regular" ? "pvp" : "pve");
-        if (string.IsNullOrWhiteSpace(settings.Language)) settings.Language = "ru";
+        static string Lang(string? l) => l?.Trim().ToLowerInvariant() switch { "ru" => "ru", "en" => "en", _ => "auto" };
+        settings.Language = Lang(settings.Language);
+        settings.UiLanguage = Lang(settings.UiLanguage);
         settings.ScanIntervalMs = Math.Clamp(settings.ScanIntervalMs, 100, 5000);
         settings.RefreshMinutes = Math.Clamp(settings.RefreshMinutes, 5, 240);
         settings.CursorOcrScale = Math.Clamp(settings.CursorOcrScale, 1.0, 4.0);

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Threading;
 using TarkovOverlay.Models;
@@ -24,8 +24,8 @@ public sealed class OverlayController : IDisposable
     private volatile string _mode = "pve";                    // эффективный режим: pvp | pve | season
     private DateTime _nextDetect = DateTime.MinValue;
     private ItemDatabase DbFor(string mode) => mode == "pve" ? _database : _databasePvp;
-    private static string Label(string m) => m switch { "pvp" => "PvP", "season" => "Сезон", _ => "PvE" };
-    private string Header => _mode == "season" ? "[Сезон · только торговцы]" : $"[{Label(_mode)}]";
+    private static string Label(string m) => m switch { "pvp" => "PvP", "season" => L.T("Сезон", "Season"), _ => "PvE" };
+    private string Header => _mode == "season" ? L.T("[Сезон · только торговцы]", "[Season · traders only]") : $"[{Label(_mode)}]";
     private readonly OcrService _ocr = new();
     private readonly ScreenCaptureService _capture = new();
     private readonly CancellationTokenSource _cts = new();
@@ -66,7 +66,8 @@ public sealed class OverlayController : IDisposable
     public async Task InitializeCoreAsync()
     {
         _settings = AppSettings.Load();
-        AppLog.Info($"[Settings] режим={_settings.GameMode}, язык={_settings.Language}, скрыть из захвата={_settings.ExcludeOverlayFromCapture}, " +
+        L.Init(_settings.UiLanguage);
+        AppLog.Info($"[Settings] режим={_settings.GameMode}, язык игры={_settings.Language}, интерфейс={L.Code}, скрыть из захвата={_settings.ExcludeOverlayFromCapture}, " +
                     $"только при активной игре={_settings.RequireGameForeground}");
 
         try
@@ -117,7 +118,9 @@ public sealed class OverlayController : IDisposable
         RegisterHotkeys();
         _tray = new TrayIcon(ToggleVisibility, RequestFullScan, RequestRefresh, OpenFolder, Exit);
         _tray.AddModeMenu(SetModeChoice);
-        _tray.AddAction("Создать ярлык на рабочем столе", CreateShortcut, 4);
+        _tray.AddAction(L.T("Создать ярлык на рабочем столе", "Create desktop shortcut"), CreateShortcut, 4);
+        _tray.AddLanguageMenu(_settings.UiLanguage, _settings.Language,
+            v => ChangeLanguage(() => _settings.UiLanguage = v), v => ChangeLanguage(() => _settings.Language = v));
         _tray.SetMode(_settings.ModeChoice, Label(_mode));
         _database.Changed += () => _dispatcher.BeginInvoke(() => _tray?.SetTooltip(DbFor(_mode).Status));
         _databasePvp.Changed += () => _dispatcher.BeginInvoke(() => _tray?.SetTooltip(DbFor(_mode).Status));
@@ -127,8 +130,10 @@ public sealed class OverlayController : IDisposable
         _ = Task.Run(() => _databasePvp.RunUpdaterAsync(_api, _settings.ForData("regular"), _cts.Token));
         _scanLoop = Task.Run(() => ScanLoopAsync(_cts.Token));
 
-        ShowStatus($"TarkovOverlay запущен · {Label(_mode)}{(_settings.ModeChoice == "auto" ? " (авто)" : "")} · {ModeHotkeyName} режим · " +
-                   "наведите на предмет — цена под подсказкой · Ctrl+Alt+O скрыть · Ctrl+Alt+R обновить цены · Ctrl+Alt+X выход", TimeSpan.FromSeconds(10));
+        ShowStatus(L.T($"TarkovOverlay запущен · {Label(_mode)}{(_settings.ModeChoice == "auto" ? " (авто)" : "")} · {ModeHotkeyName} режим · " +
+                   "наведите на предмет — цена под подсказкой · Ctrl+Alt+O скрыть · Ctrl+Alt+R обновить цены · Ctrl+Alt+X выход",
+                   $"TarkovOverlay started · {Label(_mode)}{(_settings.ModeChoice == "auto" ? " (auto)" : "")} · {ModeHotkeyName} mode · " +
+                   "hover an item — price appears under the tooltip · Ctrl+Alt+O hide · Ctrl+Alt+R refresh prices · Ctrl+Alt+X exit"), TimeSpan.FromSeconds(10));
     }
 
     public static string ModeHotkeyName = "Ctrl+Alt+M";
@@ -171,7 +176,7 @@ public sealed class OverlayController : IDisposable
         _tray?.SetVisibleState(_visible);
         AppLog.Info(_visible ? "[Overlay] Показан" : "[Overlay] Скрыт");
         if (_visible)
-            ShowStatus("TarkovOverlay включён", TimeSpan.FromSeconds(2));
+            ShowStatus(L.T("TarkovOverlay включён", "TarkovOverlay enabled"), TimeSpan.FromSeconds(2));
         PushToUi();
     }
 
@@ -217,20 +222,35 @@ public sealed class OverlayController : IDisposable
         if (changed || toast) AppLog.Info($"[Mode] режим цен: {Label(mode)} (выбор {_settings.ModeChoice})");
         _dispatcher.BeginInvoke(() => { _tray?.SetMode(_settings.ModeChoice, Label(mode)); _tray?.SetTooltip(DbFor(mode).Status); });
         if (toast || changed)
-            ShowStatus($"Режим цен: {Label(mode)}{(_settings.ModeChoice == "auto" ? " (авто)" : "")}" +
-                       (mode == "season" ? " — барахолки сезона нет в tarkov.dev, показываю торговцев" : ""), TimeSpan.FromSeconds(2.5));
+            ShowStatus($"{L.T("Режим цен", "Price mode")}: {Label(mode)}{(_settings.ModeChoice == "auto" ? L.T(" (авто)", " (auto)") : "")}" +
+                       (mode == "season" ? L.T(" — барахолки сезона нет в tarkov.dev, показываю торговцев", " — no season flea data on tarkov.dev, showing traders") : ""), TimeSpan.FromSeconds(2.5));
+    }
+
+    /// <summary>Сохраняет выбор языка и перезапускает оверлей (новый экземпляр ждёт освобождения mutex).</summary>
+    private void ChangeLanguage(Action apply)
+    {
+        apply();
+        _settings.Save();
+        AppLog.Info($"[Lang] интерфейс={_settings.UiLanguage}, игра={_settings.Language} — перезапуск");
+        try
+        {
+            var exe = Environment.ProcessPath ?? Path.Combine(AppContext.BaseDirectory, "TarkovOverlay.exe");
+            Process.Start(new ProcessStartInfo(exe, "--restarted") { UseShellExecute = false, WorkingDirectory = AppContext.BaseDirectory });
+        }
+        catch (Exception ex) { AppLog.Error("[Lang] не удалось перезапустить", ex); return; }
+        Exit();
     }
 
     private void CreateShortcut()
     {
-        try { var lnk = ShortcutHelper.Create(); AppLog.Info($"[Shortcut] {lnk}"); ShowStatus("Ярлык «Tarkov Overlay» создан на рабочем столе", TimeSpan.FromSeconds(3)); }
-        catch (Exception ex) { AppLog.Error("[Shortcut] не удалось создать ярлык", ex); ShowStatus("Не удалось создать ярлык", TimeSpan.FromSeconds(3)); }
+        try { var lnk = ShortcutHelper.Create(); AppLog.Info($"[Shortcut] {lnk}"); ShowStatus(L.T("Ярлык «Tarkov Overlay» создан на рабочем столе", "\"Tarkov Overlay\" shortcut created on the desktop"), TimeSpan.FromSeconds(3)); }
+        catch (Exception ex) { AppLog.Error("[Shortcut] не удалось создать ярлык", ex); ShowStatus(L.T("Не удалось создать ярлык", "Could not create shortcut"), TimeSpan.FromSeconds(3)); }
     }
 
     private void RequestRefresh()
     {
         AppLog.Info("[DB] Обновление цен по запросу");
-        ShowStatus("Обновляю цены...", TimeSpan.FromSeconds(4));
+        ShowStatus(L.T("Обновляю цены...", "Refreshing prices..."), TimeSpan.FromSeconds(4));
         _database.RequestRefresh();
         _databasePvp.RequestRefresh();
     }

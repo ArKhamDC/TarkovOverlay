@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Net;
 using System.Text.Json;
 using TarkovOverlay.Models;
@@ -28,18 +28,22 @@ public sealed class TarkovDevApiClient : IDisposable
     }
 
     /// <param name="gameMode">"pve" или "regular"</param>
-    public async Task<IReadOnlyList<ItemPrice>> FetchItemsAsync(string gameMode, string lang, CancellationToken ct = default)
+    /// <param name="lang">Язык названий предметов: "ru", "en" или "auto" (обе базы названий).</param>
+    /// <param name="uiLang">Язык имён торговцев ("ru"/"en").</param>
+    public async Task<IReadOnlyList<ItemPrice>> FetchItemsAsync(string gameMode, string lang, string uiLang = "ru", CancellationToken ct = default)
     {
         var mode = gameMode == "regular" ? "regular" : "pve";
+        var langs = lang == "auto" ? new[] { "ru", "en" } : new[] { lang == "en" ? "en" : "ru" };
+        uiLang = uiLang == "en" ? "en" : "ru";
         var sw = Stopwatch.StartNew();
-        AppLog.Info($"[API] Загружаю {BaseUrl}/{mode}/items (+items_{lang}, traders_{lang})...");
+        AppLog.Info($"[API] Загружаю {BaseUrl}/{mode}/items (+items_{string.Join("/", langs)}, traders_{uiLang})...");
 
         var itemsTask = GetBytesAsync($"{BaseUrl}/{mode}/items", ct);
-        var namesTask = GetBytesAsync($"{BaseUrl}/{mode}/items_{lang}", ct);
-        var tradersTask = GetBytesAsync($"{BaseUrl}/{mode}/traders_{lang}", ct);
-        await Task.WhenAll(itemsTask, namesTask, tradersTask);
+        var namesTasks = langs.Select(l => GetBytesAsync($"{BaseUrl}/{mode}/items_{l}", ct)).ToArray();
+        var tradersTask = GetBytesAsync($"{BaseUrl}/{mode}/traders_{uiLang}", ct);
+        await Task.WhenAll(namesTasks.Append(itemsTask).Append(tradersTask));
 
-        var names = ParseTranslations(namesTask.Result);
+        var nameSets = namesTasks.Select(t => ParseTranslations(t.Result)).ToArray();
         var traderNames = ParseTranslations(tradersTask.Result);
 
         using var doc = JsonDocument.Parse(itemsTask.Result);
@@ -61,16 +65,6 @@ public sealed class TarkovDevApiClient : IDisposable
             if (types.Contains("preset"))
                 continue;
 
-            var name = names.GetValueOrDefault($"{id} Name");
-            var shortName = names.GetValueOrDefault($"{id} ShortName");
-            if (string.IsNullOrWhiteSpace(name) || name.StartsWith(id, StringComparison.Ordinal))
-            {
-                skippedNoName++;
-                continue;
-            }
-            if (string.IsNullOrWhiteSpace(shortName) || shortName.StartsWith(id, StringComparison.Ordinal))
-                shortName = name;
-
             TraderOffer? best = null;
             if (e.TryGetProperty("sellToTrader", out var sells) && sells.ValueKind == JsonValueKind.Array)
             {
@@ -85,6 +79,20 @@ public sealed class TarkovDevApiClient : IDisposable
                 }
             }
 
+            var added = new List<(string, string)>();
+            foreach (var names in nameSets)
+            {
+            var name = names.GetValueOrDefault($"{id} Name");
+            var shortName = names.GetValueOrDefault($"{id} ShortName");
+            if (string.IsNullOrWhiteSpace(name) || name.StartsWith(id, StringComparison.Ordinal))
+                continue;
+            if (string.IsNullOrWhiteSpace(shortName) || shortName.StartsWith(id, StringComparison.Ordinal))
+                shortName = name;
+            var key = (Utils.TextNormalizer.Normalize(name), Utils.TextNormalizer.Normalize(shortName));
+            if (added.Contains(key))
+                continue; // одинаковые названия в обоих языках — одна запись
+            added.Add(key);
+
             result.Add(new ItemPrice(
                 id,
                 name.Trim(),
@@ -95,6 +103,9 @@ public sealed class TarkovDevApiClient : IDisposable
                 GetInt(e, "avg24hPrice"),
                 best,
                 types.Contains("noFlea")));
+            }
+            if (added.Count == 0)
+                skippedNoName++;
         }
 
         AppLog.Info($"[API] Получено предметов: {result.Count} (без перевода пропущено: {skippedNoName}) за {sw.ElapsedMilliseconds} мс");

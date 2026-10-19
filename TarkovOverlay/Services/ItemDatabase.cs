@@ -32,7 +32,7 @@ public sealed class ItemDatabase
     private readonly string _cacheDir = AppSettings.Dir;
     private readonly SemaphoreSlim _refreshSignal = new(0);
     private volatile Snapshot _snapshot = Snapshot.Empty;
-    private volatile string _status = "Цены: загрузка...";
+    private volatile string _status = L.T("Цены: загрузка...", "Prices: loading...");
 
     public int Count => _snapshot.Items.Count;
     public bool IsLoaded => _snapshot.Items.Count > 0;
@@ -40,7 +40,7 @@ public sealed class ItemDatabase
     public string Status => _status;
     public event Action? Changed;
 
-    private string CachePath(AppSettings s) => Path.Combine(_cacheDir, $"items_cache_v{CacheVersion}_{s.GameMode}_{s.Language}.json");
+    private string CachePath(AppSettings s) => Path.Combine(_cacheDir, $"items_cache_v{CacheVersion}_{s.GameMode}_{s.Language}_{L.Resolve(s.UiLanguage)}.json");
 
     // ---------------- загрузка ----------------
 
@@ -59,7 +59,7 @@ public sealed class ItemDatabase
             await using var stream = File.OpenRead(path);
             var cache = await JsonSerializer.DeserializeAsync<CacheFile>(stream, JsonOptions);
             if (cache is null || cache.Version != CacheVersion || cache.Items.Count == 0
-                || cache.GameMode != settings.GameMode || cache.Language != settings.Language)
+                || cache.GameMode != settings.GameMode || cache.Language != settings.Language + "/" + L.Resolve(settings.UiLanguage))
             {
                 AppLog.Warn("[DB] Кэш не подходит (версия/режим/язык) — игнорирую");
                 return;
@@ -95,7 +95,7 @@ public sealed class ItemDatabase
     {
         try
         {
-            var items = (await api.FetchItemsAsync(settings.GameMode, settings.Language, ct)).ToList();
+            var items = (await api.FetchItemsAsync(settings.GameMode, settings.Language, L.Resolve(settings.UiLanguage), ct)).ToList();
             if (items.Count < 500)
                 throw new InvalidOperationException($"Слишком мало предметов в ответе: {items.Count}");
 
@@ -129,7 +129,7 @@ public sealed class ItemDatabase
             {
                 failures = 0;
                 wait = TimeSpan.FromMinutes(settings.RefreshMinutes);
-                SetStatus($"Цены: {Count} предм., {ModeName(settings)}, обновлено {DateTime.Now:HH:mm}");
+                SetStatus(L.T($"Цены: {Count} предм., {ModeName(settings)}, обновлено {DateTime.Now:HH:mm}", $"Prices: {Count} items, {ModeName(settings)}, updated {DateTime.Now:HH:mm}"));
             }
             else
             {
@@ -137,8 +137,8 @@ public sealed class ItemDatabase
                 failures++;
                 var next = DateTime.Now + wait;
                 SetStatus(IsLoaded
-                    ? $"tarkov.dev недоступен — цены из кэша от {DataTime:dd.MM HH:mm}, повтор в {next:HH:mm}"
-                    : $"Нет данных о ценах: tarkov.dev недоступен, повтор в {next:HH:mm:ss}");
+                    ? L.T($"tarkov.dev недоступен — цены из кэша от {DataTime:dd.MM HH:mm}, повтор в {next:HH:mm}", $"tarkov.dev unavailable — cached prices from {DataTime:dd.MM HH:mm}, retry at {next:HH:mm}")
+                    : L.T($"Нет данных о ценах: tarkov.dev недоступен, повтор в {next:HH:mm:ss}", $"No price data: tarkov.dev unavailable, retry at {next:HH:mm:ss}"));
                 AppLog.Info($"[DB] Следующая попытка через {wait.TotalSeconds:0} с");
             }
 
@@ -159,9 +159,11 @@ public sealed class ItemDatabase
             _refreshSignal.Release();
     }
 
+    private volatile bool _hasStatus;
     private void SetStatus(string status)
     {
         _status = status;
+        _hasStatus = !status.Contains("tarkov.dev", StringComparison.Ordinal);
         Changed?.Invoke();
     }
 
@@ -181,7 +183,7 @@ public sealed class ItemDatabase
                     Version = CacheVersion,
                     SavedAt = savedAt,
                     GameMode = settings.GameMode,
-                    Language = settings.Language,
+                    Language = settings.Language + "/" + L.Resolve(settings.UiLanguage),
                     Items = items
                 }, JsonOptions);
             }
@@ -196,8 +198,8 @@ public sealed class ItemDatabase
     private void SetItems(List<ItemPrice> items, DateTime savedAt, AppSettings settings)
     {
         _snapshot = Snapshot.Build(items, savedAt);
-        if (_status.StartsWith("Цены: загрузка", StringComparison.Ordinal) || _status.StartsWith("Нет данных", StringComparison.Ordinal))
-            _status = $"Цены: {items.Count} предм., {ModeName(settings)}, данные от {savedAt:dd.MM HH:mm}";
+        if (!_hasStatus)
+            _status = L.T($"Цены: {items.Count} предм., {ModeName(settings)}, данные от {savedAt:dd.MM HH:mm}", $"Prices: {items.Count} items, {ModeName(settings)}, data from {savedAt:dd.MM HH:mm}");
         Changed?.Invoke();
     }
 

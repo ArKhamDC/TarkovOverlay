@@ -51,9 +51,9 @@ public static class ModeDetector
         try
         {
             var root = GameRoot();
-            if (root is null) { LastSource = "папка игры не найдена"; return null; }
+            if (root is null) { LastSource = Utils.L.T("папка игры не найдена", "game folder not found"); return null; }
             var dir = new DirectoryInfo(Path.Combine(root, "Logs")).GetDirectories("log_*").OrderByDescending(d => d.CreationTimeUtc).FirstOrDefault();
-            if (dir is null) { LastSource = "нет логов"; return null; }
+            if (dir is null) { LastSource = Utils.L.T("нет логов", "no logs"); return null; }
             // 1) backend: последний хост/vhost
             var be = dir.GetFiles("*backend_*.log").OrderByDescending(f => f.LastWriteTimeUtc).FirstOrDefault();
             if (be is not null)
@@ -78,9 +78,9 @@ public static class ModeDetector
                     if (m is not null) { LastSource = $"{dir.Name}: mode {v}"; return m; }
                 }
             }
-            LastSource = $"{dir.Name}: сигнала нет";
+            LastSource = $"{dir.Name}: {Utils.L.T("сигнала нет", "no signal")}";
         }
-        catch (Exception ex) { LastSource = "ошибка: " + ex.Message; }
+        catch (Exception ex) { LastSource = Utils.L.T("ошибка: ", "error: ") + ex.Message; }
         return null;
     }
 

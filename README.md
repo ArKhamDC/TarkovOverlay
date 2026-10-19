@@ -62,7 +62,8 @@ The mode hotkey tries `Ctrl+Alt+M` first. If another app already uses that, it f
 - Windows 10/11 (x64)
 - [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0); building from source needs the .NET 8 SDK
 - The game running in **Windowed** or **Borderless** mode. Exclusive full-screen hides overlays.
-- Game language: Russian (default) or English. Set `Language` in the settings.
+- Game client language: Russian or English. By default (`auto`) item names are matched in both languages, so either client works without changes.
+- Interface language: Russian or English, chosen automatically from the Windows display language. Change it in the tray menu under **Language / Язык** (the overlay restarts to apply it).
 
 ## Install
 
@@ -96,7 +97,8 @@ Settings live in `%LOCALAPPDATA%\TarkovOverlay\settings.json`, which is created 
 |---|---|---|
 | `ModeChoice` | `auto` | `auto`, `pvp`, `pve` or `season` |
 | `LastManualMode` | `pve` | Fallback for `auto` when the game logs give no signal |
-| `Language` | `ru` | Item name language (`ru`, `en`, …), must match the game |
+| `Language` | `auto` | Game client language for item names: `auto` (Russian + English), `ru` or `en` |
+| `UiLanguage` | `auto` | Overlay interface language: `auto` (from Windows), `ru` or `en` |
 | `TooltipIntervalMs` | `60` | How often to look for a tooltip |
 | `RefreshMinutes` | `20` | Price refresh interval |
 | `RequireGameForeground` | `true` | Only work while the game window is active |
@@ -118,7 +120,7 @@ This tool only **reads the screen** and the game's own log files. It does not in
   - Make sure the game is in Windowed or Borderless mode and is the active window.
   - Check `tarkov_overlay.log` for `[Tooltip]` lines.
 - **Wrong or no match.**
-  - Make sure `Language` matches the game language.
+  - Make sure `Language` is `auto` or matches the game language.
   - Press `Ctrl+Alt+R` to refresh prices.
 - **Wrong prices for your mode.**
   - Switch the mode from the tray or with the hotkey.

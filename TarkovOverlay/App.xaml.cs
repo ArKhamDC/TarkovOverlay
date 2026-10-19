@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 using System.Windows;
 using System.Windows.Threading;
 using TarkovOverlay.Services;
@@ -36,6 +36,12 @@ public partial class App : Application
             }
 
             _singleInstance = new Mutex(true, "TarkovOverlay.SingleInstance", out var isNew);
+            if (!isNew && e.Args.Contains("--restarted"))
+            {
+                // перезапуск после смены языка: ждём завершения старого экземпляра
+                try { isNew = _singleInstance.WaitOne(TimeSpan.FromSeconds(10)); }
+                catch (AbandonedMutexException) { isNew = true; }
+            }
             if (!isNew)
             {
                 AppLog.Info("Оверлей уже запущен — выходим");
