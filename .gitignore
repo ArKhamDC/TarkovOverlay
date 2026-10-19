@@ -1,0 +1,16 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+tessdata/
+tessdata_fast/
+icons/
+*.webp
+*.png
+*.annotated.png
+*.log
+items_cache*.json
+settings.json
+*_backup*/
+TarkovOverlay_backup*/
