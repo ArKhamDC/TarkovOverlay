@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace TarkovOverlay.Utils;
 
@@ -22,6 +22,15 @@ public static class TextNormalizer
             sb.Append(MapHomoglyph(char.ToUpperInvariant(ch)));
         }
         return sb.ToString();
+    }
+
+    /// <summary>Normalize + fold typical OCR digit/letter confusions (5→S, 1→I, 0→O, 8→B, L→I). Used only as a fallback key.</summary>
+    public static string Loose(string norm)
+    {
+        var a = norm.ToCharArray();
+        for (var i = 0; i < a.Length; i++)
+            a[i] = a[i] switch { '5' => 'S', '1' or 'L' or 'І' => 'I', '0' => 'О', '8' => 'В', _ => a[i] };
+        return new string(a);
     }
 
     private static char MapHomoglyph(char upper) => upper switch

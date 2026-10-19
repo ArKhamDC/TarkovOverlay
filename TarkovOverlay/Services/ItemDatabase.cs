@@ -257,6 +257,20 @@ public sealed class ItemDatabase
 
 
     /// <summary>Полное название из подсказки игры: точное совпадение, иначе нечёткое (уникально).</summary>
+    private static int Lev(string a, string b)
+    {
+        var prev = new int[b.Length + 1]; var cur = new int[b.Length + 1];
+        for (var j = 0; j <= b.Length; j++) prev[j] = j;
+        for (var i = 1; i <= a.Length; i++)
+        {
+            cur[0] = i;
+            for (var j = 1; j <= b.Length; j++)
+                cur[j] = Math.Min(Math.Min(cur[j - 1] + 1, prev[j] + 1), prev[j - 1] + (a[i - 1] == b[j - 1] ? 0 : 1));
+            (prev, cur) = (cur, prev);
+        }
+        return prev[b.Length];
+    }
+
     public ItemPrice? MatchTooltip(string text)
     {
         var snap = _snapshot;
@@ -264,6 +278,24 @@ public sealed class ItemDatabase
         if (n.Length < 3) return null;
         var exact = snap.Full.Where(e => e.Norm == n).Select(e => e.Item).DistinctBy(i => i.Id).ToList();
         if (exact.Count >= 1) return exact.OrderByDescending(i => i.BestPrice ?? 0).First(); // одноимённые варианты (плакаты) — цены близки
+        // OCR confusions (e.g. spaced 'S I C C' read as '51СС'): compare with digit/letter folding
+        var ln = TextNormalizer.Loose(n);
+        var loose = snap.Full.Where(e => TextNormalizer.Loose(e.Norm) == ln).Select(e => e.Item).DistinctBy(i => i.Id).ToList();
+        if (loose.Count >= 1 && loose.Select(i => TextNormalizer.Normalize(i.Name)).Distinct().Count() == 1) return loose.OrderByDescending(i => i.BestPrice ?? 0).First();
+        // fuzzy on folded keys (e.g. 'Кейс' read as 'Kelic'): unique best with a margin
+        if (ln.Length >= 6)
+        {
+            double best = 0, second = 0; ItemPrice? bi = null; string? bn = null;
+            foreach (var e in snap.Full)
+            {
+                var ek = TextNormalizer.Loose(e.Norm);
+                if (Math.Abs(ek.Length - ln.Length) > 3) continue;
+                var r = 1.0 - (double)Lev(ek, ln) / Math.Max(ek.Length, ln.Length);
+                if (r > best) { if (bn != e.Norm) second = best; best = r; bi = e.Item; bn = e.Norm; }
+                else if (r > second && e.Norm != bn) second = r;
+            }
+            if (bi is not null && best >= 0.75 && best - second >= 0.08) return bi;
+        }
         var sh = MatchShortName(text, 90)?.Item;
         if (n.Length < 6) return sh;
         var full = MatchFullName(text, 82)?.Item;
