@@ -6,6 +6,8 @@ A lightweight Windows overlay for **Escape from Tarkov** that shows item prices 
 
 > Unofficial fan project. Not affiliated with or endorsed by Battlestate Games or tarkov.dev.
 
+**[⬇ Download the latest release](https://github.com/ArKhamDC/TarkovOverlay/releases/latest)** — ready-to-run Windows build, no .NET install needed.
+
 ## Features
 
 - **Hover price panel.** The overlay detects the game's dark item tooltip near the cursor and reads the item name with OCR (Tesseract). It then shows a panel aligned to the tooltip's left edge with:
