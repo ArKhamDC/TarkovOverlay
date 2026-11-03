@@ -1,0 +1,2397 @@
+{
+  "version": 1,
+  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Images are original drawings aligned to those frames; they are not the tarkov-dev SVG maps (those assets forbid overlay use). Frames were checked against spawn and extract coordinates from json.tarkov.dev. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns.",
+  "maps": [
+    {
+      "id": "customs",
+      "image": "customs.png",
+      "coordinateRotation": 180,
+      "cardinalRotation": 180,
+      "publishedBounds": [
+        [
+          698,
+          -307
+        ],
+        [
+          -372,
+          237
+        ]
+      ],
+      "bounds": {
+        "x0": 698,
+        "z0": -307,
+        "x1": -372,
+        "z1": 237
+      },
+      "aliases": [
+        "bigmap",
+        "customs",
+        "customspreset"
+      ],
+      "labels": [
+        {
+          "x": -215,
+          "z": -119,
+          "text": "Big Red",
+          "priority": 140
+        },
+        {
+          "x": 83,
+          "z": -153,
+          "text": "Crackhouse",
+          "priority": 140
+        },
+        {
+          "x": 472,
+          "z": -67,
+          "text": "Depot",
+          "priority": 140
+        },
+        {
+          "x": 200,
+          "z": 150,
+          "text": "Dorms",
+          "priority": 140
+        },
+        {
+          "x": 201,
+          "z": -127,
+          "text": "Fortress",
+          "priority": 140
+        },
+        {
+          "x": 572,
+          "z": 0,
+          "text": "Military Checkpoint",
+          "priority": 140
+        },
+        {
+          "x": 404,
+          "z": 31,
+          "text": "New Gas",
+          "priority": 140
+        },
+        {
+          "x": 331,
+          "z": -173,
+          "text": "Old Gas",
+          "priority": 140
+        },
+        {
+          "x": 497,
+          "z": 110,
+          "text": "Powerline Tower",
+          "priority": 140
+        },
+        {
+          "x": 200,
+          "z": -13,
+          "text": "Skeleton",
+          "priority": 140
+        },
+        {
+          "x": 491,
+          "z": 63,
+          "text": "Sniper Ridge",
+          "priority": 140
+        },
+        {
+          "x": 390,
+          "z": -94,
+          "text": "Warehouse 3",
+          "priority": 140
+        },
+        {
+          "x": 333,
+          "z": -67,
+          "text": "Warehouse 4",
+          "priority": 140
+        },
+        {
+          "x": 555,
+          "z": -118,
+          "text": "Warehouse 7",
+          "priority": 140
+        },
+        {
+          "x": 238,
+          "z": 53,
+          "text": "Bus Station",
+          "priority": 90.0
+        },
+        {
+          "x": -66,
+          "z": 46,
+          "text": "Junk Bridge",
+          "priority": 90.0
+        },
+        {
+          "x": -69,
+          "z": 9,
+          "text": "Main Bridge",
+          "priority": 90.0
+        },
+        {
+          "x": 75,
+          "z": -9,
+          "text": "Old Construction",
+          "priority": 90.0
+        },
+        {
+          "x": 106,
+          "z": -90,
+          "text": "Repair Shop",
+          "priority": 90.0
+        },
+        {
+          "x": 110,
+          "z": 85,
+          "text": "Sniper Hill",
+          "priority": 90.0
+        },
+        {
+          "x": -288,
+          "z": -134,
+          "text": "Storage",
+          "priority": 90.0
+        },
+        {
+          "x": 567,
+          "z": -67,
+          "text": "Streamer House",
+          "priority": 90.0
+        },
+        {
+          "x": -211,
+          "z": -219,
+          "text": "Trailer Park",
+          "priority": 90.0
+        },
+        {
+          "x": 46,
+          "z": -59,
+          "text": "Warehouse 17",
+          "priority": 90.0
+        }
+      ],
+      "areas": [
+        {
+          "name": "big red 2nd",
+          "x0": -199,
+          "z0": -90,
+          "x1": -223,
+          "z1": -131
+        },
+        {
+          "name": "boiler",
+          "x0": 126,
+          "z0": -64,
+          "x1": 88,
+          "z1": -35
+        },
+        {
+          "name": "boiler room",
+          "x0": 122,
+          "z0": -61,
+          "x1": 88,
+          "z1": -40
+        },
+        {
+          "name": "chemical warehouse sniper scav",
+          "x0": 497,
+          "z0": -44,
+          "x1": 450,
+          "z1": -90
+        },
+        {
+          "name": "construction 2nd",
+          "x0": 93,
+          "z0": 0,
+          "x1": 65,
+          "z1": -22
+        },
+        {
+          "name": "dead scav warehouse",
+          "x0": 580,
+          "z0": -104,
+          "x1": 532,
+          "z1": -134
+        },
+        {
+          "name": "dorms",
+          "x0": 243,
+          "z0": 190,
+          "x1": 165,
+          "z1": 125
+        },
+        {
+          "name": "mechanic",
+          "x0": 116,
+          "z0": -83,
+          "x1": 72,
+          "z1": -170
+        },
+        {
+          "name": "oilrig & panda",
+          "x0": 279,
+          "z0": -79,
+          "x1": 246,
+          "z1": -1.4
+        },
+        {
+          "name": "pump 2nd",
+          "x0": 625,
+          "z0": -120,
+          "x1": 599,
+          "z1": -139
+        },
+        {
+          "name": "skeleton",
+          "x0": 239,
+          "z0": 3,
+          "x1": 169,
+          "z1": -160
+        },
+        {
+          "name": "USEC 2nd",
+          "x0": 584,
+          "z0": -46,
+          "x1": 556,
+          "z1": -92
+        },
+        {
+          "name": "warehouse 17",
+          "x0": 73,
+          "z0": 57,
+          "x1": 22,
+          "z1": -38
+        },
+        {
+          "name": "zb-013",
+          "x0": 219,
+          "z0": -158,
+          "x1": 193,
+          "z1": -137
+        }
+      ],
+      "note": "Orientation matches the in-game compass: Big Red to the east, dorms to the south."
+    },
+    {
+      "id": "factory",
+      "image": "factory.png",
+      "coordinateRotation": 90,
+      "cardinalRotation": 90,
+      "publishedBounds": [
+        [
+          77,
+          -64.5
+        ],
+        [
+          -65.5,
+          67.4
+        ]
+      ],
+      "bounds": {
+        "x0": 77,
+        "z0": -64.5,
+        "x1": -65.5,
+        "z1": 67.4
+      },
+      "aliases": [
+        "factory",
+        "factory4day",
+        "factory4night",
+        "factoryday",
+        "factorydaypreset",
+        "factoryevent",
+        "factoryeventpreset",
+        "factorynight",
+        "factorynightpreset",
+        "infectedfactory",
+        "nightfactory"
+      ],
+      "labels": [
+        {
+          "x": -18,
+          "z": 50,
+          "text": "Blue Containers",
+          "priority": 140
+        },
+        {
+          "x": 18,
+          "z": 4,
+          "text": "Rafters",
+          "priority": 140
+        },
+        {
+          "x": 4.5,
+          "z": 10.5,
+          "text": "Silos",
+          "priority": 140
+        },
+        {
+          "x": 56,
+          "z": 5,
+          "text": "Boilers",
+          "priority": 80.0
+        },
+        {
+          "x": 24.5,
+          "z": 39,
+          "text": "Breach Room",
+          "priority": 80.0
+        },
+        {
+          "x": 29.5,
+          "z": 17,
+          "text": "Connector",
+          "priority": 80.0
+        },
+        {
+          "x": 44,
+          "z": -36,
+          "text": "East Halls",
+          "priority": 80.0
+        },
+        {
+          "x": 66,
+          "z": -42,
+          "text": "Forklifts",
+          "priority": 80.0
+        },
+        {
+          "x": 68.25,
+          "z": -20,
+          "text": "Glass Hall",
+          "priority": 80.0
+        },
+        {
+          "x": 30,
+          "z": -8.5,
+          "text": "Heli Crash",
+          "priority": 80.0
+        },
+        {
+          "x": 20,
+          "z": 42,
+          "text": "Hole",
+          "priority": 80.0
+        },
+        {
+          "x": 30.5,
+          "z": 39,
+          "text": "Locked Office",
+          "priority": 80.0
+        },
+        {
+          "x": 29,
+          "z": 41,
+          "text": "Locker Rooms",
+          "priority": 80.0
+        },
+        {
+          "x": 15.5,
+          "z": 39,
+          "text": "Main Office",
+          "priority": 80.0
+        },
+        {
+          "x": -18,
+          "z": -29,
+          "text": "Med Tent",
+          "priority": 80.0
+        },
+        {
+          "x": 35,
+          "z": 39,
+          "text": "North Stairs",
+          "priority": 80.0
+        },
+        {
+          "x": 21,
+          "z": 39,
+          "text": "Office Building",
+          "priority": 80.0
+        },
+        {
+          "x": -1,
+          "z": 16,
+          "text": "Pit",
+          "priority": 80.0
+        },
+        {
+          "x": -3,
+          "z": 37,
+          "text": "Platform",
+          "priority": 80.0
+        },
+        {
+          "x": 41,
+          "z": -11,
+          "text": "Pumping Station",
+          "priority": 80.0
+        },
+        {
+          "x": -20.5,
+          "z": 23,
+          "text": "Scav Bunker",
+          "priority": 80.0
+        },
+        {
+          "x": -21,
+          "z": 27,
+          "text": "Servers",
+          "priority": 80.0
+        },
+        {
+          "x": 15,
+          "z": 41,
+          "text": "Sinks",
+          "priority": 80.0
+        },
+        {
+          "x": 34,
+          "z": 26,
+          "text": "Sky Bridge",
+          "priority": 80.0
+        },
+        {
+          "x": 9,
+          "z": 39,
+          "text": "South Stairs",
+          "priority": 80.0
+        },
+        {
+          "x": -2,
+          "z": -24.5,
+          "text": "Underground Stash",
+          "priority": 80.0
+        },
+        {
+          "x": -45.5,
+          "z": 61,
+          "text": "Wood Room",
+          "priority": 80.0
+        }
+      ],
+      "areas": [],
+      "note": "A few spawns sit a few meters south of the published frame."
+    },
+    {
+      "id": "woods",
+      "image": "woods.png",
+      "coordinateRotation": 180,
+      "cardinalRotation": 180,
+      "publishedBounds": [
+        [
+          646,
+          -914
+        ],
+        [
+          -761,
+          442
+        ]
+      ],
+      "bounds": {
+        "x0": 646,
+        "z0": -914,
+        "x1": -761,
+        "z1": 442
+      },
+      "aliases": [
+        "woods",
+        "woodspreset"
+      ],
+      "labels": [
+        {
+          "x": -80,
+          "z": -680,
+          "text": "Cultist Village",
+          "priority": 140
+        },
+        {
+          "x": -188,
+          "z": 235,
+          "text": "Military Camp",
+          "priority": 140
+        },
+        {
+          "x": -517,
+          "z": -210,
+          "text": "Old Sawmill",
+          "priority": 140
+        },
+        {
+          "x": 10,
+          "z": -3,
+          "text": "Sawmill",
+          "priority": 140
+        },
+        {
+          "x": -485,
+          "z": -390,
+          "text": "Scav Town",
+          "priority": 140
+        },
+        {
+          "x": 290,
+          "z": -475,
+          "text": "USEC Camp",
+          "priority": 140
+        },
+        {
+          "x": -252,
+          "z": -37,
+          "text": "Crash Site",
+          "priority": 80.0
+        },
+        {
+          "x": -5,
+          "z": -515,
+          "text": "Ponds",
+          "priority": 80.0
+        },
+        {
+          "x": -234,
+          "z": 357,
+          "text": "Bus Stop",
+          "priority": 70.0
+        },
+        {
+          "x": -3,
+          "z": -74,
+          "text": "Cabins",
+          "priority": 70.0
+        },
+        {
+          "x": 239,
+          "z": -65,
+          "text": "Checkpoint",
+          "priority": 70.0
+        },
+        {
+          "x": 200,
+          "z": -606,
+          "text": "Convoy",
+          "priority": 70.0
+        },
+        {
+          "x": -327,
+          "z": 19,
+          "text": "Jaeger's Camp",
+          "priority": 70.0
+        },
+        {
+          "x": -16,
+          "z": -122,
+          "text": "Lumber",
+          "priority": 70.0
+        },
+        {
+          "x": 244,
+          "z": 125,
+          "text": "Shack",
+          "priority": 70.0
+        },
+        {
+          "x": 85,
+          "z": -147,
+          "text": "Sniper Rock",
+          "priority": 70.0
+        }
+      ],
+      "areas": []
+    },
+    {
+      "id": "lighthouse",
+      "image": "lighthouse.png",
+      "coordinateRotation": 180,
+      "cardinalRotation": 180,
+      "publishedBounds": [
+        [
+          515,
+          -998
+        ],
+        [
+          -545,
+          725
+        ]
+      ],
+      "bounds": {
+        "x0": 515,
+        "z0": -998,
+        "x1": -545,
+        "z1": 725
+      },
+      "aliases": [
+        "lighthouse",
+        "lighthousepreset"
+      ],
+      "labels": [
+        {
+          "x": 125,
+          "z": -153,
+          "text": "Boathouses",
+          "priority": 140
+        },
+        {
+          "x": -278,
+          "z": -323,
+          "text": "Cabins",
+          "priority": 140
+        },
+        {
+          "x": 0,
+          "z": -188,
+          "text": "Construction",
+          "priority": 140
+        },
+        {
+          "x": -55,
+          "z": -288,
+          "text": "Convenience",
+          "priority": 140
+        },
+        {
+          "x": -162,
+          "z": -225,
+          "text": "Cottages",
+          "priority": 140
+        },
+        {
+          "x": -125,
+          "z": 296,
+          "text": "Crash Site",
+          "priority": 140
+        },
+        {
+          "x": 62,
+          "z": -60,
+          "text": "Dead Tree",
+          "priority": 140
+        },
+        {
+          "x": -120,
+          "z": -841,
+          "text": "Drug Lab",
+          "priority": 140
+        },
+        {
+          "x": -133,
+          "z": 100,
+          "text": "Grand Chalet",
+          "priority": 140
+        },
+        {
+          "x": 18,
+          "z": -453,
+          "text": "Gunner Nest",
+          "priority": 140
+        },
+        {
+          "x": -151,
+          "z": -243,
+          "text": "Hillside",
+          "priority": 140
+        },
+        {
+          "x": -177,
+          "z": -356,
+          "text": "Island",
+          "priority": 140
+        },
+        {
+          "x": 382,
+          "z": 496,
+          "text": "Lightkeeper Island",
+          "priority": 140
+        },
+        {
+          "x": -107,
+          "z": -53,
+          "text": "Pikes Peak Resort",
+          "priority": 140
+        },
+        {
+          "x": -182,
+          "z": -552,
+          "text": "Pipes",
+          "priority": 140
+        },
+        {
+          "x": 40,
+          "z": -618,
+          "text": "Plant 1",
+          "priority": 140
+        },
+        {
+          "x": -97,
+          "z": -737,
+          "text": "Plant 2",
+          "priority": 140
+        },
+        {
+          "x": -189,
+          "z": -665,
+          "text": "Plant 3",
+          "priority": 140
+        },
+        {
+          "x": -75,
+          "z": -284,
+          "text": "Red Brick",
+          "priority": 140
+        },
+        {
+          "x": -70,
+          "z": 129,
+          "text": "Tennis Court",
+          "priority": 140
+        },
+        {
+          "x": -30,
+          "z": -882,
+          "text": "Train Yard",
+          "priority": 140
+        },
+        {
+          "x": -65,
+          "z": -600,
+          "text": "Water Treatment",
+          "priority": 140
+        }
+      ],
+      "areas": []
+    },
+    {
+      "id": "shoreline",
+      "image": "shoreline.png",
+      "coordinateRotation": 180,
+      "cardinalRotation": 180,
+      "publishedBounds": [
+        [
+          504,
+          -415
+        ],
+        [
+          -1056,
+          618
+        ]
+      ],
+      "bounds": {
+        "x0": 504,
+        "z0": -415,
+        "x1": -1056,
+        "z1": 618
+      },
+      "aliases": [
+        "shoreline",
+        "shorelinepreset"
+      ],
+      "labels": [
+        {
+          "x": -252,
+          "z": -146,
+          "text": "Admin",
+          "priority": 140
+        },
+        {
+          "x": -153,
+          "z": -290,
+          "text": "Bunker",
+          "priority": 140
+        },
+        {
+          "x": -96,
+          "z": -6,
+          "text": "Bus Stop",
+          "priority": 140
+        },
+        {
+          "x": 288,
+          "z": 144,
+          "text": "Cabins",
+          "priority": 140
+        },
+        {
+          "x": 52,
+          "z": 134,
+          "text": "Construction",
+          "priority": 140
+        },
+        {
+          "x": 128,
+          "z": 93,
+          "text": "Cottages",
+          "priority": 140
+        },
+        {
+          "x": -625,
+          "z": 484,
+          "text": "Crane",
+          "priority": 140
+        },
+        {
+          "x": -329,
+          "z": -83,
+          "text": "East Wing",
+          "priority": 140
+        },
+        {
+          "x": -189.3,
+          "z": 420,
+          "text": "Gas Station",
+          "priority": 140
+        },
+        {
+          "x": -338.6,
+          "z": 525,
+          "text": "Pier",
+          "priority": 140
+        },
+        {
+          "x": -215.8,
+          "z": 178.4,
+          "text": "Power Station",
+          "priority": 140
+        },
+        {
+          "x": -708.9,
+          "z": 93.91,
+          "text": "Radio Tower",
+          "priority": 140
+        },
+        {
+          "x": -622,
+          "z": -202,
+          "text": "Scav Farm",
+          "priority": 140
+        },
+        {
+          "x": 216,
+          "z": 424,
+          "text": "Scav Island",
+          "priority": 140
+        },
+        {
+          "x": 326,
+          "z": -118.5,
+          "text": "Swamp",
+          "priority": 140
+        },
+        {
+          "x": -355,
+          "z": 188,
+          "text": "Tank Bridge",
+          "priority": 140
+        },
+        {
+          "x": 418.4,
+          "z": 118,
+          "text": "Village",
+          "priority": 140
+        },
+        {
+          "x": -496,
+          "z": 257,
+          "text": "Weather Station",
+          "priority": 140
+        },
+        {
+          "x": -171,
+          "z": -83,
+          "text": "West Wing",
+          "priority": 140
+        },
+        {
+          "x": -258.2,
+          "z": -71.2,
+          "text": "Resort",
+          "priority": 100.0
+        }
+      ],
+      "areas": [
+        {
+          "name": "admin",
+          "x0": -234,
+          "z0": -134,
+          "x1": -268,
+          "z1": -163
+        },
+        {
+          "name": "west wing",
+          "x0": -137,
+          "z0": -68,
+          "x1": -237,
+          "z1": -104
+        }
+      ]
+    },
+    {
+      "id": "reserve",
+      "image": "reserve.png",
+      "coordinateRotation": 180,
+      "cardinalRotation": 195.209,
+      "publishedBounds": [
+        [
+          289,
+          -293
+        ],
+        [
+          -303,
+          244
+        ]
+      ],
+      "bounds": {
+        "x0": 289,
+        "z0": -293,
+        "x1": -303,
+        "z1": 244
+      },
+      "aliases": [
+        "reserve",
+        "rezervbase",
+        "rezervbasepreset"
+      ],
+      "labels": [
+        {
+          "x": 167,
+          "z": -222,
+          "text": "Barracks",
+          "priority": 140
+        },
+        {
+          "x": -140,
+          "z": -14.5,
+          "text": "Black Bishop",
+          "priority": 140
+        },
+        {
+          "x": 14.5,
+          "z": -10.8,
+          "text": "Black Knight",
+          "priority": 140
+        },
+        {
+          "x": -165,
+          "z": 57,
+          "text": "Black Pawn",
+          "priority": 140
+        },
+        {
+          "x": -220,
+          "z": -13,
+          "text": "E1 Bunkers",
+          "priority": 140
+        },
+        {
+          "x": 173,
+          "z": -3,
+          "text": "E2 Bunkers",
+          "priority": 140
+        },
+        {
+          "x": 28,
+          "z": -102,
+          "text": "K Buildings",
+          "priority": 140
+        },
+        {
+          "x": -67,
+          "z": -30,
+          "text": "White Bishop",
+          "priority": 140
+        },
+        {
+          "x": -49.5,
+          "z": 15.5,
+          "text": "White King",
+          "priority": 140
+        },
+        {
+          "x": 82.2,
+          "z": -30.2,
+          "text": "White Knight",
+          "priority": 140
+        },
+        {
+          "x": -104,
+          "z": 93,
+          "text": "White Pawn",
+          "priority": 140
+        },
+        {
+          "x": -25,
+          "z": 180,
+          "text": "White Queen",
+          "priority": 140
+        },
+        {
+          "x": 149,
+          "z": -124,
+          "text": "White Rook",
+          "priority": 140
+        },
+        {
+          "x": 80,
+          "z": -167,
+          "text": "\u0434 - Warehouse Bunkers",
+          "priority": 140
+        },
+        {
+          "x": -8.5,
+          "z": 175,
+          "text": "Dome",
+          "priority": 80.0
+        },
+        {
+          "x": 96,
+          "z": 30,
+          "text": "Garage",
+          "priority": 80.0
+        },
+        {
+          "x": 29.7,
+          "z": 29.5,
+          "text": "Gas Station",
+          "priority": 80.0
+        },
+        {
+          "x": -1,
+          "z": -71,
+          "text": "K1",
+          "priority": 80.0
+        },
+        {
+          "x": 66,
+          "z": -90,
+          "text": "K2",
+          "priority": 80.0
+        },
+        {
+          "x": -5.5,
+          "z": -94,
+          "text": "K3",
+          "priority": 80.0
+        },
+        {
+          "x": 60,
+          "z": -112,
+          "text": "K4",
+          "priority": 80.0
+        },
+        {
+          "x": -10.5,
+          "z": -115,
+          "text": "K5",
+          "priority": 80.0
+        },
+        {
+          "x": 54,
+          "z": -132,
+          "text": "K6",
+          "priority": 80.0
+        },
+        {
+          "x": 55.5,
+          "z": 60.6,
+          "text": "Mechanic",
+          "priority": 80.0
+        },
+        {
+          "x": -31,
+          "z": -150,
+          "text": "Shipping Yard",
+          "priority": 80.0
+        },
+        {
+          "x": -120,
+          "z": 37,
+          "text": "Tarmac",
+          "priority": 80.0
+        },
+        {
+          "x": 161,
+          "z": -149,
+          "text": "Train Station",
+          "priority": 80.0
+        }
+      ],
+      "areas": [
+        {
+          "name": "black bishop",
+          "x0": -104,
+          "z0": -37,
+          "x1": -177,
+          "z1": 5
+        },
+        {
+          "name": "dome",
+          "x0": 1,
+          "z0": 164,
+          "x1": -17,
+          "z1": 199
+        },
+        {
+          "name": "knights",
+          "x0": 99,
+          "z0": -50,
+          "x1": -2,
+          "z1": 7
+        },
+        {
+          "name": "pawns",
+          "x0": -77,
+          "z0": 26,
+          "x1": -177,
+          "z1": 106
+        },
+        {
+          "name": "scav lands",
+          "x0": -128,
+          "z0": -139,
+          "x1": -146,
+          "z1": -120
+        },
+        {
+          "name": "train depot",
+          "x0": 191,
+          "z0": -175,
+          "x1": 137,
+          "z1": -120
+        },
+        {
+          "name": "white bishop",
+          "x0": -47,
+          "z0": -47,
+          "x1": -85,
+          "z1": -18
+        },
+        {
+          "name": "white king",
+          "x0": -19.91,
+          "z0": -13,
+          "x1": -78,
+          "z1": 39
+        }
+      ],
+      "note": "Frame rotation is the tarkov.dev interactive map (180). json.tarkov.dev coordinateToCardinalRotation for Reserve is 195.209, so compass north is about 15 degrees clockwise of image up."
+    },
+    {
+      "id": "interchange",
+      "image": "interchange.png",
+      "coordinateRotation": 180,
+      "cardinalRotation": 180,
+      "publishedBounds": [
+        [
+          598,
+          -442
+        ],
+        [
+          -433,
+          426
+        ]
+      ],
+      "bounds": {
+        "x0": 598,
+        "z0": -442,
+        "x1": -433,
+        "z1": 426
+      },
+      "aliases": [
+        "interchange",
+        "shoppingmall"
+      ],
+      "labels": [
+        {
+          "x": 373.5,
+          "z": -391.2,
+          "text": "Highway Construction",
+          "priority": 140
+        },
+        {
+          "x": -186.4,
+          "z": -318.7,
+          "text": "Power Station",
+          "priority": 100.0
+        },
+        {
+          "x": 68.2,
+          "z": 312.9,
+          "text": "Cargo Containers",
+          "priority": 80.0
+        },
+        {
+          "x": 158,
+          "z": -78.5,
+          "text": "Four Camp",
+          "priority": 80.0
+        },
+        {
+          "x": 33,
+          "z": -222,
+          "text": "Garage A",
+          "priority": 80.0
+        },
+        {
+          "x": 47,
+          "z": -112,
+          "text": "Garage B",
+          "priority": 80.0
+        },
+        {
+          "x": 0,
+          "z": 47,
+          "text": "Garage C",
+          "priority": 80.0
+        },
+        {
+          "x": 20,
+          "z": 138,
+          "text": "Garage D",
+          "priority": 80.0
+        },
+        {
+          "x": 155,
+          "z": -253,
+          "text": "Go Kart",
+          "priority": 80.0
+        },
+        {
+          "x": -115,
+          "z": -45,
+          "text": "Goshan",
+          "priority": 80.0
+        },
+        {
+          "x": -34,
+          "z": -235,
+          "text": "IDEA",
+          "priority": 80.0
+        },
+        {
+          "x": 46.5,
+          "z": -358.5,
+          "text": "Idea Tower",
+          "priority": 80.0
+        },
+        {
+          "x": -28,
+          "z": 140,
+          "text": "OLI",
+          "priority": 80.0
+        },
+        {
+          "x": 202.3,
+          "z": 219.4,
+          "text": "Oli Tower",
+          "priority": 80.0
+        },
+        {
+          "x": -175.5,
+          "z": 145.1,
+          "text": "Ramps",
+          "priority": 80.0
+        },
+        {
+          "x": 263.2,
+          "z": -11.1,
+          "text": "Scav Camp",
+          "priority": 80.0
+        },
+        {
+          "x": -260.2,
+          "z": 123.8,
+          "text": "Wall Break",
+          "priority": 80.0
+        },
+        {
+          "x": 19,
+          "z": -6,
+          "text": "ADIK",
+          "priority": 65.0
+        },
+        {
+          "x": 71,
+          "z": -130,
+          "text": "Arena",
+          "priority": 65.0
+        },
+        {
+          "x": -37,
+          "z": 26,
+          "text": "Avokado",
+          "priority": 65.0
+        },
+        {
+          "x": -65,
+          "z": -103,
+          "text": "Bizarro",
+          "priority": 65.0
+        },
+        {
+          "x": -38,
+          "z": -129,
+          "text": "Book Store",
+          "priority": 65.0
+        },
+        {
+          "x": 91,
+          "z": 55,
+          "text": "Boots 4 Life",
+          "priority": 65.0
+        },
+        {
+          "x": 13,
+          "z": -32,
+          "text": "Brutal",
+          "priority": 65.0
+        },
+        {
+          "x": 67,
+          "z": -23.5,
+          "text": "Burger House",
+          "priority": 65.0
+        },
+        {
+          "x": -27,
+          "z": -103,
+          "text": "Burger Spot",
+          "priority": 65.0
+        },
+        {
+          "x": 43,
+          "z": -69,
+          "text": "Coffee Joy",
+          "priority": 65.0
+        },
+        {
+          "x": 91,
+          "z": -119,
+          "text": "Dino Clothes",
+          "priority": 65.0
+        },
+        {
+          "x": 6,
+          "z": 49,
+          "text": "Dom",
+          "priority": 65.0
+        },
+        {
+          "x": 18,
+          "z": -103,
+          "text": "EMERCOM",
+          "priority": 65.0
+        },
+        {
+          "x": 26,
+          "z": -149,
+          "text": "Eastland",
+          "priority": 65.0
+        },
+        {
+          "x": 70,
+          "z": -94,
+          "text": "FCK",
+          "priority": 65.0
+        },
+        {
+          "x": 39,
+          "z": 67,
+          "text": "Fashion Store",
+          "priority": 65.0
+        },
+        {
+          "x": 38,
+          "z": -170,
+          "text": "Father & Sons",
+          "priority": 65.0
+        },
+        {
+          "x": 19,
+          "z": 26,
+          "text": "Figaro",
+          "priority": 65.0
+        },
+        {
+          "x": -28,
+          "z": 0.5,
+          "text": "Generic",
+          "priority": 65.0
+        },
+        {
+          "x": -18,
+          "z": -72,
+          "text": "German",
+          "priority": 65.0
+        },
+        {
+          "x": 69,
+          "z": -116,
+          "text": "Intourist",
+          "priority": 65.0
+        },
+        {
+          "x": 15,
+          "z": -74,
+          "text": "Jacob & Jacob",
+          "priority": 65.0
+        },
+        {
+          "x": -18,
+          "z": -25,
+          "text": "Kiba",
+          "priority": 65.0
+        },
+        {
+          "x": -28,
+          "z": -103,
+          "text": "Kostin",
+          "priority": 65.0
+        },
+        {
+          "x": 13,
+          "z": -66,
+          "text": "Mantis",
+          "priority": 65.0
+        },
+        {
+          "x": 70,
+          "z": -87,
+          "text": "McDaniels",
+          "priority": 65.0
+        },
+        {
+          "x": 69.5,
+          "z": -134,
+          "text": "Mode7",
+          "priority": 65.0
+        },
+        {
+          "x": 87,
+          "z": -165,
+          "text": "Nortex",
+          "priority": 65.0
+        },
+        {
+          "x": 92,
+          "z": 17,
+          "text": "Papillon",
+          "priority": 65.0
+        },
+        {
+          "x": -34,
+          "z": -24,
+          "text": "Philly Cute",
+          "priority": 65.0
+        },
+        {
+          "x": -34,
+          "z": -20,
+          "text": "Pretty Lights",
+          "priority": 65.0
+        },
+        {
+          "x": 19.5,
+          "z": 26,
+          "text": "Rasmussen",
+          "priority": 65.0
+        },
+        {
+          "x": 62,
+          "z": -12,
+          "text": "Revis",
+          "priority": 65.0
+        },
+        {
+          "x": 53,
+          "z": 47,
+          "text": "SARA",
+          "priority": 65.0
+        },
+        {
+          "x": 67,
+          "z": -16,
+          "text": "Shiccos",
+          "priority": 65.0
+        },
+        {
+          "x": 92,
+          "z": -87,
+          "text": "Spiel",
+          "priority": 65.0
+        },
+        {
+          "x": 61,
+          "z": 15,
+          "text": "Sports",
+          "priority": 65.0
+        },
+        {
+          "x": 64,
+          "z": -34,
+          "text": "Sushi Huyushi",
+          "priority": 65.0
+        },
+        {
+          "x": 91,
+          "z": 54,
+          "text": "TECHLIGHT",
+          "priority": 65.0
+        },
+        {
+          "x": 60,
+          "z": -152,
+          "text": "TRend",
+          "priority": 65.0
+        },
+        {
+          "x": 19,
+          "z": -129,
+          "text": "TTS",
+          "priority": 65.0
+        },
+        {
+          "x": 64,
+          "z": -69,
+          "text": "Tarducks",
+          "priority": 65.0
+        },
+        {
+          "x": 69,
+          "z": -150,
+          "text": "Tarkovstar",
+          "priority": 65.0
+        },
+        {
+          "x": 92,
+          "z": -18,
+          "text": "Telespot",
+          "priority": 65.0
+        },
+        {
+          "x": 61,
+          "z": 50,
+          "text": "Texho",
+          "priority": 65.0
+        },
+        {
+          "x": 57,
+          "z": -32,
+          "text": "The National",
+          "priority": 65.0
+        },
+        {
+          "x": 92,
+          "z": 15,
+          "text": "Top Brand",
+          "priority": 65.0
+        },
+        {
+          "x": -17,
+          "z": -32,
+          "text": "Underway",
+          "priority": 65.0
+        },
+        {
+          "x": 26,
+          "z": 46,
+          "text": "Urban Clothes",
+          "priority": 65.0
+        },
+        {
+          "x": 57,
+          "z": -66,
+          "text": "Viking",
+          "priority": 65.0
+        },
+        {
+          "x": -18,
+          "z": -87,
+          "text": "Voyage",
+          "priority": 65.0
+        },
+        {
+          "x": 70,
+          "z": 32,
+          "text": "Yushka",
+          "priority": 65.0
+        },
+        {
+          "x": 71,
+          "z": 47,
+          "text": "\u0410\u041f\u0422\u0415\u041a\u0410",
+          "priority": 65.0
+        },
+        {
+          "x": 20,
+          "z": -128,
+          "text": "\u041c\u0415\u0411\u0415\u041b\u042c \u041c\u041a",
+          "priority": 65.0
+        },
+        {
+          "x": 17,
+          "z": 0,
+          "text": "\u041c\u0423\u0417\u0415\u0419 \u0418\u0421\u0422\u041e\u0420\u0418\u0418",
+          "priority": 65.0
+        },
+        {
+          "x": 70,
+          "z": 27,
+          "text": "\u041d\u0410-\u0421\u0412\u042f\u0417\u0418",
+          "priority": 65.0
+        },
+        {
+          "x": -34,
+          "z": -79,
+          "text": "\u041f\u0423\u0428\u041a\u0418\u041d",
+          "priority": 65.0
+        },
+        {
+          "x": 54,
+          "z": 24,
+          "text": "\u0421\u041a\u041e\u0420\u041e \u041e\u0422\u041a\u0420\u042b\u0422\u0418\u0415",
+          "priority": 65.0
+        },
+        {
+          "x": 54,
+          "z": -128,
+          "text": "\u0422\u0410\u0420\u0417\u0414\u0420\u0410\u0412",
+          "priority": 65.0
+        },
+        {
+          "x": 58,
+          "z": 13,
+          "text": "\u0417\u0410\u041a\u0420\u042b\u0422\u041e \u041d\u0410 \u0420\u0415\u041c\u041e\u041d\u0422",
+          "priority": 60.0
+        }
+      ],
+      "areas": [
+        {
+          "name": "mall",
+          "x0": 120,
+          "z0": 218,
+          "x1": -222,
+          "z1": -327
+        }
+      ]
+    },
+    {
+      "id": "streets-of-tarkov",
+      "image": "streets-of-tarkov.png",
+      "coordinateRotation": 180,
+      "cardinalRotation": 180,
+      "publishedBounds": [
+        [
+          323,
+          -295
+        ],
+        [
+          -280,
+          532
+        ]
+      ],
+      "bounds": {
+        "x0": 323,
+        "z0": -295,
+        "x1": -280,
+        "z1": 532
+      },
+      "aliases": [
+        "city",
+        "citypreset",
+        "streetsoftarkov",
+        "tarkovstreets"
+      ],
+      "labels": [
+        {
+          "x": -45,
+          "z": -52,
+          "text": "Beluga",
+          "priority": 90.0
+        },
+        {
+          "x": 99,
+          "z": -71,
+          "text": "Cardinal Apartments",
+          "priority": 90.0
+        },
+        {
+          "x": -175,
+          "z": 400,
+          "text": "Cinema",
+          "priority": 90.0
+        },
+        {
+          "x": 230,
+          "z": 295,
+          "text": "Construction",
+          "priority": 90.0
+        },
+        {
+          "x": -128,
+          "z": -35,
+          "text": "Kilmov Shopping Mall",
+          "priority": 90.0
+        },
+        {
+          "x": 66,
+          "z": 305,
+          "text": "Lexos",
+          "priority": 90.0
+        },
+        {
+          "x": -35,
+          "z": 64,
+          "text": "Pinewood Hotel",
+          "priority": 90.0
+        },
+        {
+          "x": -218,
+          "z": 135,
+          "text": "Shestyorochka",
+          "priority": 90.0
+        },
+        {
+          "x": 140,
+          "z": 300,
+          "text": "Sparja Grocery",
+          "priority": 90.0
+        },
+        {
+          "x": 111,
+          "z": 251,
+          "text": "Chekannaya St.",
+          "priority": 80.0
+        },
+        {
+          "x": 232,
+          "z": 100,
+          "text": "Kamchatskaya St.",
+          "priority": 80.0
+        },
+        {
+          "x": -104,
+          "z": 28,
+          "text": "Kilmov St.",
+          "priority": 80.0
+        },
+        {
+          "x": 125,
+          "z": 10,
+          "text": "Kilmov St.",
+          "priority": 80.0
+        },
+        {
+          "x": -200,
+          "z": 290,
+          "text": "Malevecha St.",
+          "priority": 80.0
+        },
+        {
+          "x": -125,
+          "z": 210,
+          "text": "Nikitskaya St.",
+          "priority": 80.0
+        },
+        {
+          "x": -101,
+          "z": 441,
+          "text": "Nizhnyaya St.",
+          "priority": 80.0
+        },
+        {
+          "x": 9,
+          "z": -80,
+          "text": "Primorsky Ave.",
+          "priority": 80.0
+        },
+        {
+          "x": 9,
+          "z": 104,
+          "text": "Primorsky Ave.",
+          "priority": 80.0
+        },
+        {
+          "x": 9,
+          "z": 308,
+          "text": "Primorsky Ave.",
+          "priority": 80.0
+        },
+        {
+          "x": 174,
+          "z": 430,
+          "text": "Razvedchikov St.",
+          "priority": 80.0
+        },
+        {
+          "x": -112,
+          "z": 361,
+          "text": "Verhnyaya St.",
+          "priority": 80.0
+        },
+        {
+          "x": 140,
+          "z": 150,
+          "text": "Zmejskij Alley",
+          "priority": 80.0
+        },
+        {
+          "x": -119,
+          "z": 287,
+          "text": "Abandon Factory",
+          "priority": 70.0
+        },
+        {
+          "x": -30,
+          "z": 138,
+          "text": "Burger Spot",
+          "priority": 70.0
+        },
+        {
+          "x": 89,
+          "z": -20,
+          "text": "Cardinal Bank",
+          "priority": 70.0
+        },
+        {
+          "x": 140,
+          "z": 362,
+          "text": "Concordia",
+          "priority": 70.0
+        },
+        {
+          "x": -197,
+          "z": 340,
+          "text": "Corner Restaurant",
+          "priority": 70.0
+        },
+        {
+          "x": -80,
+          "z": 235,
+          "text": "Diner",
+          "priority": 70.0
+        },
+        {
+          "x": -223,
+          "z": 279,
+          "text": "Family Market",
+          "priority": 70.0
+        },
+        {
+          "x": -212,
+          "z": 300,
+          "text": "Hive",
+          "priority": 70.0
+        },
+        {
+          "x": 239,
+          "z": -60,
+          "text": "LERM Expo",
+          "priority": 70.0
+        },
+        {
+          "x": -200,
+          "z": 248,
+          "text": "Marked Hotel",
+          "priority": 70.0
+        },
+        {
+          "x": -173,
+          "z": 226,
+          "text": "Office",
+          "priority": 70.0
+        },
+        {
+          "x": 42,
+          "z": 160,
+          "text": "Pharmacy 1",
+          "priority": 70.0
+        },
+        {
+          "x": -43,
+          "z": 335,
+          "text": "Pharmacy 2",
+          "priority": 70.0
+        },
+        {
+          "x": 90,
+          "z": -277,
+          "text": "Pharmacy 3",
+          "priority": 70.0
+        },
+        {
+          "x": 42,
+          "z": 97,
+          "text": "Post Office",
+          "priority": 70.0
+        },
+        {
+          "x": -13,
+          "z": 244,
+          "text": "Primorskij 49",
+          "priority": 70.0
+        },
+        {
+          "x": 211,
+          "z": 129,
+          "text": "School",
+          "priority": 70.0
+        },
+        {
+          "x": -175,
+          "z": 297,
+          "text": "South Hotel",
+          "priority": 70.0
+        },
+        {
+          "x": -64,
+          "z": 166,
+          "text": "Sparja Express",
+          "priority": 70.0
+        },
+        {
+          "x": 67,
+          "z": 230,
+          "text": "Tarbank",
+          "priority": 70.0
+        },
+        {
+          "x": 65,
+          "z": 398,
+          "text": "Teppakot / Koener",
+          "priority": 70.0
+        },
+        {
+          "x": 222,
+          "z": 173,
+          "text": "Vet Clinic",
+          "priority": 70.0
+        },
+        {
+          "x": -70,
+          "z": 343,
+          "text": "Bilbo Coffee",
+          "priority": 60.0
+        },
+        {
+          "x": 39,
+          "z": 230,
+          "text": "Prestigio Cafe",
+          "priority": 60.0
+        }
+      ],
+      "areas": []
+    },
+    {
+      "id": "ground-zero",
+      "image": "ground-zero.png",
+      "coordinateRotation": 180,
+      "cardinalRotation": 180,
+      "publishedBounds": [
+        [
+          249,
+          -124
+        ],
+        [
+          -99,
+          364
+        ]
+      ],
+      "bounds": {
+        "x0": 249,
+        "z0": -124,
+        "x1": -99,
+        "z1": 364
+      },
+      "aliases": [
+        "groundzero",
+        "groundzero21",
+        "groundzerotutorial",
+        "sandbox",
+        "sandboxhigh",
+        "sandboxhighpreset",
+        "sandboxpreset",
+        "sandboxstart",
+        "sandboxstartpreset"
+      ],
+      "labels": [
+        {
+          "x": 115,
+          "z": 285,
+          "text": "Capital Insight",
+          "priority": 140
+        },
+        {
+          "x": 80,
+          "z": -118,
+          "text": "Elemental Global",
+          "priority": 140
+        },
+        {
+          "x": 14,
+          "z": 201,
+          "text": "Empire",
+          "priority": 140
+        },
+        {
+          "x": 141,
+          "z": 142,
+          "text": "Fusion",
+          "priority": 140
+        },
+        {
+          "x": 2,
+          "z": 324,
+          "text": "Nakatani",
+          "priority": 140
+        },
+        {
+          "x": 150,
+          "z": 1,
+          "text": "Skyside",
+          "priority": 140
+        },
+        {
+          "x": -50,
+          "z": 0,
+          "text": "TerraGroup",
+          "priority": 140
+        },
+        {
+          "x": 115,
+          "z": 30,
+          "text": "ASAP Winery",
+          "priority": 70.0
+        },
+        {
+          "x": 58,
+          "z": 234,
+          "text": "GAGRIN Hotel",
+          "priority": 70.0
+        },
+        {
+          "x": 97,
+          "z": 223,
+          "text": "M Showroom",
+          "priority": 70.0
+        },
+        {
+          "x": 115,
+          "z": 104,
+          "text": "Oasis",
+          "priority": 70.0
+        },
+        {
+          "x": 43,
+          "z": 150,
+          "text": "Tarbank",
+          "priority": 70.0
+        },
+        {
+          "x": -13,
+          "z": 48,
+          "text": "Science Office",
+          "priority": 60.0
+        }
+      ],
+      "areas": [
+        {
+          "name": "garage",
+          "x0": 117,
+          "z0": -100,
+          "x1": 43,
+          "z1": 190
+        },
+        {
+          "name": "underpass",
+          "x0": 143,
+          "z0": 49,
+          "x1": 117,
+          "z1": 80
+        }
+      ],
+      "note": "East Gate, UN Roadblock, and the co-op exit lie outside this published frame. Spawns and the other extracts sit inside it."
+    },
+    {
+      "id": "the-lab",
+      "image": "the-lab.png",
+      "coordinateRotation": 270,
+      "cardinalRotation": 270,
+      "publishedBounds": [
+        [
+          -80,
+          -477
+        ],
+        [
+          -287,
+          -193
+        ]
+      ],
+      "bounds": {
+        "x0": -80,
+        "z0": -477,
+        "x1": -287,
+        "z1": -193
+      },
+      "aliases": [
+        "infectedlab",
+        "laboratory",
+        "laboratorydark",
+        "laboratorydarkpreset",
+        "laboratoryevent",
+        "laboratoryeventpreset",
+        "laboratorypreset",
+        "thelab",
+        "thelabdark"
+      ],
+      "labels": [
+        {
+          "x": -260,
+          "z": -364,
+          "text": "Administrative Office",
+          "priority": 90.0
+        },
+        {
+          "x": -259,
+          "z": -366,
+          "text": "Boiler Room",
+          "priority": 90.0
+        },
+        {
+          "x": -219,
+          "z": -302,
+          "text": "Cafeteria",
+          "priority": 90.0
+        },
+        {
+          "x": -229,
+          "z": -343,
+          "text": "Conference Room",
+          "priority": 90.0
+        },
+        {
+          "x": -169,
+          "z": -288,
+          "text": "Control Room",
+          "priority": 90.0
+        },
+        {
+          "x": -250,
+          "z": -281,
+          "text": "Corridor To Building #2",
+          "priority": 90.0
+        },
+        {
+          "x": -236,
+          "z": -302,
+          "text": "Gym",
+          "priority": 90.0
+        },
+        {
+          "x": -130,
+          "z": -398,
+          "text": "Infirmary Lvl 1",
+          "priority": 90.0
+        },
+        {
+          "x": -130,
+          "z": -401,
+          "text": "Infirmary Lvl 2",
+          "priority": 90.0
+        },
+        {
+          "x": -207,
+          "z": -305,
+          "text": "Lecture Hall",
+          "priority": 90.0
+        },
+        {
+          "x": -172,
+          "z": -342,
+          "text": "Main Working Area",
+          "priority": 90.0
+        },
+        {
+          "x": -241,
+          "z": -280,
+          "text": "Men's Locker Room",
+          "priority": 90.0
+        },
+        {
+          "x": -148,
+          "z": -398,
+          "text": "Negotiation Room",
+          "priority": 90.0
+        },
+        {
+          "x": -189,
+          "z": -401,
+          "text": "Offices #1",
+          "priority": 90.0
+        },
+        {
+          "x": -149,
+          "z": -401,
+          "text": "Offices #2",
+          "priority": 90.0
+        },
+        {
+          "x": -230,
+          "z": -400,
+          "text": "Parking",
+          "priority": 90.0
+        },
+        {
+          "x": -260,
+          "z": -342,
+          "text": "Reception",
+          "priority": 90.0
+        },
+        {
+          "x": -221,
+          "z": -343,
+          "text": "Recreation Area",
+          "priority": 90.0
+        },
+        {
+          "x": -244,
+          "z": -378,
+          "text": "Security #1",
+          "priority": 90.0
+        },
+        {
+          "x": -215,
+          "z": -379,
+          "text": "Security #2",
+          "priority": 90.0
+        },
+        {
+          "x": -260,
+          "z": -319,
+          "text": "Security Barracks",
+          "priority": 90.0
+        },
+        {
+          "x": -254,
+          "z": -320,
+          "text": "Security Office",
+          "priority": 90.0
+        },
+        {
+          "x": -125,
+          "z": -308,
+          "text": "Server Room",
+          "priority": 90.0
+        },
+        {
+          "x": -130,
+          "z": -361,
+          "text": "Sterile Laboratory",
+          "priority": 90.0
+        },
+        {
+          "x": -130,
+          "z": -356,
+          "text": "Test Room",
+          "priority": 90.0
+        },
+        {
+          "x": -246,
+          "z": -379,
+          "text": "Vestibules #1",
+          "priority": 90.0
+        },
+        {
+          "x": -216,
+          "z": -379,
+          "text": "Vestibules #2",
+          "priority": 90.0
+        },
+        {
+          "x": -163,
+          "z": -269,
+          "text": "Warehouse",
+          "priority": 90.0
+        },
+        {
+          "x": -170,
+          "z": -248,
+          "text": "Warehouse Gate",
+          "priority": 90.0
+        },
+        {
+          "x": -116,
+          "z": -266,
+          "text": "Warehouse Tunnels",
+          "priority": 90.0
+        },
+        {
+          "x": -232,
+          "z": -280,
+          "text": "Women's Locker Room",
+          "priority": 90.0
+        }
+      ],
+      "areas": []
+    },
+    {
+      "id": "the-labyrinth",
+      "image": "the-labyrinth.png",
+      "coordinateRotation": 270,
+      "cardinalRotation": 180,
+      "publishedBounds": [
+        [
+          -52,
+          -37
+        ],
+        [
+          53,
+          76
+        ]
+      ],
+      "bounds": {
+        "x0": -52,
+        "z0": -37,
+        "x1": 53,
+        "z1": 76
+      },
+      "aliases": [
+        "labyrinth",
+        "labyrinthpreset",
+        "thelabyrinth"
+      ],
+      "labels": [],
+      "areas": [],
+      "note": "Frame rotation is 270, from tarkov.dev maps.json. json.tarkov.dev coordinateToCardinalRotation for Labyrinth is 180."
+    },
+    {
+      "id": "terminal",
+      "image": "terminal.png",
+      "coordinateRotation": 180,
+      "cardinalRotation": 180,
+      "publishedBounds": [
+        [
+          463,
+          -580
+        ],
+        [
+          -433,
+          475
+        ]
+      ],
+      "bounds": {
+        "x0": 463,
+        "z0": -580,
+        "x1": -433,
+        "z1": 475
+      },
+      "aliases": [
+        "terminal",
+        "terminalpreset"
+      ],
+      "labels": [],
+      "areas": []
+    }
+  ]
+}
