@@ -17,10 +17,15 @@ public sealed class AppSettings
         GameMode = dataMode, Language = Language, UiLanguage = UiLanguage, RefreshMinutes = RefreshMinutes
     };
 
+    private static readonly object SaveLock = new();
+
     public void Save()
     {
-        try { Directory.CreateDirectory(Dir); File.WriteAllText(FilePath, JsonSerializer.Serialize(this, Options)); }
-        catch (Exception ex) { AppLog.Error("[Settings] Не удалось сохранить settings.json", ex); }
+        lock (SaveLock)
+        {
+            try { Directory.CreateDirectory(Dir); File.WriteAllText(FilePath, JsonSerializer.Serialize(this, Options)); }
+            catch (Exception ex) { AppLog.Error("[Settings] Не удалось сохранить settings.json", ex); }
+        }
     }
     /// <summary>Язык клиента игры (названия предметов для OCR): auto | ru | en. auto — ищет и по русским, и по английским названиям.</summary>
     public string Language { get; set; } = "auto";
@@ -51,6 +56,27 @@ public sealed class AppSettings
     public double GridCellPx { get; set; } = 0;
     /// <summary>Сколько секунд держать метки после полного сканирования (Ctrl+Alt+S).</summary>
     public int FullScanLabelSeconds { get; set; } = 15;
+
+    /// <summary>Стрелка к ближайшему выходу и окно карты.</summary>
+    public bool GpsEnabled { get; set; } = true;
+    /// <summary>Нажимать клавишу скриншота игры, пока идёт рейд.</summary>
+    public bool GpsAutoScreenshot { get; set; } = true;
+    /// <summary>Интервал автоскриншота, секунды.</summary>
+    public int GpsAutoScreenshotSeconds { get; set; } = 10;
+    /// <summary>Удалять скриншот после успешного разбора координат из имени файла.</summary>
+    public bool GpsDeleteAfterParse { get; set; } = true;
+    /// <summary>Папка скриншотов. Пусто — Documents\Escape from Tarkov\Screenshots.</summary>
+    public string GpsScreenshotsPath { get; set; } = "";
+    /// <summary>Клавиша скриншота в игре: PrintScreen, F12, буква или код виртуальной клавиши.</summary>
+    public string GpsScreenshotKey { get; set; } = "PrintScreen";
+    /// <summary>Показывать окно карты (не влияет на стрелку GPS).</summary>
+    public bool GpsMapVisible { get; set; } = true;
+    public double GpsMapLeft { get; set; } = 24;
+    public double GpsMapTop { get; set; } = 80;
+    public double GpsMapWidth { get; set; } = 420;
+    public double GpsMapHeight { get; set; } = 320;
+    /// <summary>Прозрачность окна карты, 0.3–1.</summary>
+    public double GpsMapOpacity { get; set; } = 0.85;
 
     public static string Dir => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TarkovOverlay");
@@ -90,11 +116,18 @@ public sealed class AppSettings
         settings.CursorOcrScale = Math.Clamp(settings.CursorOcrScale, 1.0, 4.0);
         settings.FullScanOcrScale = Math.Clamp(settings.FullScanOcrScale, 1.0, 3.0);
         settings.MinFullNameScore = Math.Clamp(settings.MinFullNameScore, 60, 100);
+        settings.GpsAutoScreenshotSeconds = Math.Clamp(settings.GpsAutoScreenshotSeconds, 2, 600);
+        settings.GpsScreenshotsPath = settings.GpsScreenshotsPath?.Trim() ?? "";
+        settings.GpsScreenshotKey = ScreenshotHotkey.Canonical(settings.GpsScreenshotKey);
+        settings.GpsMapWidth = Math.Clamp(settings.GpsMapWidth <= 0 ? 420 : settings.GpsMapWidth, 220, 2400);
+        settings.GpsMapHeight = Math.Clamp(settings.GpsMapHeight <= 0 ? 320 : settings.GpsMapHeight, 180, 1600);
+        settings.GpsMapOpacity = Math.Clamp(settings.GpsMapOpacity <= 0 ? 0.85 : settings.GpsMapOpacity, 0.3, 1);
 
         try
         {
             Directory.CreateDirectory(Dir);
-            File.WriteAllText(FilePath, JsonSerializer.Serialize(settings, Options)); // дописывает новые ключи
+            lock (SaveLock)
+                File.WriteAllText(FilePath, JsonSerializer.Serialize(settings, Options)); // дописывает новые ключи
         }
         catch (Exception ex)
         {

@@ -32,8 +32,22 @@ A lightweight Windows overlay for **Escape from Tarkov** that shows item prices 
 | `Ctrl+Alt+R` | Refresh prices now |
 | `Ctrl+Shift+M` | Cycle price mode: auto → PvP → PvE → Season |
 | `Ctrl+Alt+X` | Exit |
+| `Ctrl+Alt+G` | GPS arrow on / off |
+| `Ctrl+Alt+N` | Map window show / hide (falls back to `Ctrl+Alt+K` if N is taken) |
 
-The mode hotkey tries `Ctrl+Alt+M` first. If another app already uses that, it falls back to `Ctrl+Shift+M`, then `Ctrl+Alt+P`. The log shows which one it registered.
+The mode hotkey tries `Ctrl+Alt+M` first. If another app already uses that, it falls back to `Ctrl+Shift+M`, then `Ctrl+Alt+P`. The log shows which one it registered. GPS and map hotkeys are skipped if another app already owns them; the tray items still work.
+
+## GPS and map
+
+In a raid the overlay can press the in-game screenshot key (Print Screen by default, every 10 seconds) and read your position and facing from the **file name** Escape from Tarkov already writes. It does not open the image, read game memory, or inject code.
+
+- An arrow on the price overlay points at the nearest extract and shows the distance in meters.
+- A separate map window draws a simple top-down schematic (you, your heading, extracts) from [tarkov.dev](https://tarkov.dev) coordinates. Drag the title bar to move it, drag the edges or corners to resize it, and set opacity from the tray slider. Position, size, and opacity are saved in `settings.json`.
+- Hiding the map does not turn off the arrow. Hiding the arrow does not forget the map window. `Ctrl+Alt+O` still hides the whole overlay.
+- After a file name is parsed, that screenshot is deleted (`GpsDeleteAfterParse`, default on) so the folder does not fill up. Turn auto-capture off in the tray if you only want manual screenshots.
+- The current map comes from the game's own log files (the same logs used for PvP/PvE/Season). Outside a raid the arrow and the map hide.
+
+This is not a cheat and it is not a full illustrated map. Pressing the screenshot key is ordinary input. It does not move your character, buy or sell items, or read account data.
 
 ## How it works
 
@@ -49,15 +63,18 @@ The mode hotkey tries `Ctrl+Alt+M` first. If another app already uses that, it f
 - **Reads:**
   - the game's `Logs` folder (install path from the registry key `HKLM\...\Uninstall\EscapeFromTarkov`), read-only
   - screen pixels near the cursor
+  - screenshot **file names** in `Documents\Escape from Tarkov\Screenshots` (the image is not opened)
 - **Writes:** only `%LOCALAPPDATA%\TarkovOverlay\`:
   - `settings.json`
   - `tarkov_overlay.log`
-  - the price caches (`items_cache_*.json`)
+  - the price caches (`items_cache_*.json`) and the map cache (`maps_cache.json`)
 - **Desktop:** a `Tarkov Overlay.lnk` shortcut, only when you ask for it (via `install.ps1` or the tray item).
 - **Network:**
-  - `json.tarkov.dev` for prices
+  - `json.tarkov.dev` for prices and map extracts
   - `github.com/tesseract-ocr` for the one-time OCR data download (`download-tessdata.ps1`)
-- **Never** reads or modifies game files or game memory, never injects anything, and sends no input to the game. It doesn't touch account data or credentials.
+- **May delete** in-raid screenshots after their file names have been parsed, when GPS delete is on.
+- **May press** the in-game screenshot key while you are in a raid, the game window is focused, and GPS auto-capture is on. It does not click, move, buy, or sell.
+- **Never** reads game memory, never injects code, and does not touch account data or credentials.
 
 ## Requirements
 
@@ -107,6 +124,16 @@ Settings live in `%LOCALAPPDATA%\TarkovOverlay\settings.json`, which is created 
 | `ExcludeOverlayFromCapture` | `true` | Hide the overlay from screen capture so OCR doesn't read its own panels |
 | `AutoFullScan` | `false` | Experimental labels on every stash tile |
 | `ScanIntervalMs`, `OcrThreads` | `350`, `0` | Full-scan tuning (`0` = auto) |
+| `GpsEnabled` | `true` | Arrow to the nearest extract |
+| `GpsAutoScreenshot` | `true` | Press the screenshot key during a raid |
+| `GpsAutoScreenshotSeconds` | `10` | How often (2–600) |
+| `GpsDeleteAfterParse` | `true` | Delete a screenshot after its file name is parsed |
+| `GpsScreenshotsPath` | empty | Blank uses `Documents\Escape from Tarkov\Screenshots` |
+| `GpsScreenshotKey` | `PrintScreen` | `PrintScreen`, `F12`, a letter, or a virtual-key code |
+| `GpsMapVisible` | `true` | Map window, separate from the arrow |
+| `GpsMapLeft`, `GpsMapTop` | `24`, `80` | Map window position (also saved when you drag it) |
+| `GpsMapWidth`, `GpsMapHeight` | `420`, `320` | Map window size (also saved when you resize it) |
+| `GpsMapOpacity` | `0.85` | Map window opacity, 0.3–1 (tray slider) |
 
 ## Data source
 
@@ -114,7 +141,7 @@ Prices come from the public [tarkov.dev](https://tarkov.dev) JSON API (`regular`
 
 ## Disclaimer
 
-This tool only **reads the screen** and the game's own log files. It does not inject into, modify or automate the game, and it sends no input to it. Even so, third-party tools may conflict with the Battlestate Games EULA, and the rules can change. **Use at your own risk.** The authors take no responsibility for account actions or any other consequences.
+The price overlay **reads the screen** and the game's own log files. GPS reads screenshot **file names** and those same logs, and it can press the screenshot key you already use in game. It does not inject into the game, read game memory, or play the game for you. Even so, third-party tools may conflict with the Battlestate Games EULA, and the rules can change. **Use at your own risk.** The authors take no responsibility for account actions or any other consequences.
 
 ## Troubleshooting
 
@@ -128,6 +155,8 @@ This tool only **reads the screen** and the game's own log files. It does not in
   - Switch the mode from the tray or with the hotkey.
   - On `auto`, the log shows the detected mode in `[Mode]` lines.
 - **Hotkey doesn't work.** Another app has it registered. See the `[Hotkeys]` line in the log.
+- **GPS arrow never appears.** Be in a raid (the log should show `[GPS] рейд начался`), with the game window focused if auto-screenshot is on. A manual in-raid screenshot updates it too. If the game runs as administrator, start the overlay as administrator so the screenshot key is delivered.
+- **Map is in the way.** Drag its title bar, resize from the edges, or hide it from the tray / `Ctrl+Alt+N`. Opacity is the tray slider and `GpsMapOpacity`.
 - **"tessdata missing".** Run `scripts\download-tessdata.ps1`.
 - **Different screen scale or resolution.** The detector scales with screen height (tuned at 1080p and up). Please open an issue with a screenshot.
 

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>TarkovOverlay.Tests</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\TarkovOverlay\Models\GpsModels.cs" Link="GpsModels.cs" />
+    <Compile Include="..\TarkovOverlay\Services\WorldMath.cs" Link="WorldMath.cs" />
+    <Compile Include="..\TarkovOverlay\Services\ScreenshotNameParser.cs" Link="ScreenshotNameParser.cs" />
+    <Compile Include="..\TarkovOverlay\Services\ScreenshotHotkey.cs" Link="ScreenshotHotkey.cs" />
+    <Compile Include="..\TarkovOverlay\Services\ScreenshotPath.cs" Link="ScreenshotPath.cs" />
+    <Compile Include="..\TarkovOverlay\Services\MapIndex.cs" Link="MapIndex.cs" />
+    <Compile Include="..\TarkovOverlay\Services\MapDataParser.cs" Link="MapDataParser.cs" />
+    <Compile Include="..\TarkovOverlay\Services\ExtractNav.cs" Link="ExtractNav.cs" />
+    <Compile Include="..\TarkovOverlay\Services\RaidLogTracker.cs" Link="RaidLogTracker.cs" />
+  </ItemGroup>
+</Project>
