@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using Microsoft.Win32;
 
 namespace TarkovOverlay.Services;
 
@@ -11,31 +10,8 @@ public static class ModeDetector
 {
     private static readonly Regex AppMode = new(@"\|application\|.*?\bmode: (\w+)", RegexOptions.Compiled);
     private static readonly Regex Host = new(@"https://(gw-[a-z0-9-]+|prod[a-z0-9-]*)\.escapefromtarkov\.com|vhost=(\w+)", RegexOptions.Compiled);
-    private static string? _root;
 
     public static string? LastSource { get; private set; }
-
-    private static string? GameRoot()
-    {
-        if (_root is not null && Directory.Exists(_root)) return _root;
-        foreach (var key in new[] { @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\EscapeFromTarkov", @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\EscapeFromTarkov" })
-        {
-            try
-            {
-                using var k = Registry.LocalMachine.OpenSubKey(key);
-                if (k?.GetValue("InstallLocation") is string p && Directory.Exists(Path.Combine(p, "Logs"))) return _root = p;
-            }
-            catch { }
-        }
-        try
-        {
-            var proc = System.Diagnostics.Process.GetProcessesByName("EscapeFromTarkov").FirstOrDefault();
-            var path = proc?.MainModule?.FileName;
-            if (path is not null) return _root = Path.GetDirectoryName(path);
-        }
-        catch { }
-        return null;
-    }
 
     private static string Tail(string path, int bytes)
     {
@@ -50,9 +26,9 @@ public static class ModeDetector
     {
         try
         {
-            var root = GameRoot();
+            var root = GameInstall.Root();
             if (root is null) { LastSource = Utils.L.T("папка игры не найдена", "game folder not found"); return null; }
-            var dir = new DirectoryInfo(Path.Combine(root, "Logs")).GetDirectories("log_*").OrderByDescending(d => d.CreationTimeUtc).FirstOrDefault();
+            var dir = GameInstall.LatestLogDirectory();
             if (dir is null) { LastSource = Utils.L.T("нет логов", "no logs"); return null; }
             // 1) backend: последний хост/vhost
             var be = dir.GetFiles("*backend_*.log").OrderByDescending(f => f.LastWriteTimeUtc).FirstOrDefault();

@@ -1,0 +1,44 @@
+<Window x:Class="TarkovOverlay.Windows.MapWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="TarkovOverlay Map"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        ResizeMode="NoResize"
+        Focusable="False"
+        Width="420"
+        Height="320"
+        MouseMove="OnGestureMove"
+        MouseLeftButtonUp="OnGestureUp">
+    <Grid>
+        <Border x:Name="Frame" CornerRadius="6" BorderThickness="1" SnapsToDevicePixels="True">
+            <Border.Background>
+                <SolidColorBrush Color="#E0101316" />
+            </Border.Background>
+            <Border.BorderBrush>
+                <SolidColorBrush Color="#FF5AC878" />
+            </Border.BorderBrush>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="26" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid x:Name="TitleBar" Background="#FF14181C" MouseLeftButtonDown="OnTitleDown" Cursor="SizeAll">
+                    <TextBlock x:Name="TitleText" Margin="10,0,18,0" VerticalAlignment="Center"
+                               Foreground="White" FontFamily="Segoe UI" FontSize="12" TextTrimming="CharacterEllipsis" />
+                </Grid>
+                <Canvas x:Name="MapCanvas" Grid.Row="1" ClipToBounds="True" Background="Transparent" />
+                <Canvas Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="14" Height="14"
+                        IsHitTestVisible="False" Margin="0,0,4,4">
+                    <Path Stroke="#88FFFFFF" StrokeThickness="1"
+                          Data="M2,12 L12,12 M6,12 L12,6 M10,12 L12,10" />
+                </Canvas>
+            </Grid>
+        </Border>
+        <Grid x:Name="Edges" />
+    </Grid>
+</Window>

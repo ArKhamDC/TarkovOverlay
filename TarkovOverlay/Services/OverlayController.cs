@@ -13,7 +13,7 @@ namespace TarkovOverlay.Services;
 /// </summary>
 public sealed class OverlayController : IDisposable
 {
-    private const int HotkeyToggle = 1, HotkeyFullScan = 2, HotkeyRefresh = 3, HotkeyExit = 4, HotkeyMode = 5;
+    private const int HotkeyToggle = 1, HotkeyFullScan = 2, HotkeyRefresh = 3, HotkeyExit = 4, HotkeyMode = 5, HotkeyGps = 6, HotkeyMap = 7;
     private const uint ModAlt = 0x1, ModControl = 0x2;
 
     private readonly OverlayWindow _overlay;
@@ -35,6 +35,10 @@ public sealed class OverlayController : IDisposable
     private TooltipScanner? _tooltip;
     private OcrEnginePool? _bandPool;
     private TrayIcon? _tray;
+    private MapWindow? _map;
+    private GpsController? _gps;
+    private string _gpsHotkey = "";
+    private string _mapHotkey = "";
     private Task? _scanLoop;
     private Task? _updater;
 
@@ -122,6 +126,17 @@ public sealed class OverlayController : IDisposable
         _tray.AddLanguageMenu(_settings.UiLanguage, _settings.Language,
             v => ChangeLanguage(() => _settings.UiLanguage = v), v => ChangeLanguage(() => _settings.Language = v));
         _tray.SetMode(_settings.ModeChoice, Label(_mode));
+        _map = new MapWindow();
+        var mapHidden = _map.ExcludeFromCapture(out var mapCaptureError);
+        AppLog.Info(mapHidden
+            ? "[GPS] окно карты скрыто из захвата экрана"
+            : $"[GPS] окно карты не скрыто из захвата (код {mapCaptureError})");
+        _gps = new GpsController(_settings, _dispatcher, _overlay, _map);
+        _gps.StateChanged += () => _dispatcher.BeginInvoke(SyncGpsMenu);
+        _gps.Start();
+        _tray.AddGpsMenu(_settings.GpsEnabled, _settings.GpsAutoScreenshot, _settings.GpsMapVisible, _settings.GpsMapOpacity,
+            _gpsHotkey, _mapHotkey, ToggleGps, ToggleAutoShot, ToggleMap, SetMapOpacity);
+        AppLog.Info($"[GPS] {(_settings.GpsEnabled ? "вкл" : "выкл")}, авто={_settings.GpsAutoScreenshot} каждые {_settings.GpsAutoScreenshotSeconds} с, карта={_settings.GpsMapVisible}");
         _database.Changed += () => _dispatcher.BeginInvoke(() => _tray?.SetTooltip(DbFor(_mode).Status));
         _databasePvp.Changed += () => _dispatcher.BeginInvoke(() => _tray?.SetTooltip(DbFor(_mode).Status));
         _tooltip!.Db = DbFor(_mode);
@@ -131,9 +146,11 @@ public sealed class OverlayController : IDisposable
         _scanLoop = Task.Run(() => ScanLoopAsync(_cts.Token));
 
         ShowStatus(L.T($"TarkovOverlay запущен · {Label(_mode)}{(_settings.ModeChoice == "auto" ? " (авто)" : "")} · {ModeHotkeyName} режим · " +
-                   "наведите на предмет — цена под подсказкой · Ctrl+Alt+O скрыть · Ctrl+Alt+R обновить цены · Ctrl+Alt+X выход",
+                   "наведите на предмет — цена под подсказкой · Ctrl+Alt+O скрыть · Ctrl+Alt+R обновить цены · Ctrl+Alt+X выход" +
+                   (_settings.GpsEnabled ? " · GPS вкл" : ""),
                    $"TarkovOverlay started · {Label(_mode)}{(_settings.ModeChoice == "auto" ? " (auto)" : "")} · {ModeHotkeyName} mode · " +
-                   "hover an item — price appears under the tooltip · Ctrl+Alt+O hide · Ctrl+Alt+R refresh prices · Ctrl+Alt+X exit"), TimeSpan.FromSeconds(10));
+                   "hover an item — price appears under the tooltip · Ctrl+Alt+O hide · Ctrl+Alt+R refresh prices · Ctrl+Alt+X exit" +
+                   (_settings.GpsEnabled ? " · GPS on" : "")), TimeSpan.FromSeconds(10));
     }
 
     public static string ModeHotkeyName = "Ctrl+Alt+M";
@@ -147,12 +164,17 @@ public sealed class OverlayController : IDisposable
     private void RegisterHotkeys()
     {
         var mods = ModControl | ModAlt;
+        if (_overlay.RegisterHotkey(HotkeyGps, mods, 0x47)) _gpsHotkey = "Ctrl+Alt+G";
+        if (_overlay.RegisterHotkey(HotkeyMap, mods, 0x4E)) _mapHotkey = "Ctrl+Alt+N";
+        else if (_overlay.RegisterHotkey(HotkeyMap, mods, 0x4B)) _mapHotkey = "Ctrl+Alt+K";
         var results = new[]
         {
             ("Ctrl+Alt+O", _overlay.RegisterHotkey(HotkeyToggle, mods, 0x4F)),
             ("Ctrl+Alt+R", _overlay.RegisterHotkey(HotkeyRefresh, mods, 0x52)),
             ("Ctrl+Alt+X", _overlay.RegisterHotkey(HotkeyExit, mods, 0x58)),
-            RegisterModeHotkey()
+            RegisterModeHotkey(),
+            (string.IsNullOrEmpty(_gpsHotkey) ? "GPS" : _gpsHotkey, _gpsHotkey.Length > 0),
+            (string.IsNullOrEmpty(_mapHotkey) ? "карта" : _mapHotkey, _mapHotkey.Length > 0)
         };
         AppLog.Info("[Hotkeys] " + string.Join(", ", results.Select(r => $"{r.Item1}={(r.Item2 ? "ok" : "ЗАНЯТО")}")));
         _overlay.HotkeyPressed += id =>
@@ -164,6 +186,8 @@ public sealed class OverlayController : IDisposable
                 case HotkeyRefresh: RequestRefresh(); break;
                 case HotkeyExit: Exit(); break;
                 case HotkeyMode: CycleMode(); break;
+                case HotkeyGps: ToggleGps(); break;
+                case HotkeyMap: ToggleMap(); break;
             }
         };
     }
@@ -174,6 +198,7 @@ public sealed class OverlayController : IDisposable
     {
         _visible = !_visible;
         _tray?.SetVisibleState(_visible);
+        _gps?.SetOverlayVisible(_visible);
         AppLog.Info(_visible ? "[Overlay] Показан" : "[Overlay] Скрыт");
         if (_visible)
             ShowStatus(L.T("TarkovOverlay включён", "TarkovOverlay enabled"), TimeSpan.FromSeconds(2));
@@ -181,6 +206,47 @@ public sealed class OverlayController : IDisposable
     }
 
     public void TriggerFullScan() => RequestFullScan();
+
+    private void ToggleGps()
+    {
+        _settings.GpsEnabled = !_settings.GpsEnabled;
+        _settings.Save();
+        AppLog.Info(_settings.GpsEnabled ? "[GPS] включён" : "[GPS] выключен");
+        SyncGpsMenu();
+        _gps?.NotifySettingsChanged();
+        ShowStatus(_settings.GpsEnabled ? L.T("GPS включён", "GPS on") : L.T("GPS выключен", "GPS off"), TimeSpan.FromSeconds(2));
+    }
+
+    private void ToggleAutoShot()
+    {
+        _settings.GpsAutoScreenshot = !_settings.GpsAutoScreenshot;
+        _settings.Save();
+        SyncGpsMenu();
+        _gps?.NotifySettingsChanged();
+        ShowStatus(_settings.GpsAutoScreenshot
+            ? L.T($"Автоскриншот каждые {_settings.GpsAutoScreenshotSeconds} с", $"Auto-screenshot every {_settings.GpsAutoScreenshotSeconds} s")
+            : L.T("Автоскриншот выключен — снимайте кадр сами", "Auto-screenshot off — take screenshots yourself"), TimeSpan.FromSeconds(2.5));
+    }
+
+    private void ToggleMap()
+    {
+        _settings.GpsMapVisible = !_settings.GpsMapVisible;
+        _settings.Save();
+        SyncGpsMenu();
+        _gps?.NotifySettingsChanged();
+        ShowStatus(_settings.GpsMapVisible ? L.T("Карта показана", "Map shown") : L.T("Карта скрыта", "Map hidden"), TimeSpan.FromSeconds(2));
+    }
+
+    private void SetMapOpacity(double opacity)
+    {
+        _settings.GpsMapOpacity = Math.Clamp(opacity, 0.3, 1);
+        _settings.Save();
+        if (_map is not null) _map.Opacity = _settings.GpsMapOpacity;
+        _tray?.SetMapOpacity(_settings.GpsMapOpacity);
+    }
+
+    private void SyncGpsMenu()
+        => _tray?.SetGpsState(_settings.GpsEnabled, _settings.GpsAutoScreenshot, _settings.GpsMapVisible, _settings.GpsMapOpacity);
 
     private void RequestFullScan()
     {
@@ -441,6 +507,7 @@ public sealed class OverlayController : IDisposable
         if (_disposed)
             return;
         _disposed = true;
+        _gps?.Dispose();
         _cts.Cancel();
         try
         {

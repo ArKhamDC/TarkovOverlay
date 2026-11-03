@@ -30,6 +30,7 @@ public partial class OverlayWindow : Window
     public OverlayWindow()
     {
         InitializeComponent();
+        SizeChanged += (_, _) => PlaceGps();
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -60,12 +61,15 @@ public partial class OverlayWindow : Window
     }
 
     private volatile System.Drawing.Rectangle[] _markerRects = [];
+    private System.Drawing.Rectangle[] _gpsRects = [];
+    private Border? _gpsPanel;
+    private string _gpsKey = "";
 
     /// <summary>
     /// Прямоугольники видимых меток в физических пикселях. Используются, чтобы OCR не читал
     /// собственные метки, если Windows не дала скрыть окно из захвата (у прозрачных WPF-окон так бывает).
     /// </summary>
-    public System.Drawing.Rectangle[] MarkerRects => _markerRects;
+    public System.Drawing.Rectangle[] MarkerRects => _gpsRects.Length == 0 ? _markerRects : CombineRects(_markerRects, _gpsRects);
 
     public bool RegisterHotkey(int id, uint modifiers, uint virtualKey)
     {
@@ -127,6 +131,119 @@ public partial class OverlayWindow : Window
                 (int)Math.Ceiling(size.Width * dpi.DpiScaleX) + 4, (int)Math.Ceiling(size.Height * dpi.DpiScaleY) + 4));
         }
         _markerRects = rects.ToArray();
+        if (_gpsPanel is not null)
+        {
+            MarkerCanvas.Children.Add(_gpsPanel);
+            PlaceGps();
+        }
+    }
+
+    /// <summary>Arrow toward the nearest extract. Independent of the movable map window.</summary>
+    public void SetGps(GpsHud? hud)
+    {
+        var key = hud is null ? "" : $"{hud.HasBearing}|{hud.ArrowDegrees:0.0}|{hud.Meters}|{hud.Primary}|{hud.Secondary}";
+        if (key == _gpsKey) return;
+        _gpsKey = key;
+        if (_gpsPanel is not null)
+            MarkerCanvas.Children.Remove(_gpsPanel);
+        _gpsPanel = hud is null ? null : BuildGps(hud);
+        _gpsRects = [];
+        if (_gpsPanel is null) return;
+        MarkerCanvas.Children.Add(_gpsPanel);
+        PlaceGps();
+    }
+
+    private void PlaceGps()
+    {
+        if (_gpsPanel is null) return;
+        _gpsPanel.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        var size = _gpsPanel.DesiredSize;
+        var x = Math.Max(0, ActualWidth - size.Width - 16);
+        var y = 16.0;
+        Canvas.SetLeft(_gpsPanel, x);
+        Canvas.SetTop(_gpsPanel, y);
+        var dpi = VisualTreeHelper.GetDpi(this);
+        _gpsRects =
+        [
+            new System.Drawing.Rectangle(
+                (int)(x * dpi.DpiScaleX) - 2,
+                (int)(y * dpi.DpiScaleY) - 2,
+                (int)Math.Ceiling(size.Width * dpi.DpiScaleX) + 4,
+                (int)Math.Ceiling(size.Height * dpi.DpiScaleY) + 4)
+        ];
+    }
+
+    private static Border BuildGps(GpsHud hud)
+    {
+        var stack = new StackPanel { HorizontalAlignment = HorizontalAlignment.Center };
+        if (hud.HasBearing)
+        {
+            var arrow = new System.Windows.Shapes.Polygon
+            {
+                Points = new PointCollection { new(12, 0), new(24, 22), new(12, 16), new(0, 22) },
+                Fill = Accent,
+                Width = 24,
+                Height = 22,
+                Stretch = Stretch.Fill,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                RenderTransformOrigin = new Point(0.5, 0.5),
+                RenderTransform = new RotateTransform(hud.ArrowDegrees)
+            };
+            stack.Children.Add(arrow);
+            stack.Children.Add(new TextBlock
+            {
+                Text = hud.Primary,
+                Foreground = Brushes.White,
+                FontFamily = Font,
+                FontSize = 18,
+                FontWeight = FontWeights.SemiBold,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Margin = new Thickness(0, 2, 0, 0)
+            });
+            if (!string.IsNullOrWhiteSpace(hud.Secondary))
+            {
+                stack.Children.Add(new TextBlock
+                {
+                    Text = hud.Secondary,
+                    Foreground = Secondary,
+                    FontFamily = Font,
+                    FontSize = 12,
+                    TextWrapping = TextWrapping.Wrap,
+                    TextAlignment = TextAlignment.Center,
+                    MaxWidth = 168,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                });
+            }
+        }
+        else
+        {
+            stack.Children.Add(new TextBlock
+            {
+                Text = hud.Primary,
+                Foreground = StatusAccent,
+                FontFamily = Font,
+                FontSize = 12
+            });
+        }
+
+        return new Border
+        {
+            Background = PanelBackground,
+            BorderBrush = hud.HasBearing ? Accent : StatusAccent,
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(10, 8, 10, 8),
+            Child = stack,
+            IsHitTestVisible = false
+        };
+    }
+
+    private static System.Drawing.Rectangle[] CombineRects(System.Drawing.Rectangle[] a, System.Drawing.Rectangle[] b)
+    {
+        var all = new System.Drawing.Rectangle[a.Length + b.Length];
+        Array.Copy(a, all, a.Length);
+        Array.Copy(b, 0, all, a.Length, b.Length);
+        return all;
     }
 
     private static readonly Brush PanelBackground = Freeze(new SolidColorBrush(Color.FromArgb(225, 16, 19, 22)));

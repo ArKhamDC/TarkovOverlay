@@ -12,6 +12,12 @@ public sealed class TrayIcon : IDisposable
     private readonly Forms.ToolStripMenuItem _toggleItem;
     private readonly Drawing.Icon _iconImage;
     private readonly Dictionary<string, Forms.ToolStripMenuItem> _modeItems = new();
+    private Forms.ToolStripMenuItem? _gpsItem;
+    private Forms.ToolStripMenuItem? _gpsAutoItem;
+    private Forms.ToolStripMenuItem? _mapItem;
+    private Forms.ToolStripLabel? _opacityCaption;
+    private Forms.TrackBar? _opacityTrack;
+    private bool _silenceMenu;
 
     public void SetMode(string choice, string effectiveLabel)
     {
@@ -47,6 +53,89 @@ public sealed class TrayIcon : IDisposable
         root.DropDownItems.Add(game);
         _icon.ContextMenuStrip!.Items.Insert(1, root);
     }
+
+    /// <summary>GPS arrow, auto-screenshot, and the separate map window (move / resize / opacity).</summary>
+    public void AddGpsMenu(
+        bool gpsEnabled, bool auto, bool mapVisible, double opacity,
+        string gpsHotkey, string mapHotkey,
+        Action toggleGps, Action toggleAuto, Action toggleMap, Action<double> onOpacity)
+    {
+        var menu = _icon.ContextMenuStrip!;
+        _gpsItem = new Forms.ToolStripMenuItem(WithHotkey(L.T("GPS к ближайшему выходу", "GPS to nearest extract"), gpsHotkey), null, (_, _) => toggleGps())
+            { Checked = gpsEnabled };
+        _gpsAutoItem = new Forms.ToolStripMenuItem(L.T("Автоскриншот GPS", "GPS auto-screenshot"), null, (_, _) => toggleAuto())
+            { Checked = auto };
+        _mapItem = new Forms.ToolStripMenuItem(WithHotkey(L.T("Карта", "Map"), mapHotkey), null, (_, _) => toggleMap())
+            { Checked = mapVisible };
+        _opacityCaption = new Forms.ToolStripLabel(OpacityText(opacity)) { AutoSize = true };
+        var track = new Forms.TrackBar
+        {
+            Minimum = 30,
+            Maximum = 100,
+            TickFrequency = 10,
+            SmallChange = 5,
+            LargeChange = 10,
+            TickStyle = Forms.TickStyle.None,
+            AutoSize = false,
+            Size = new Drawing.Size(150, 28),
+            Value = (int)Math.Round(Math.Clamp(opacity, 0.3, 1) * 100)
+        };
+        track.ValueChanged += (_, _) =>
+        {
+            if (_silenceMenu) return;
+            _opacityCaption!.Text = OpacityText(track.Value / 100.0);
+            onOpacity(track.Value / 100.0);
+        };
+        track.MouseDown += (_, _) => menu.AutoClose = false;
+        track.MouseUp += (_, _) => menu.AutoClose = true;
+        _opacityTrack = track;
+        var host = new Forms.ToolStripControlHost(track)
+        {
+            AutoSize = false,
+            Size = new Drawing.Size(168, 32),
+            Margin = new Forms.Padding(12, 2, 8, 4)
+        };
+        menu.Items.Insert(2, _gpsItem);
+        menu.Items.Insert(3, _gpsAutoItem);
+        menu.Items.Insert(4, _mapItem);
+        menu.Items.Insert(5, _opacityCaption);
+        menu.Items.Insert(6, host);
+        menu.Items.Insert(7, new Forms.ToolStripSeparator());
+    }
+
+    public void SetGpsState(bool gpsEnabled, bool auto, bool mapVisible, double opacity)
+    {
+        _silenceMenu = true;
+        try
+        {
+            if (_gpsItem is not null) _gpsItem.Checked = gpsEnabled;
+            if (_gpsAutoItem is not null) _gpsAutoItem.Checked = auto;
+            if (_mapItem is not null) _mapItem.Checked = mapVisible;
+            SetMapOpacity(opacity);
+        }
+        finally { _silenceMenu = false; }
+    }
+
+    public void SetMapOpacity(double opacity)
+    {
+        _silenceMenu = true;
+        try
+        {
+            if (_opacityCaption is not null) _opacityCaption.Text = OpacityText(opacity);
+            if (_opacityTrack is not null)
+            {
+                var v = (int)Math.Round(Math.Clamp(opacity, 0.3, 1) * 100);
+                if (_opacityTrack.Value != v) _opacityTrack.Value = v;
+            }
+        }
+        finally { _silenceMenu = false; }
+    }
+
+    private static string WithHotkey(string text, string hotkey)
+        => string.IsNullOrEmpty(hotkey) ? text : text + "\t" + hotkey;
+
+    private static string OpacityText(double opacity)
+        => L.T($"Прозрачность карты: {(int)Math.Round(opacity * 100)}%", $"Map opacity: {(int)Math.Round(opacity * 100)}%");
 
     public TrayIcon(Action toggle, Action fullScan, Action refresh, Action openFolder, Action exit)
     {
