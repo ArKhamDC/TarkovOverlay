@@ -8,6 +8,7 @@ tessdata_fast/
 icons/
 *.webp
 *.png
+!TarkovOverlay/Maps/images/*.png
 *.annotated.png
 *.log
 items_cache*.json

@@ -22,6 +22,7 @@ public sealed class GpsController : IDisposable
     private readonly object _gate = new();
 
     private List<GameMap> _maps = [];
+    private IReadOnlyList<MapUnderlay> _underlays = [];
     private GameMap? _lastMap;
     private ScreenshotFix? _fix;
     private string? _watchFolder;
@@ -96,6 +97,16 @@ public sealed class GpsController : IDisposable
     {
         try { await _catalog.LoadAsync(ct); }
         catch (OperationCanceledException) { return; }
+        try
+        {
+            _underlays = MapUnderlayCatalog.LoadFromAppDirectory();
+            AppLog.Info($"[GPS] подложки карт: {_underlays.Count}");
+        }
+        catch (Exception ex)
+        {
+            _underlays = [];
+            AppLog.Error("[GPS] не удалось загрузить подложки карт", ex);
+        }
         lock (_gate) _maps = _catalog.Maps.ToList();
 
         lock (_gate)
@@ -302,20 +313,6 @@ public sealed class GpsController : IDisposable
             return new MapView(quiet, quiet, 0, 0, 1, 0, 1, null, null, 0, []);
         }
 
-        var minX = map.MinX;
-        var maxX = map.MaxX;
-        var minZ = map.MinZ;
-        var maxZ = map.MaxZ;
-        if (fix is { } player)
-        {
-            minX = Math.Min(minX, player.Position.X);
-            maxX = Math.Max(maxX, player.Position.X);
-            minZ = Math.Min(minZ, player.Position.Z);
-            maxZ = Math.Max(maxZ, player.Position.Z);
-        }
-
-        var padX = Math.Max(30, (maxX - minX) * 0.06);
-        var padZ = Math.Max(30, (maxZ - minZ) * 0.06);
         var side = _logs.Tracker.SideName;
         var markers = new List<MapMarker>();
         foreach (var e in map.Extracts)
@@ -333,12 +330,35 @@ public sealed class GpsController : IDisposable
         var title = nearest is null
             ? mapName
             : $"{mapName} · {Meters((int)Math.Round(nearest.DistanceMeters))} · {Pick(nearest.Extract.NameEn, nearest.Extract.NameRu)}";
+        var heading = fix is null ? 0 : WorldMath.HeadingDegrees(fix.Rotation);
+        var underlay = MapUnderlayCatalog.Match(_underlays, map);
+        if (underlay is not null)
+        {
+            return new MapView(
+                title, null, underlay.Rotation,
+                underlay.MinX, underlay.MaxX, underlay.MinZ, underlay.MaxZ,
+                fix?.Position.X, fix?.Position.Z, heading, markers.ToArray(),
+                underlay.ImagePath, underlay.Labels, underlay.CompassDegrees);
+        }
+
+        var minX = map.MinX;
+        var maxX = map.MaxX;
+        var minZ = map.MinZ;
+        var maxZ = map.MaxZ;
+        if (fix is { } player)
+        {
+            minX = Math.Min(minX, player.Position.X);
+            maxX = Math.Max(maxX, player.Position.X);
+            minZ = Math.Min(minZ, player.Position.Z);
+            maxZ = Math.Max(maxZ, player.Position.Z);
+        }
+
+        var padX = Math.Max(30, (maxX - minX) * 0.06);
+        var padZ = Math.Max(30, (maxZ - minZ) * 0.06);
         return new MapView(
             title, null, map.NorthRotation,
             minX - padX, maxX + padX, minZ - padZ, maxZ + padZ,
-            fix?.Position.X, fix?.Position.Z,
-            fix is null ? 0 : WorldMath.HeadingDegrees(fix.Rotation),
-            markers.ToArray());
+            fix?.Position.X, fix?.Position.Z, heading, markers.ToArray());
     }
 
     private static string Sig(GpsHud? hud, MapView? map, bool showMap, bool overlayVisible)
@@ -347,7 +367,7 @@ public sealed class GpsController : IDisposable
         var nearest = map?.Markers.FirstOrDefault(m => m.Nearest)?.Name ?? "";
         var m = map is null
             ? "-"
-            : $"{showMap}|{map.Title}|{map.PlayerX:0.#}|{map.PlayerZ:0.#}|{map.Heading:0.#}|{map.Markers.Length}|{nearest}";
+            : $"{showMap}|{map.Title}|{map.UnderlayImage}|{map.PlayerX:0.#}|{map.PlayerZ:0.#}|{map.Heading:0.#}|{map.Markers.Length}|{nearest}";
         return (overlayVisible ? "1" : "0") + h + m;
     }
 

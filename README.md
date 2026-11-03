@@ -42,12 +42,12 @@ The mode hotkey tries `Ctrl+Alt+M` first. If another app already uses that, it f
 In a raid the overlay can press the in-game screenshot key (Print Screen by default, every 10 seconds) and read your position and facing from the **file name** Escape from Tarkov already writes. It does not open the image, read game memory, or inject code.
 
 - An arrow on the price overlay points at the nearest extract and shows the distance in meters.
-- A separate map window draws a simple top-down schematic (you, your heading, extracts) from [tarkov.dev](https://tarkov.dev) coordinates. Drag the title bar to move it, drag the edges or corners to resize it, and set opacity from the tray slider. Position, size, and opacity are saved in `settings.json`.
+- A separate map window draws a top-down underlay for the current raid: Customs, Reserve, Woods, Shoreline, Interchange, Factory (day, night, and the infected variant), Lighthouse, Streets of Tarkov, Ground Zero, The Lab, Labyrinth, and Terminal. Your marker, heading, and extracts are drawn on top of that image. The picture keeps its aspect ratio when you resize the window (empty bands on the sides are fine). Drag the title bar to move it, drag the edges or corners to resize it, and set opacity from the tray slider. Position, size, and opacity are saved in `settings.json`. Icebreaker, and any map that does not have a calibrated image yet, stays on the simple dot schematic.
 - Hiding the map does not turn off the arrow. Hiding the arrow does not forget the map window. `Ctrl+Alt+O` still hides the whole overlay.
 - After a file name is parsed, that screenshot is deleted (`GpsDeleteAfterParse`, default on) so the folder does not fill up. Turn auto-capture off in the tray if you only want manual screenshots.
 - The current map comes from the game's own log files (the same logs used for PvP/PvE/Season). Outside a raid the arrow and the map hide.
 
-This is not a cheat and it is not a full illustrated map. Pressing the screenshot key is ordinary input. It does not move your character, buy or sell items, or read account data.
+The underlay is an original drawing aligned to the public [tarkov.dev](https://tarkov.dev) map frames (bounds and `coordinateRotation` from their MIT-licensed map data, checked against that API's spawn and extract coordinates). It is not an official game map and it is not the tarkov.dev SVG art. Pressing the screenshot key is ordinary input. It does not move your character, buy or sell items, or read account data.
 
 ## How it works
 
@@ -156,7 +156,8 @@ The price overlay **reads the screen** and the game's own log files. GPS reads s
   - On `auto`, the log shows the detected mode in `[Mode]` lines.
 - **Hotkey doesn't work.** Another app has it registered. See the `[Hotkeys]` line in the log.
 - **GPS arrow never appears.** Be in a raid (the log should show `[GPS] рейд начался`), with the game window focused if auto-screenshot is on. A manual in-raid screenshot updates it too. If the game runs as administrator, start the overlay as administrator so the screenshot key is delivered.
-- **Map is in the way.** Drag its title bar, resize from the edges, or hide it from the tray / `Ctrl+Alt+N`. Opacity is the tray slider and `GpsMapOpacity`.
+- **Map is in the way.** Drag its title bar, resize from the edges, or hide it from the tray / `Ctrl+Alt+N`. Opacity is the tray slider and `GpsMapOpacity`. The picture scales with the window and keeps its aspect ratio.
+- **Map is only dots.** That raid has no calibrated underlay (Icebreaker, or a map added after this build). Extracts and the player arrow still draw.
 - **"tessdata missing".** Run `scripts\download-tessdata.ps1`.
 - **Different screen scale or resolution.** The detector scales with screen height (tuned at 1080p and up). Please open an issue with a screenshot.
 

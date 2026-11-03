@@ -49,6 +49,59 @@ public static class WorldMath
         return (x * c - z * s, x * s + z * c);
     }
 
+    /// <summary>
+    /// Normalized image position for a world point inside a map frame.
+    /// <paramref name="rotationDegrees"/> is tarkov.dev <c>coordinateRotation</c>.
+    /// (0, 0) is the top-left of the frame and (1, 1) is the bottom-right. Y grows down.
+    /// </summary>
+    public static bool TryImageUv(
+        double x, double z,
+        double minX, double maxX, double minZ, double maxZ, double rotationDegrees,
+        out double u, out double v)
+    {
+        var (minPX, maxPX, minPY, maxPY) = ProjectedBounds(minX, maxX, minZ, maxZ, rotationDegrees);
+        var spanX = maxPX - minPX;
+        var spanY = maxPY - minPY;
+        if (spanX < 1e-6 || spanY < 1e-6)
+        {
+            u = v = 0;
+            return false;
+        }
+
+        var p = Project(x, z, rotationDegrees);
+        u = (p.X - minPX) / spanX;
+        v = (maxPY - p.Y) / spanY;
+        return true;
+    }
+
+    /// <summary>
+    /// Letterbox the world frame into a view. Matches the historical schematic fit:
+    /// uniform scale, Y flipped so projected +Y is screen-up.
+    /// </summary>
+    public static bool TryFit(
+        double minX, double maxX, double minZ, double maxZ, double rotationDegrees,
+        double viewW, double viewH, out MapProjection fit)
+    {
+        fit = default;
+        if (viewW < 2 || viewH < 2) return false;
+        var (minPX, maxPX, minPY, maxPY) = ProjectedBounds(minX, maxX, minZ, maxZ, rotationDegrees);
+        var spanX = Math.Max(1, maxPX - minPX);
+        var spanY = Math.Max(1, maxPY - minPY);
+        var scale = Math.Min(viewW / spanX, viewH / spanY);
+        var usedW = spanX * scale;
+        var usedH = spanY * scale;
+        fit = new MapProjection(
+            (viewW - usedW) / 2,
+            (viewH - usedH) / 2,
+            scale,
+            minPX,
+            maxPY,
+            usedW,
+            usedH,
+            rotationDegrees);
+        return true;
+    }
+
     /// <summary>Clockwise degrees from screen-up for a player facing <paramref name="headingDegrees"/> after the map rotation.</summary>
     public static double ScreenAngleDegrees(double x, double z, double headingDegrees, double mapRotationDegrees)
     {
@@ -58,5 +111,47 @@ public static class WorldMath
         var a = Project(x, z, mapRotationDegrees);
         var b = Project(x + fx, z + fz, mapRotationDegrees);
         return Math.Atan2(b.X - a.X, b.Y - a.Y) * 180.0 / Math.PI;
+    }
+
+    private static (double MinPX, double MaxPX, double MinPY, double MaxPY) ProjectedBounds(
+        double minX, double maxX, double minZ, double maxZ, double rotationDegrees)
+    {
+        var corners = new[]
+        {
+            Project(minX, minZ, rotationDegrees),
+            Project(maxX, minZ, rotationDegrees),
+            Project(minX, maxZ, rotationDegrees),
+            Project(maxX, maxZ, rotationDegrees)
+        };
+        var minPX = corners[0].X;
+        var maxPX = corners[0].X;
+        var minPY = corners[0].Y;
+        var maxPY = corners[0].Y;
+        for (var i = 1; i < corners.Length; i++)
+        {
+            if (corners[i].X < minPX) minPX = corners[i].X;
+            if (corners[i].X > maxPX) maxPX = corners[i].X;
+            if (corners[i].Y < minPY) minPY = corners[i].Y;
+            if (corners[i].Y > maxPY) maxPY = corners[i].Y;
+        }
+        return (minPX, maxPX, minPY, maxPY);
+    }
+}
+
+/// <summary>Letterboxed placement of a map frame inside a view, in device-independent pixels.</summary>
+public readonly record struct MapProjection(
+    double OriginX,
+    double OriginY,
+    double Scale,
+    double MinPX,
+    double MaxPY,
+    double UsedW,
+    double UsedH,
+    double RotationDegrees)
+{
+    public (double X, double Y) ToScreen(double worldX, double worldZ)
+    {
+        var p = WorldMath.Project(worldX, worldZ, RotationDegrees);
+        return (OriginX + (p.X - MinPX) * Scale, OriginY + (MaxPY - p.Y) * Scale);
     }
 }

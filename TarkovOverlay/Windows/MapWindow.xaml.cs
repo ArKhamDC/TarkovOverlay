@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using TarkovOverlay.Models;
 using TarkovOverlay.Services;
@@ -31,6 +32,7 @@ public partial class MapWindow : Window
     private string? _gesture;
     private Point _start;
     private double _ol, _ot, _ow, _oh;
+    private static readonly Dictionary<string, ImageSource?> _images = new(StringComparer.OrdinalIgnoreCase);
     private MapView? _view;
 
     public event Action<double, double, double, double>? BoundsCommitted;
@@ -257,54 +259,57 @@ public partial class MapWindow : Window
         var w = MapCanvas.ActualWidth;
         var h = MapCanvas.ActualHeight;
         if (w < 2 || h < 2) return;
-        if (view is null || view.Markers.Length == 0 && view.PlayerX is null)
+        var underlay = LoadUnderlay(view?.UnderlayImage);
+        if (view is null || (underlay is null && view.Markers.Length == 0 && view.PlayerX is null))
         {
             AddMessage(view?.Message ?? L.T("Карта скрыта вне рейда", "Map hides outside a raid"), w, h);
             return;
         }
 
-        if (!string.IsNullOrWhiteSpace(view.Message) && view.Markers.Length == 0 && view.PlayerX is null)
-        {
-            AddMessage(view.Message, w, h);
+        if (!WorldMath.TryFit(view.MinX, view.MaxX, view.MinZ, view.MaxZ, view.Rotation, w, h, out var fit))
             return;
-        }
-
-        var rot = view.Rotation;
-        var corners = new[]
-        {
-            WorldMath.Project(view.MinX, view.MinZ, rot),
-            WorldMath.Project(view.MaxX, view.MinZ, rot),
-            WorldMath.Project(view.MinX, view.MaxZ, rot),
-            WorldMath.Project(view.MaxX, view.MaxZ, rot)
-        };
-        var minPX = corners.Min(p => p.X);
-        var maxPX = corners.Max(p => p.X);
-        var minPY = corners.Min(p => p.Y);
-        var maxPY = corners.Max(p => p.Y);
-        var spanX = Math.Max(1, maxPX - minPX);
-        var spanY = Math.Max(1, maxPY - minPY);
-        var scale = Math.Min(w / spanX, h / spanY);
-        var usedW = spanX * scale;
-        var usedH = spanY * scale;
-        var ox = (w - usedW) / 2;
-        var oy = (h - usedH) / 2;
 
         Point ToScreen(double x, double z)
         {
-            var p = WorldMath.Project(x, z, rot);
-            return new Point(ox + (p.X - minPX) * scale, oy + (maxPY - p.Y) * scale);
+            var p = fit.ToScreen(x, z);
+            return new Point(p.X, p.Y);
+        }
+
+        if (underlay is not null)
+        {
+            var img = new System.Windows.Controls.Image
+            {
+                Source = underlay,
+                Width = fit.UsedW,
+                Height = fit.UsedH,
+                Stretch = Stretch.Fill,
+                IsHitTestVisible = false,
+                SnapsToDevicePixels = true
+            };
+            RenderOptions.SetBitmapScalingMode(img, BitmapScalingMode.HighQuality);
+            Canvas.SetLeft(img, fit.OriginX);
+            Canvas.SetTop(img, fit.OriginY);
+            MapCanvas.Children.Add(img);
         }
 
         MapCanvas.Children.Add(new Rectangle
         {
-            Width = usedW,
-            Height = usedH,
+            Width = fit.UsedW,
+            Height = fit.UsedH,
             Stroke = FrameStroke,
             StrokeThickness = 1,
             IsHitTestVisible = false
         });
-        Canvas.SetLeft(MapCanvas.Children[^1], ox);
-        Canvas.SetTop(MapCanvas.Children[^1], oy);
+        Canvas.SetLeft(MapCanvas.Children[^1], fit.OriginX);
+        Canvas.SetTop(MapCanvas.Children[^1], fit.OriginY);
+
+        if (underlay is not null)
+        {
+            DrawScale(fit);
+            DrawLabels(view, fit, ToScreen);
+            if (!double.IsNaN(view.CompassDegrees))
+                DrawNorth(fit, WorldMath.ScreenAngleDegrees(0, 0, view.CompassDegrees, view.Rotation));
+        }
 
         foreach (var marker in view.Markers.OrderBy(m => m.Nearest))
         {
@@ -348,7 +353,7 @@ public partial class MapWindow : Window
         if (view.PlayerX is { } px && view.PlayerZ is { } pz)
         {
             var at = ToScreen(px, pz);
-            var angle = WorldMath.ScreenAngleDegrees(px, pz, view.Heading, rot);
+            var angle = WorldMath.ScreenAngleDegrees(px, pz, view.Heading, view.Rotation);
             var arrow = new Polygon
             {
                 Points = new PointCollection { new(0, -10), new(7, 8), new(0, 4), new(-7, 8) },
@@ -362,6 +367,161 @@ public partial class MapWindow : Window
                 }
             };
             MapCanvas.Children.Add(arrow);
+        }
+    }
+
+    private void DrawScale(MapProjection fit)
+    {
+        var meters = 100;
+        while (meters > 25 && meters * fit.Scale > fit.UsedW * 0.4) meters /= 2;
+        var length = meters * fit.Scale;
+        if (length < 8 || fit.UsedH < 36) return;
+        var x = fit.OriginX + 10;
+        var y = fit.OriginY + fit.UsedH - 14;
+        MapCanvas.Children.Add(new Line
+        {
+            X1 = x,
+            Y1 = y,
+            X2 = x + length,
+            Y2 = y,
+            Stroke = Brushes.White,
+            StrokeThickness = 2,
+            IsHitTestVisible = false
+        });
+        var caption = new TextBlock
+        {
+            Text = L.T($"{meters} м", $"{meters} m"),
+            Foreground = Brushes.White,
+            FontFamily = UiFont,
+            FontSize = 11,
+            IsHitTestVisible = false
+        };
+        caption.Measure(new Size(fit.UsedW, fit.UsedH));
+        Canvas.SetLeft(caption, x);
+        Canvas.SetTop(caption, Math.Max(fit.OriginY + 2, y - caption.DesiredSize.Height - 2));
+        MapCanvas.Children.Add(caption);
+    }
+
+    private void DrawNorth(MapProjection fit, double angle)
+    {
+        if (fit.UsedW < 48 || fit.UsedH < 48) return;
+        var cx = fit.OriginX + fit.UsedW / 2;
+        var cy = fit.OriginY + 16;
+        var rad = angle * Math.PI / 180.0;
+        var nx = cx + Math.Sin(rad) * 14;
+        var ny = cy - Math.Cos(rad) * 14;
+        MapCanvas.Children.Add(new Line
+        {
+            X1 = cx,
+            Y1 = cy,
+            X2 = nx,
+            Y2 = ny,
+            Stroke = Brushes.White,
+            StrokeThickness = 1.5,
+            IsHitTestVisible = false
+        });
+        var letter = new TextBlock
+        {
+            Text = "N",
+            Foreground = Brushes.White,
+            FontFamily = UiFont,
+            FontSize = 11,
+            FontWeight = FontWeights.SemiBold,
+            IsHitTestVisible = false
+        };
+        letter.Measure(new Size(40, 20));
+        Canvas.SetLeft(letter, nx - letter.DesiredSize.Width / 2);
+        Canvas.SetTop(letter, ny - letter.DesiredSize.Height - 1);
+        MapCanvas.Children.Add(letter);
+    }
+
+    private void DrawLabels(MapView view, MapProjection fit, Func<double, double, Point> toScreen)
+    {
+        var labels = view.Labels;
+        if (labels is null || labels.Length == 0) return;
+        var placed = new List<Rect>();
+        var limit = 0;
+        foreach (var label in labels.OrderByDescending(l => l.Priority).ThenBy(l => l.Text.Length))
+        {
+            if (limit >= 28) break;
+            var at = toScreen(label.X, label.Z);
+            if (at.X < fit.OriginX + 4 || at.Y < fit.OriginY + 4
+                || at.X > fit.OriginX + fit.UsedW - 4 || at.Y > fit.OriginY + fit.UsedH - 4)
+                continue;
+            if (NearMarker(view, toScreen, at)) continue;
+
+            var block = new TextBlock
+            {
+                Text = label.Text,
+                Foreground = LabelFg,
+                FontFamily = UiFont,
+                FontSize = 12,
+                IsHitTestVisible = false
+            };
+            block.Measure(new Size(fit.UsedW, fit.UsedH));
+            var width = block.DesiredSize.Width;
+            var height = block.DesiredSize.Height;
+            var x = Math.Clamp(at.X + 6, fit.OriginX + 2, Math.Max(fit.OriginX + 2, fit.OriginX + fit.UsedW - width - 2));
+            var y = Math.Clamp(at.Y - height - 2, fit.OriginY + 2, Math.Max(fit.OriginY + 2, fit.OriginY + fit.UsedH - height - 2));
+            var rect = new Rect(x - 2, y - 1, width + 4, height + 2);
+            if (placed.Any(p => p.IntersectsWith(rect))) continue;
+            placed.Add(rect);
+
+            var shadow = new TextBlock
+            {
+                Text = label.Text,
+                Foreground = Brushes.Black,
+                FontFamily = UiFont,
+                FontSize = 12,
+                IsHitTestVisible = false
+            };
+            Canvas.SetLeft(shadow, x + 1);
+            Canvas.SetTop(shadow, y + 1);
+            MapCanvas.Children.Add(shadow);
+            Canvas.SetLeft(block, x);
+            Canvas.SetTop(block, y);
+            MapCanvas.Children.Add(block);
+            limit++;
+        }
+    }
+
+    private static bool NearMarker(MapView view, Func<double, double, Point> toScreen, Point at)
+    {
+        if (view.PlayerX is { } px && view.PlayerZ is { } pz)
+        {
+            var player = toScreen(px, pz);
+            if (Math.Abs(player.X - at.X) < 20 && Math.Abs(player.Y - at.Y) < 20) return true;
+        }
+
+        foreach (var marker in view.Markers)
+        {
+            if (!marker.Nearest) continue;
+            var p = toScreen(marker.X, marker.Z);
+            if (Math.Abs(p.X - at.X) < 18 && Math.Abs(p.Y - at.Y) < 18) return true;
+        }
+        return false;
+    }
+
+    private static ImageSource? LoadUnderlay(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return null;
+        if (_images.TryGetValue(path, out var cached)) return cached;
+        try
+        {
+            var bmp = new BitmapImage();
+            bmp.BeginInit();
+            bmp.CacheOption = BitmapCacheOption.OnLoad;
+            bmp.UriSource = new Uri(path, UriKind.Absolute);
+            bmp.EndInit();
+            bmp.Freeze();
+            _images[path] = bmp;
+            return bmp;
+        }
+        catch (Exception ex)
+        {
+            _images[path] = null;
+            AppLog.Warn($"[GPS] не удалось открыть подложку {System.IO.Path.GetFileName(path)}: {ex.Message}");
+            return null;
         }
     }
 
@@ -406,6 +566,7 @@ public partial class MapWindow : Window
     private static readonly Brush OtherBrush = Freeze(Color.FromRgb(200, 205, 210));
     private static readonly Brush QuietBrush = Freeze(Color.FromRgb(230, 180, 70));
     private static readonly Brush LabelBg = Freeze(Color.FromArgb(210, 16, 19, 22));
+    private static readonly Brush LabelFg = Freeze(Color.FromRgb(236, 232, 214));
     private static readonly Brush FrameStroke = Freeze(Color.FromArgb(50, 255, 255, 255));
     private static readonly FontFamily UiFont = new("Segoe UI");
 

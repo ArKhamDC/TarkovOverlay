@@ -31,7 +31,14 @@ public sealed record GpsHud(bool HasBearing, double ArrowDegrees, int Meters, st
 
 public sealed record MapMarker(double X, double Z, string Name, string Faction, bool Nearest);
 
-/// <summary>Schematic map: player, heading, and extracts in world XZ.</summary>
+/// <summary>Place name drawn on top of a map underlay. <paramref name="Priority"/> is higher for larger landmarks.</summary>
+public sealed record MapLabel(double X, double Z, string Text, double Priority);
+
+/// <summary>
+/// Map window contents. When <paramref name="UnderlayImage"/> is set, the bounds are that image's
+/// world frame and <paramref name="Rotation"/> is its coordinateRotation. Otherwise this is the
+/// extract schematic fitted around the player.
+/// </summary>
 public sealed record MapView(
     string Title,
     string? Message,
@@ -43,4 +50,7 @@ public sealed record MapView(
     double? PlayerX,
     double? PlayerZ,
     double Heading,
-    MapMarker[] Markers);
+    MapMarker[] Markers,
+    string? UnderlayImage = null,
+    MapLabel[]? Labels = null,
+    double CompassDegrees = double.NaN);
