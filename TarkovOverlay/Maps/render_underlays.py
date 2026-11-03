@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import random
 import re
 import urllib.request
 from pathlib import Path
@@ -70,20 +71,88 @@ CARDINAL = {
     "terminal": 180,
 }
 
-# bg, blob, grid, major grid, building, building edge
+# terrain, water, road edge, road, path, building, building edge, tree
 PALETTES = {
-    "customs": ((34, 40, 32), (46, 56, 42), (58, 70, 54), (86, 104, 78), (118, 104, 78), (214, 196, 150)),
-    "factory": ((32, 30, 28), (48, 42, 38), (64, 56, 50), (96, 84, 72), (132, 108, 84), (220, 196, 160)),
-    "woods": ((26, 40, 30), (34, 58, 38), (48, 74, 52), (72, 110, 74), (150, 132, 90), (220, 206, 160)),
-    "lighthouse": ((28, 40, 42), (36, 58, 58), (52, 78, 76), (78, 116, 112), (168, 150, 114), (226, 214, 180)),
-    "shoreline": ((48, 44, 34), (70, 62, 44), (86, 78, 56), (120, 108, 74), (150, 124, 90), (230, 214, 176)),
-    "reserve": ((32, 36, 40), (44, 50, 56), (58, 66, 74), (90, 102, 112), (108, 112, 118), (196, 204, 208)),
-    "interchange": ((36, 34, 32), (52, 48, 44), (70, 64, 58), (104, 96, 86), (124, 116, 104), (214, 206, 188)),
-    "streets-of-tarkov": ((30, 32, 36), (42, 46, 52), (58, 64, 72), (88, 96, 108), (120, 114, 104), (210, 204, 190)),
-    "ground-zero": ((40, 36, 32), (58, 50, 42), (76, 66, 54), (112, 98, 78), (140, 118, 90), (222, 204, 170)),
-    "the-lab": ((24, 32, 40), (32, 48, 60), (46, 66, 82), (70, 102, 124), (90, 120, 140), (190, 214, 226)),
-    "the-labyrinth": ((28, 26, 34), (42, 38, 52), (58, 52, 70), (90, 80, 110), (110, 96, 120), (206, 196, 220)),
-    "terminal": ((26, 32, 38), (36, 46, 54), (50, 64, 74), (76, 98, 112), (100, 114, 124), (196, 210, 216)),
+    "customs": ((58, 74, 50), (42, 86, 102), (48, 42, 34), (196, 176, 132), (154, 140, 108), (132, 118, 96), (236, 220, 184), (34, 50, 32)),
+    "factory": ((46, 42, 38), (42, 86, 102), (28, 26, 24), (168, 156, 140), (130, 120, 108), (108, 96, 84), (220, 204, 176), (34, 50, 32)),
+    "woods": ((42, 64, 40), (48, 96, 112), (52, 44, 32), (186, 164, 116), (146, 128, 92), (120, 108, 84), (230, 214, 176), (28, 46, 28)),
+    "lighthouse": ((52, 70, 58), (38, 84, 104), (48, 42, 34), (190, 172, 128), (150, 136, 104), (140, 128, 104), (232, 218, 184), (30, 48, 36)),
+    "shoreline": ((132, 124, 90), (40, 92, 118), (70, 60, 46), (188, 176, 140), (160, 148, 116), (168, 150, 118), (236, 222, 190), (70, 90, 52)),
+    "reserve": ((58, 64, 66), (42, 86, 102), (28, 30, 32), (150, 150, 148), (110, 112, 112), (118, 122, 124), (214, 218, 216), (34, 50, 32)),
+    "interchange": ((54, 52, 48), (42, 86, 102), (24, 24, 24), (176, 172, 160), (120, 116, 108), (142, 134, 120), (226, 218, 200), (34, 50, 32)),
+    "streets-of-tarkov": ((62, 64, 66), (42, 86, 102), (32, 32, 34), (168, 164, 154), (120, 116, 110), (128, 120, 112), (220, 214, 200), (34, 50, 32)),
+    "ground-zero": ((78, 72, 62), (42, 86, 102), (36, 32, 28), (176, 164, 140), (140, 128, 108), (150, 132, 108), (230, 214, 184), (34, 50, 32)),
+    "the-lab": ((36, 48, 58), (42, 86, 102), (18, 24, 30), (140, 164, 176), (96, 116, 128), (78, 104, 120), (196, 216, 224), (34, 50, 32)),
+    "the-labyrinth": ((40, 36, 48), (42, 86, 102), (24, 22, 30), (130, 120, 146), (96, 88, 110), (96, 86, 112), (210, 200, 220), (34, 50, 32)),
+    "terminal": ((40, 48, 54), (42, 86, 102), (22, 26, 30), (150, 158, 162), (110, 118, 122), (100, 112, 120), (200, 210, 214), (34, 50, 32)),
+}
+
+# Main roads as world (x, z) polylines. Waypoints are the published landmark
+# coordinates (or a few meters beside them), joined in the order those places
+# are actually connected. Widths are meters and are drawn a little wide so the
+# road is still visible in the small GPS window.
+ROADS: dict[str, list[tuple[float, list[tuple[float, float]]]]] = {
+    "customs": [
+        (16, [(-250, -200), (-230, -150), (-190, -90), (-120, 20), (-20, 8), (70, -4), (180, -6), (320, 16), (430, 24), (580, 2)]),
+        (12, [(-140, 48), (-20, 46), (50, 28)]),
+        (12, [(-140, 8), (-140, 48)]),
+        (12, [(170, 8), (150, 70), (190, 160)]),
+        (11, [(60, -16), (70, -80), (120, -120), (210, -130), (331, -168)]),
+        (11, [(210, -130), (90, -150), (70, -90)]),
+        (12, [(560, 0), (540, -70), (470, -78), (340, -72), (250, -100), (200, -125)]),
+        (10, [(-230, -150), (-280, -140), (-300, -180)]),
+    ],
+    "reserve": [
+        (14, [(175, -215), (158, -155), (90, -125), (40, -90), (30, -30), (-60, -28), (-140, -12), (-125, 55), (-70, 100), (-15, 170)]),
+        (11, [(40, -90), (66, -95), (60, -40), (50, 25), (55, 62)]),
+        (10, [(-55, -20), (-50, 20), (-70, 70), (-110, 90)]),
+        (10, [(150, -150), (130, -130), (70, -140), (0, -145)]),
+    ],
+    "woods": [
+        (15, [(-240, 350), (-190, 220), (-80, 80), (10, -5), (0, -90), (-20, -300), (-8, -500), (-80, -670)]),
+        (13, [(10, -5), (120, -40), (239, -65), (220, -250), (280, -470), (200, -600)]),
+        (13, [(10, -5), (-180, -20), (-330, -40), (-510, -200), (-485, -385)]),
+        (10, [(-190, 220), (-320, 40)]),
+        (10, [(0, -90), (80, -150)]),
+    ],
+    "lighthouse": [
+        (14, [(-115, 360), (-130, 110), (-100, 120), (-155, -230), (-75, -290), (-70, -610), (-45, -860)]),
+        (11, [(-70, -620), (40, -618), (-90, -730), (-185, -665)]),
+        (10, [(-80, -200), (5, -188), (125, -155)]),
+        (10, [(-130, 110), (-70, 130)]),
+    ],
+    "shoreline": [
+        (16, [(430, 400), (280, 430), (50, 450), (-190, 440), (-340, 500), (-500, 490), (-630, 475), (-520, 280)]),
+        (13, [(-190, 430), (-210, 180), (-250, 40), (-250, -75)]),
+        (12, [(-210, 180), (0, 150), (140, 130), (300, 140), (418, 118)]),
+        (10, [(418, 118), (340, 0), (326, -110)]),
+        (10, [(-510, 280), (-700, 100)]),
+        (10, [(-250, -75), (-180, -85), (-140, -80)]),
+    ],
+    "interchange": [
+        (18, [(520, -400), (370, -395), (80, -385), (-190, -350), (-380, -345)]),
+        (16, [(155, 250), (-255, 250), (-255, -360), (160, -360), (160, 250)]),
+        (11, [(155, -250), (200, -253)]),
+        (11, [(-255, 150), (-300, 140)]),
+    ],
+    "ground-zero": [
+        (14, [(85, -115), (95, 20), (115, 145), (105, 290)]),
+        (12, [(-55, 8), (10, 35), (80, 28), (155, 8)]),
+        (12, [(8, 190), (60, 220), (115, 210), (148, 150)]),
+        (10, [(8, 200), (4, 330)]),
+    ],
+    "factory": [
+        (5, [(-20, 50), (-4, 38), (18, 40), (40, 36), (58, 8), (67, -28)]),
+        (4, [(-4, 38), (-1, 16), (16, 6), (30, -8), (41, -11)]),
+        (4, [(-20, -28), (-4, -18), (16, -8)]),
+        (4, [(20, 40), (24, 28), (34, 26)]),
+    ],
+    "the-lab": [
+        (5, [(-262, -348), (-230, -345), (-172, -342), (-140, -370), (-130, -398)]),
+        (4, [(-246, -282), (-220, -310), (-220, -345), (-220, -400)]),
+        (4, [(-163, -270), (-170, -310), (-172, -342)]),
+        (4, [(-250, -320), (-236, -302), (-207, -305)]),
+    ],
 }
 
 NOTES = {
@@ -129,14 +198,6 @@ def frame_of(bounds: list, rotation: float) -> tuple[float, float, float, float]
     xs = [p[0] for p in pts]
     zs = [p[1] for p in pts]
     return min(xs), max(xs), min(zs), max(zs)
-
-
-def grid_step(span: float) -> int:
-    if span < 220:
-        return 25
-    if span < 700:
-        return 50
-    return 100
 
 
 def interactive_maps(doc: list) -> dict[str, dict]:
@@ -210,9 +271,72 @@ def collect_labels(inter: dict) -> list[dict]:
     return kept
 
 
+def world_direction(map_rotation: float, label_rotation: float) -> tuple[float, float]:
+    """Label rotation is the street angle in the projected plane, 0 along +projected X."""
+    theta = math.radians(label_rotation)
+    drx, drz = math.cos(theta), math.sin(theta)
+    c, s = math.cos(math.radians(map_rotation)), math.sin(math.radians(map_rotation))
+    return (drx * c + drz * s, -drx * s + drz * c)
+
+
+def street_roads(inter: dict, map_rotation: float) -> list[tuple[float, list[tuple[float, float]]]]:
+    grouped: dict[str, list[dict]] = {}
+    for raw in inter.get("labels") or []:
+        text = str(raw.get("text") or "")
+        if not any(token in text for token in ("St.", "Ave", "Alley")):
+            continue
+        pos = raw.get("position")
+        if not isinstance(pos, list) or len(pos) < 2:
+            continue
+        try:
+            rotation = float(raw.get("rotation") or 0)
+        except (TypeError, ValueError):
+            rotation = 0
+        grouped.setdefault(text, []).append({"x": pos[0], "z": pos[1], "rotation": rotation})
+
+    roads = []
+    for marks in grouped.values():
+        dx, dz = world_direction(map_rotation, marks[0]["rotation"])
+        marks.sort(key=lambda m: m["x"] * dx + m["z"] * dz)
+        reach = 220 if len(marks) > 1 else 140
+        start = (marks[0]["x"] - dx * reach, marks[0]["z"] - dz * reach)
+        end = (marks[-1]["x"] + dx * reach, marks[-1]["z"] + dz * reach)
+        middle = [(m["x"], m["z"]) for m in marks]
+        roads.append((18, [start, *middle, end]))
+    return roads
+
+
+def water_shapes(map_id: str, bounds: list) -> tuple[list[list[tuple[float, float]]], list[tuple[float, float, float]]]:
+    (x0, z0), (x1, z1) = bounds
+    min_x, max_x = min(x0, x1), max(x0, x1)
+    min_z, max_z = min(z0, z1), max(z0, z1)
+    polys: list[list[tuple[float, float]]] = []
+    ponds: list[tuple[float, float, float]] = []
+    if map_id == "customs":
+        polys.append([(-96, -110), (-46, -110), (-46, 200), (-96, 200)])
+    elif map_id == "shoreline":
+        polys.append([(min_x, 545), (max_x, 545), (max_x, max_z), (min_x, max_z)])
+        ponds.append((326, -118, 70))
+    elif map_id == "woods":
+        ponds.append((-5, -515, 78))
+        ponds.append((40, -470, 28))
+    elif map_id == "lighthouse":
+        polys.append([(210, min_z), (max_x, min_z), (max_x, max_z), (210, max_z)])
+        ponds.append((-177, -356, 36))
+    return polys, ponds
+
+
+def inside_area(x: float, z: float, areas: list[dict]) -> bool:
+    for area in areas:
+        x0, x1 = sorted((area["x0"], area["x1"]))
+        z0, z1 = sorted((area["z0"], area["z1"]))
+        if x0 - 10 <= x <= x1 + 10 and z0 - 10 <= z <= z1 + 10:
+            return True
+    return False
+
+
 def render(spec: dict, path: Path) -> tuple[int, int]:
     rotation = spec["coordinateRotation"]
-    (x0, z0), (x1, z1) = spec["publishedBounds"]
     min_rx, max_rx, min_rz, max_rz = frame_of(spec["publishedBounds"], rotation)
     span_x = max(max_rx - min_rx, 1)
     span_y = max(max_rz - min_rz, 1)
@@ -227,42 +351,70 @@ def render(spec: dict, path: Path) -> tuple[int, int]:
     palette = PALETTES[spec["id"]]
     image = Image.new("RGB", (width, height), palette[0])
     draw = ImageDraw.Draw(image)
+    ppm = (width - 1) / span_x
 
     def pix(x: float, z: float) -> tuple[float, float]:
         rx, rz = project(x, z, rotation)
-        u = (rx - min_rx) / span_x
-        v = (max_rz - rz) / span_y
-        return (u * (width - 1), v * (height - 1))
+        return ((rx - min_rx) / span_x * (width - 1), (max_rz - rz) / span_y * (height - 1))
 
-    step = grid_step(max(abs(x1 - x0), abs(z1 - z0)))
-    min_x, max_x = min(x0, x1), max(x0, x1)
-    min_z, max_z = min(z0, z1), max(z0, z1)
-    start_x = math.ceil(min_x / step) * step
-    x = start_x
-    while x <= max_x:
-        major = abs(x) % (step * 2) < 1e-6
-        draw.line([pix(x, min_z), pix(x, max_z)], fill=palette[3 if major else 2], width=2 if major else 1)
-        x += step
-    start_z = math.ceil(min_z / step) * step
-    z = start_z
-    while z <= max_z:
-        major = abs(z) % (step * 2) < 1e-6
-        draw.line([pix(min_x, z), pix(max_x, z)], fill=palette[3 if major else 2], width=2 if major else 1)
-        z += step
+    if spec["id"] == "woods":
+        rng = random.Random(spec["id"])
+        for _ in range(420):
+            wx = rng.uniform(min(spec["bounds"]["x0"], spec["bounds"]["x1"]), max(spec["bounds"]["x0"], spec["bounds"]["x1"]))
+            wz = rng.uniform(min(spec["bounds"]["z0"], spec["bounds"]["z1"]), max(spec["bounds"]["z0"], spec["bounds"]["z1"]))
+            px, py = pix(wx, wz)
+            rad = rng.uniform(1.5, 3.5)
+            draw.ellipse((px - rad, py - rad, px + rad, py + rad), fill=palette[7])
+
+    for poly in spec.get("water") or []:
+        draw.polygon([pix(x, z) for x, z in poly], fill=palette[1])
+    for cx, cz, radius in spec.get("ponds") or []:
+        px, py = pix(cx, cz)
+        rad = radius * ppm
+        draw.ellipse((px - rad, py - rad, px + rad, py + rad), fill=palette[1])
+    if spec["id"] == "lighthouse":
+        px, py = pix(382, 496)
+        rad = 48 * ppm
+        draw.ellipse((px - rad, py - rad * 0.7, px + rad, py + rad * 0.7), fill=palette[0])
+
+    def paint(points: list[tuple[float, float]], width_m: float, fill: tuple[int, int, int], edge: tuple[int, int, int] | None) -> None:
+        seq = [pix(x, z) for x, z in points]
+        if len(seq) < 2:
+            return
+        if edge is not None:
+            draw.line(seq, fill=edge, width=max(2, round(width_m * ppm * 1.45)), joint="curve")
+        draw.line(seq, fill=fill, width=max(1, round(width_m * ppm)), joint="curve")
+
+    for width_m, points in spec.get("roads") or []:
+        paint(points, width_m, palette[3], palette[2])
 
     for area in spec["areas"]:
-        ax0, az0, ax1, az1 = area["x0"], area["z0"], area["x1"], area["z1"]
-        poly = [pix(ax0, az0), pix(ax1, az0), pix(ax1, az1), pix(ax0, az1)]
-        shift = sum(ord(ch) for ch in area["name"]) % 24 - 12
-        fill = tuple(max(0, min(255, c + shift)) for c in palette[4])
-        draw.polygon(poly, fill=fill, outline=palette[5])
+        poly = [
+            pix(area["x0"], area["z0"]),
+            pix(area["x1"], area["z0"]),
+            pix(area["x1"], area["z1"]),
+            pix(area["x0"], area["z1"]),
+        ]
+        draw.polygon(poly, fill=palette[5], outline=palette[6])
 
+    foot = 12 if spec["id"] in {"factory", "the-lab"} else 26
     for label in spec["labels"]:
-        px, py = pix(label["x"], label["z"])
-        r = 4
-        draw.polygon([(px, py - r), (px + r, py), (px, py + r), (px - r, py)], fill=palette[5])
+        if any(token in label["text"] for token in ("St.", "Ave", "Alley")):
+            continue
+        if inside_area(label["x"], label["z"], spec["areas"]):
+            continue
+        if spec["id"] in {"interchange", "customs", "reserve", "shoreline"}:
+            continue
+        half_x, half_z = foot / 2, foot * 0.35
+        poly = [
+            pix(label["x"] - half_x, label["z"] - half_z),
+            pix(label["x"] + half_x, label["z"] - half_z),
+            pix(label["x"] + half_x, label["z"] + half_z),
+            pix(label["x"] - half_x, label["z"] + half_z),
+        ]
+        draw.polygon(poly, fill=palette[5], outline=palette[6])
 
-    draw.rectangle((1, 1, width - 2, height - 2), outline=palette[5], width=2)
+    draw.rectangle((1, 1, width - 2, height - 2), outline=palette[6], width=2)
     path.parent.mkdir(parents=True, exist_ok=True)
     image.save(path, format="PNG", optimize=True)
     return width, height
@@ -295,6 +447,9 @@ def build(doc: list) -> list[dict]:
             "aliases": sorted(alias),
             "labels": collect_labels(inter),
             "areas": collect_areas(inter),
+            "roads": [*ROADS.get(map_id, []), *street_roads(inter, inter["coordinateRotation"])],
+            "water": water_shapes(map_id, bounds)[0],
+            "ponds": water_shapes(map_id, bounds)[1],
         }
         if map_id in NOTES:
             spec["note"] = NOTES[map_id]
@@ -320,10 +475,15 @@ def main() -> None:
             "World bounds and coordinateRotation are the interactive frames in "
             "the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels "
             "in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base "
-            "location and is used only for the compass tick. Images are original drawings aligned to those "
-            "frames; they are not the tarkov-dev SVG maps (those assets forbid overlay use). Frames were "
-            "checked against spawn and extract coordinates from json.tarkov.dev. Icebreaker is omitted: its "
-            "published bounds match Factory and do not contain Icebreaker spawns."
+            "location and is used only for the compass tick. "
+            "The tarkov.dev SVG maps (and the raster tiles made from them) are CC BY-NC-SA 4.0 and their "
+            "authors forbid using them in an in-raid overlay or radar, so they are not shipped. MapGenie "
+            "tiles and the game's own map textures are not licensed for redistribution. "
+            "The images here are original drawings on those same frames: roads join the published landmark "
+            "coordinates in the order those places connect, with water and building footprints. "
+            "Frames were checked against spawn and extract coordinates from json.tarkov.dev. "
+            "Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns. "
+            "Terminal and Labyrinth have no published road or landmark geometry, so they stay a plain frame."
         ),
         "maps": specs,
     }

@@ -47,7 +47,7 @@ In a raid the overlay can press the in-game screenshot key (Print Screen by defa
 - After a file name is parsed, that screenshot is deleted (`GpsDeleteAfterParse`, default on) so the folder does not fill up. Turn auto-capture off in the tray if you only want manual screenshots.
 - The current map comes from the game's own log files (the same logs used for PvP/PvE/Season). Outside a raid the arrow and the map hide.
 
-The underlay is an original drawing aligned to the public [tarkov.dev](https://tarkov.dev) map frames (bounds and `coordinateRotation` from their MIT-licensed map data, checked against that API's spawn and extract coordinates). It is not an official game map and it is not the tarkov.dev SVG art. Pressing the screenshot key is ordinary input. It does not move your character, buy or sell items, or read account data.
+The underlay sits on the public [tarkov.dev](https://tarkov.dev) map frames (bounds and `coordinateRotation` from their MIT-licensed map data, checked against that API's spawn and extract coordinates). Roads and paths are drawn between those published landmarks, with water and building footprints, so the picture shows the road network. The tarkov.dev SVG maps, and the tiles made from them, are CC BY-NC-SA and their authors forbid using them in an in-raid overlay, so they are not included. MapGenie tiles and the game's own map textures are not licensed for redistribution. This is not an official game map. Terminal and Labyrinth have no published road geometry, so those two stay a plain frame. Pressing the screenshot key is ordinary input. It does not move your character, buy or sell items, or read account data.
 
 ## How it works
 
