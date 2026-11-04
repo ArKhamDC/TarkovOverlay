@@ -1,0 +1,438 @@
+{
+  "map": "streets-of-tarkov",
+  "source": "Door markers from json.tarkov.dev locks, colored by key. Streets.svg has no .locked room fills, so these are markers only. Stairs stay on the raster and are not a key. Extract and transit swatches are not keys.",
+  "entries": [
+    {
+      "key": "6582dbe43a2e5248357dbe9a",
+      "name": "\"Negotiation\" room key",
+      "fill": "#ff3f3f",
+      "itemId": "6582dbe43a2e5248357dbe9a",
+      "count": 1,
+      "roomFill": false,
+      "tip": "\"Negotiation\" room key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a3a93f8a56922e82001f5d",
+      "name": "Abandoned factory marked key",
+      "fill": "#3f77ff",
+      "itemId": "63a3a93f8a56922e82001f5d",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Abandoned factory marked key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a39e49cd6db0635c1975fc",
+      "name": "Archive room key",
+      "fill": "#afff3f",
+      "itemId": "63a39e49cd6db0635c1975fc",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Archive room key. Colored door marker. No room fill."
+    },
+    {
+      "key": "64ce572331dd890873175115",
+      "name": "Aspect company office key",
+      "fill": "#ff3fe7",
+      "itemId": "64ce572331dd890873175115",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Aspect company office key. Colored door marker. No room fill."
+    },
+    {
+      "key": "6398fd8ad3de3849057f5128",
+      "name": "Backup hideout key",
+      "fill": "#3fffde",
+      "itemId": "6398fd8ad3de3849057f5128",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Backup hideout key. Colored door marker. No room fill."
+    },
+    {
+      "key": "64ccc1fe088064307e14a6f7",
+      "name": "Beluga restaurant director key",
+      "fill": "#ffa73f",
+      "itemId": "64ccc1fe088064307e14a6f7",
+      "count": 2,
+      "roomFill": false,
+      "tip": "Beluga restaurant director key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a397d3af870e651d58e65b",
+      "name": "Car dealership closed section key",
+      "fill": "#6f3fff",
+      "itemId": "63a397d3af870e651d58e65b",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Car dealership closed section key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a399193901f439517cafb6",
+      "name": "Car dealership director's office room key",
+      "fill": "#48ff3f",
+      "itemId": "63a399193901f439517cafb6",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Car dealership director's office room key. Colored door marker. No room fill."
+    },
+    {
+      "key": "68c165f1903341d88b092b2a",
+      "name": "Cardinal apartment key",
+      "fill": "#ff3f80",
+      "itemId": "68c165f1903341d88b092b2a",
+      "count": 2,
+      "roomFill": false,
+      "tip": "Cardinal apartment key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a39fdf1e21260da44a0256",
+      "name": "Cargo container mesh door key",
+      "fill": "#3fb7ff",
+      "itemId": "63a39fdf1e21260da44a0256",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Cargo container mesh door key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a39fc0af870e651d58e6ae",
+      "name": "Chekannaya 15 apartment key",
+      "fill": "#efff3f",
+      "itemId": "63a39fc0af870e651d58e6ae",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Chekannaya 15 apartment key. Colored door marker. No room fill."
+    },
+    {
+      "key": "64ccc1d4a0f13c24561edf27",
+      "name": "Concordia apartment 34 room key",
+      "fill": "#d63fff",
+      "itemId": "64ccc1d4a0f13c24561edf27",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Concordia apartment 34 room key. Colored door marker. No room fill."
+    },
+    {
+      "key": "64ccc1f4ff54fb38131acf27",
+      "name": "Concordia apartment 63 room key",
+      "fill": "#3fff9e",
+      "itemId": "64ccc1f4ff54fb38131acf27",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Concordia apartment 63 room key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a71e922b25f7513905ca20",
+      "name": "Concordia apartment 64 key",
+      "fill": "#ff663f",
+      "itemId": "63a71e922b25f7513905ca20",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Concordia apartment 64 key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a71e86b7f4570d3a293169",
+      "name": "Concordia apartment 64 office room key",
+      "fill": "#3f50ff",
+      "itemId": "63a71e86b7f4570d3a293169",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Concordia apartment 64 office room key. Colored door marker. No room fill."
+    },
+    {
+      "key": "64ccc1ec1779ad6ba200a137",
+      "name": "Concordia apartment 8 home cinema key",
+      "fill": "#88ff3f",
+      "itemId": "64ccc1ec1779ad6ba200a137",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Concordia apartment 8 home cinema key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a71e781031ac76fe773c7d",
+      "name": "Concordia apartment 8 room key",
+      "fill": "#ff3fc0",
+      "itemId": "63a71e781031ac76fe773c7d",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Concordia apartment 8 room key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a39c7964283b5e9c56b280",
+      "name": "Concordia security room key",
+      "fill": "#3ff8ff",
+      "itemId": "63a39c7964283b5e9c56b280",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Concordia security room key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a39cb1c9b3aa4b61683ee2",
+      "name": "Construction site bunkhouse key",
+      "fill": "#ffce3f",
+      "itemId": "63a39cb1c9b3aa4b61683ee2",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Construction site bunkhouse key. Colored door marker. No room fill."
+    },
+    {
+      "key": "68e96180901b9b10270f1eed",
+      "name": "Cult victim's apartment key",
+      "fill": "#963fff",
+      "itemId": "68e96180901b9b10270f1eed",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Cult victim's apartment key. Colored door marker. No room fill."
+    },
+    {
+      "key": "68e95d71a3d110355b03e529",
+      "name": "Elektronik's key",
+      "fill": "#3fff5e",
+      "itemId": "68e95d71a3d110355b03e529",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Elektronik's key. Colored door marker. No room fill."
+    },
+    {
+      "key": "5448ba0b4bdc2d02308b456c",
+      "name": "Factory emergency exit key",
+      "fill": "#ff3f58",
+      "itemId": "5448ba0b4bdc2d02308b456c",
+      "count": 6,
+      "roomFill": false,
+      "tip": "Factory emergency exit key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a39667c9b3aa4b61683e98",
+      "name": "Financial institution office key",
+      "fill": "#3f90ff",
+      "itemId": "63a39667c9b3aa4b61683e98",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Financial institution office key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a71ed21031ac76fe773c7f",
+      "name": "Financial institution small office key",
+      "fill": "#c8ff3f",
+      "itemId": "63a71ed21031ac76fe773c7f",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Financial institution small office key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a39f6e64283b5e9c56b289",
+      "name": "Iron gate key",
+      "fill": "#fd3fff",
+      "itemId": "63a39f6e64283b5e9c56b289",
+      "count": 3,
+      "roomFill": false,
+      "tip": "Iron gate key. Colored door marker. No room fill."
+    },
+    {
+      "key": "6582dc4b6ba9e979af6b79f4",
+      "name": "MVD academy entrance hall guard room key",
+      "fill": "#3fffc5",
+      "itemId": "6582dc4b6ba9e979af6b79f4",
+      "count": 1,
+      "roomFill": false,
+      "tip": "MVD academy entrance hall guard room key. Colored door marker. No room fill."
+    },
+    {
+      "key": "64ccc25f95763a1ae376e447",
+      "name": "Mysterious room marked key",
+      "fill": "#ff8d3f",
+      "itemId": "64ccc25f95763a1ae376e447",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Mysterious room marked key. Colored door marker. No room fill."
+    },
+    {
+      "key": "64ccc268c41e91416064ebc7",
+      "name": "PE teacher's office key",
+      "fill": "#553fff",
+      "itemId": "64ccc268c41e91416064ebc7",
+      "count": 1,
+      "roomFill": false,
+      "tip": "PE teacher's office key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a39f08cd6db0635c197600",
+      "name": "Pinewood hotel room 215 key",
+      "fill": "#61ff3f",
+      "itemId": "63a39f08cd6db0635c197600",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Pinewood hotel room 215 key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a39e1d234195315d4020bd",
+      "name": "Primorsky 46-48 skybridge key",
+      "fill": "#ff3f99",
+      "itemId": "63a39e1d234195315d4020bd",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Primorsky 46-48 skybridge key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a71eb5b7f4570d3a29316b",
+      "name": "Primorsky 48 apartment key",
+      "fill": "#3fd1ff",
+      "itemId": "63a71eb5b7f4570d3a29316b",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Primorsky 48 apartment key. Colored door marker. No room fill."
+    },
+    {
+      "key": "6582dc5740562727a654ebb1",
+      "name": "Real estate agency office room key",
+      "fill": "#fff53f",
+      "itemId": "6582dc5740562727a654ebb1",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Real estate agency office room key. Colored door marker. No room fill."
+    },
+    {
+      "key": "6582dbf0b8d7830efc45016f",
+      "name": "Relaxation room key",
+      "fill": "#bd3fff",
+      "itemId": "6582dbf0b8d7830efc45016f",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Relaxation room key. Colored door marker. No room fill."
+    },
+    {
+      "key": "68c14b734a7e0bada00f8fd4",
+      "name": "Reprogrammed keycard for A.P.'s apartment lock (Green)",
+      "fill": "#3fff85",
+      "itemId": "68c14b734a7e0bada00f8fd4",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Reprogrammed keycard for A.P.'s apartment lock (Green). Colored door marker. No room fill."
+    },
+    {
+      "key": "68e63b56ad8cba49190ea529",
+      "name": "Rus Post car key",
+      "fill": "#ff4d3f",
+      "itemId": "68e63b56ad8cba49190ea529",
+      "count": 2,
+      "roomFill": false,
+      "tip": "Rus Post car key. Colored door marker. No room fill."
+    },
+    {
+      "key": "64d4b23dc1b37504b41ac2b6",
+      "name": "Rusted bloody key",
+      "fill": "#3f69ff",
+      "itemId": "64d4b23dc1b37504b41ac2b6",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Rusted bloody key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a39fd1c9b3aa4b61683efb",
+      "name": "Stair landing key",
+      "fill": "#a1ff3f",
+      "itemId": "63a39fd1c9b3aa4b61683efb",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Stair landing key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a39c69af870e651d58e6aa",
+      "name": "Store manager's key",
+      "fill": "#ff3fd9",
+      "itemId": "63a39c69af870e651d58e6aa",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Store manager's key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a39ce4cd6db0635c1975fa",
+      "name": "Supply department director's office key",
+      "fill": "#3fffec",
+      "itemId": "63a39ce4cd6db0635c1975fa",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Supply department director's office key. Colored door marker. No room fill."
+    },
+    {
+      "key": "64ccc2111779ad6ba200a139",
+      "name": "Tarbank cash register department key",
+      "fill": "#ffb43f",
+      "itemId": "64ccc2111779ad6ba200a139",
+      "count": 2,
+      "roomFill": false,
+      "tip": "Tarbank cash register department key. Colored door marker. No room fill."
+    },
+    {
+      "key": "67ee7680562d5057e60ccc3a",
+      "name": "TerraGroup corporate apartment key",
+      "fill": "#7c3fff",
+      "itemId": "67ee7680562d5057e60ccc3a",
+      "count": 1,
+      "roomFill": false,
+      "tip": "TerraGroup corporate apartment key. Colored door marker. No room fill."
+    },
+    {
+      "key": "64ccc206793ca11c8f450a38",
+      "name": "TerraGroup meeting room key",
+      "fill": "#3fff45",
+      "itemId": "64ccc206793ca11c8f450a38",
+      "count": 1,
+      "roomFill": false,
+      "tip": "TerraGroup meeting room key. Colored door marker. No room fill."
+    },
+    {
+      "key": "64ccc24de61ea448b507d34d",
+      "name": "TerraGroup security armory key",
+      "fill": "#ff3f72",
+      "itemId": "64ccc24de61ea448b507d34d",
+      "count": 1,
+      "roomFill": false,
+      "tip": "TerraGroup security armory key. Colored door marker. No room fill."
+    },
+    {
+      "key": "61aa5ba8018e9821b7368da9",
+      "name": "USEC cottage second safe key",
+      "fill": "#3faaff",
+      "itemId": "61aa5ba8018e9821b7368da9",
+      "count": 5,
+      "roomFill": false,
+      "tip": "USEC cottage second safe key. Colored door marker. No room fill."
+    },
+    {
+      "key": "64ccc246ff54fb38131acf29",
+      "name": "X-ray room key",
+      "fill": "#e1ff3f",
+      "itemId": "64ccc246ff54fb38131acf29",
+      "count": 1,
+      "roomFill": false,
+      "tip": "X-ray room key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a39dfe3901f439517cafba",
+      "name": "Zmeisky 3 apartment 8 key",
+      "fill": "#e43fff",
+      "itemId": "63a39dfe3901f439517cafba",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Zmeisky 3 apartment 8 key. Colored door marker. No room fill."
+    },
+    {
+      "key": "68e960db934bf7b02d005dab",
+      "name": "Zmeisky 3 apartment key",
+      "fill": "#3fffac",
+      "itemId": "68e960db934bf7b02d005dab",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Zmeisky 3 apartment key. Colored door marker. No room fill."
+    },
+    {
+      "key": "63a39df18a56922e82001f25",
+      "name": "Zmeisky 5 apartment 20 key",
+      "fill": "#ff743f",
+      "itemId": "63a39df18a56922e82001f25",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Zmeisky 5 apartment 20 key. Colored door marker. No room fill."
+    }
+  ]
+}

@@ -203,7 +203,6 @@ public class MapUnderlayTests
             ["shoreline"] = (2560, 1695, 19),
             ["reserve"] = (2560, 2322, 11),
             ["interchange"] = (2560, 2106, 9),
-            ["streets-of-tarkov"] = (1867, 2560, 19),
             ["terminal"] = (2174, 2560, 0),
         };
 
@@ -425,6 +424,77 @@ public class MapUnderlayTests
         Assert.False(storage.RoomFill);
         Assert.Equal("66acd6702b17692df20144c0", storage.ItemId);
         Assert.DoesNotContain(factory.Keycards, k => k.Name.Contains("stairs", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void StreetsRasterUsesThePublishedFrameAndKeyColors()
+    {
+        var streets = Load().Single(m => m.Id == "streets-of-tarkov");
+        Assert.Equal(180, streets.Rotation);
+        Assert.Equal(180, streets.CompassDegrees);
+        Assert.Equal(-280, streets.MinX, 3);
+        Assert.Equal(323, streets.MaxX, 3);
+        Assert.Equal(-295, streets.MinZ, 3);
+        Assert.Equal(532, streets.MaxZ, 3);
+        Assert.Contains("Shebuka", streets.Credit);
+        var (width, height) = PngSize(streets.ImagePath);
+        Assert.Equal(2421, width);
+        Assert.Equal(3326, height);
+
+        Assert.True(WorldMath.TryImageUv(-67.01, 59.32, streets.MinX, streets.MaxX, streets.MinZ, streets.MaxZ, streets.Rotation, out var u, out var v));
+        Assert.Equal((323 - (-67.01)) / 603, u, 4);
+        Assert.Equal((59.32 - (-295)) / 827, v, 4);
+
+        Assert.Equal(22, streets.Extracts.Length);
+        Assert.Equal(19, streets.Extracts.Count(e => e.Faction != "transit"));
+        Assert.Equal(3, streets.Extracts.Count(e => e.Faction == "transit"));
+        var crane = streets.Extracts.Single(e => e.NameEn == "Collapsed Crane");
+        Assert.Equal("Упавший кран", crane.NameRu);
+        Assert.Equal("pmc", crane.Faction);
+        Assert.Equal(3.44, crane.Y, 2);
+        var checkpoint = streets.Extracts.Single(e => e.NameEn == "Scav Checkpoint");
+        Assert.Equal("Блокпост Диких", checkpoint.NameRu);
+        Assert.Equal(-8.16, checkpoint.Y, 2);
+        var elevator = streets.Extracts.Single(e => e.NameEn == "Stylobate Building Elevator");
+        Assert.Equal("Лифт в стилобате", elevator.NameRu);
+        Assert.Equal(11.04, elevator.Y, 2);
+        var coop = streets.Extracts.Single(e => e.NameEn == "Pinewood Basement (Co-Op)");
+        Assert.Equal("Подвал в Pinewood (Совм.)", coop.NameRu);
+        Assert.Equal("shared", coop.Faction);
+        var lab = streets.Extracts.Single(e => e.NameEn == "Transit to The Lab");
+        Assert.Equal("Переход на Лабораторию", lab.NameRu);
+        Assert.Equal("transit", lab.Faction);
+        Assert.Equal(-7.38, lab.Y, 2);
+        Assert.Equal("Переход на Эпицентр", streets.Extracts.Single(e => e.NameEn == "Transit to Ground Zero").NameRu);
+        Assert.Equal(4.39, streets.Extracts.Single(e => e.NameEn == "Transit to Interchange").Y, 2);
+        Assert.Equal(7, streets.Extracts.Count(e => e.Faction == "scav"));
+        foreach (var extract in streets.Extracts)
+        {
+            Assert.True(WorldMath.TryImageUv(extract.X, extract.Z, streets.MinX, streets.MaxX, streets.MinZ, streets.MaxZ, streets.Rotation, out var eu, out var ev));
+            Assert.InRange(eu, 0, 1);
+            Assert.InRange(ev, 0, 1);
+            Assert.False(string.IsNullOrWhiteSpace(extract.NameRu));
+        }
+
+        Assert.Equal(15, streets.Labels.Length);
+        Assert.Contains(streets.Labels, l => l.Text == "Collapsed Crane" && l.TextRu == "Упавший кран");
+        Assert.Contains(streets.Labels, l => l.Text == "Transit to The Lab");
+        Assert.DoesNotContain(streets.Labels, l => l.Text == "Klimov Shopping Mall Exfil");
+        Assert.DoesNotContain(streets.Labels, l => l.Text == "Lexos");
+
+        Assert.Equal(48, streets.Keycards.Length);
+        Assert.Equal(63, streets.Keycards.Sum(k => k.Count));
+        Assert.Equal(48, streets.Keycards.Select(k => k.Fill).Distinct(StringComparer.OrdinalIgnoreCase).Count());
+        Assert.All(streets.Keycards, k => Assert.False(k.RoomFill));
+        var pinewood = streets.Keycards.Single(k => k.Name == "Pinewood hotel room 215 key");
+        Assert.Equal("#61ff3f", pinewood.Fill);
+        Assert.Equal(1, pinewood.Count);
+        Assert.Equal("63a39f08cd6db0635c197600", pinewood.ItemId);
+        Assert.Equal(6, streets.Keycards.Single(k => k.Name == "Factory emergency exit key").Count);
+        Assert.Equal(5, streets.Keycards.Single(k => k.Name == "USEC cottage second safe key").Count);
+        Assert.Equal(3, streets.Keycards.Single(k => k.Name == "Iron gate key").Count);
+        Assert.DoesNotContain(streets.Keycards, k => k.Name.Contains("stairs", StringComparison.OrdinalIgnoreCase));
+        Assert.DoesNotContain(streets.Keycards, k => k.Name is "PMC extract" or "Scav extract" or "Shared extract" or "Transit");
     }
 
     [Fact]

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "Customs interior floors are crops of Customs.svg by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), the same map as the Customs overview. EFT TarkDev allowed use of the site and its data for this program on 2026-11-04; see Maps/attribution/SOURCE.md. rectXZ x0/z0 is the image top-left and x1/z1 the bottom-right in the overview world frame (coordinateRotation 180). Floor 0 is underground. Dorm room numbers are verified placements in image pixels; only confidence verified is shipped. Stairs stay painted on the raster. Boiler is omitted: Customs.svg has no boiler group. The Lab is one underground complex from Labs.svg (same author and licence): there is no outdoor overview. rectXZ uses coordinateRotation 270. Height picks the floor: below -0.9 technical, below 3 first, otherwise second. Locked rooms are painted on the rasters in the keycard color. Factory is one indoor complex from Factory.svg (same author and licence) on the published frame, coordinateRotation 90. factory.png is the overview until a position arrives, then height picks the floor: below -1 basement, below 3 ground, below 6 second, otherwise third. Locks are door markers, not room fills. Ground Zero is the whole GroundZero.svg on the official frame (coordinateRotation 180). ground-zero.png is the overview until a position arrives, then height picks the floor: below 21 underground, below 28 ground, below 32.3 second, otherwise third. Door locks are painted markers, not room fills. The official bounds are not shifted.",
+  "source": "Customs interior floors are crops of Customs.svg by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), the same map as the Customs overview. EFT TarkDev allowed use of the site and its data for this program on 2026-11-04; see Maps/attribution/SOURCE.md. rectXZ x0/z0 is the image top-left and x1/z1 the bottom-right in the overview world frame (coordinateRotation 180). Floor 0 is underground. Dorm room numbers are verified placements in image pixels; only confidence verified is shipped. Stairs stay painted on the raster. Boiler is omitted: Customs.svg has no boiler group. The Lab is one underground complex from Labs.svg (same author and licence): there is no outdoor overview. rectXZ uses coordinateRotation 270. Height picks the floor: below -0.9 technical, below 3 first, otherwise second. Locked rooms are painted on the rasters in the keycard color. Factory is one indoor complex from Factory.svg (same author and licence) on the published frame, coordinateRotation 90. factory.png is the overview until a position arrives, then height picks the floor: below -1 basement, below 3 ground, below 6 second, otherwise third. Locks are door markers, not room fills. Ground Zero is the whole GroundZero.svg on the official frame (coordinateRotation 180). ground-zero.png is the overview until a position arrives, then height picks the floor: below 21 underground, below 28 ground, below 32.3 second, otherwise third. Door locks are painted markers, not room fills. The official bounds are not shifted. Streets of Tarkov is the whole city from Streets.svg (same author and licence) on the published frame, coordinateRotation 180. streets-of-tarkov.png is the overview until a position arrives, then height picks the floor: below -6 underground, below 10 ground (Ground Level and First Floor, including tunnels and passages), below 15 second, below 20 third, below 25 fourth, otherwise fifth. Locks are door markers, not room fills.",
   "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
   "maps": [
     {
@@ -1219,6 +1219,112 @@
               "image": "factory_third.png",
               "width": 1047,
               "height": 1130
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "streets-of-tarkov",
+      "coordinateRotation": 180,
+      "aliases": [
+        "city",
+        "citypreset",
+        "streetsoftarkov",
+        "tarkovstreets"
+      ],
+      "buildings": [
+        {
+          "id": "streets",
+          "name": "Streets of Tarkov",
+          "nameRu": "Улицы Таркова",
+          "coversMap": true,
+          "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+          "rectXZ": {
+            "x0": 323,
+            "z0": -295,
+            "x1": -280,
+            "z1": 532
+          },
+          "floorByY": [
+            {
+              "below": -6,
+              "floor": 0
+            },
+            {
+              "below": 10,
+              "floor": 1
+            },
+            {
+              "below": 15,
+              "floor": 2
+            },
+            {
+              "below": 20,
+              "floor": 3
+            },
+            {
+              "below": 25,
+              "floor": 4
+            },
+            {
+              "floor": 5
+            }
+          ],
+          "floors": [
+            {
+              "floor": 0,
+              "floorKey": "underground",
+              "caption": "U",
+              "tip": "Underground",
+              "image": "streets_underground.png",
+              "width": 2421,
+              "height": 3326
+            },
+            {
+              "floor": 1,
+              "floorKey": "ground",
+              "caption": "1",
+              "tip": "Ground",
+              "image": "streets_ground.png",
+              "width": 2421,
+              "height": 3326
+            },
+            {
+              "floor": 2,
+              "floorKey": "second",
+              "caption": "2",
+              "tip": "Second",
+              "image": "streets_second.png",
+              "width": 2421,
+              "height": 3326
+            },
+            {
+              "floor": 3,
+              "floorKey": "third",
+              "caption": "3",
+              "tip": "Third",
+              "image": "streets_third.png",
+              "width": 2421,
+              "height": 3326
+            },
+            {
+              "floor": 4,
+              "floorKey": "fourth",
+              "caption": "4",
+              "tip": "Fourth",
+              "image": "streets_fourth.png",
+              "width": 2421,
+              "height": 3326
+            },
+            {
+              "floor": 5,
+              "floorKey": "fifth",
+              "caption": "5",
+              "tip": "Fifth",
+              "image": "streets_fifth.png",
+              "width": 2421,
+              "height": 3326
             }
           ]
         }

@@ -49,6 +49,19 @@ The Ground Zero GPS images (`Maps/images/ground-zero.png`, `Maps/interiors/groun
 - GroundZero.svg has no locked-room fills. Door locks are colored markers. The legend is `Maps/ground-zero-keycards.json` (parking utility, factory exit, bank register, horse toilet, science office). Five markers are on the map. A second Factory emergency exit key at x=264.95 is outside the frame and is not drawn. The same five locks are published for ground-zero-21.
 - Extract positions: https://json.tarkov.dev/regular/maps (`Maps/ground-zero-extracts.json`), English and Russian names from `maps_en` / `maps_ru`, fetched with User-Agent `TarkovOverlay/1.0`. The ground raster paints the captions. A GPS marker is drawn on the floor its Y selects. Scav Bunker (East Gate), UN Roadblock, and Pinewood Basement are outside the frame. ground-zero-21 shares the in-frame extracts and does not publish those three.
 
+## Streets.svg (tarkov.dev)
+
+The Streets of Tarkov GPS images (`Maps/images/streets-of-tarkov.png`, `Maps/interiors/streets_*.png`) are rasters of the tarkov.dev Streets map. `streets-of-tarkov.png` is the overview, and it is the same picture as the ground floor. Underground, ground, second, third, fourth, and fifth are the six floor groups from the SVG. Until a position arrives the window shows the overview; after that it stays on the floor plan. `StreetsOfTarkov.svg` is the same file as `Streets.svg`.
+
+- URL: https://raw.githubusercontent.com/the-hideout/tarkov-dev-svg-maps/master/Streets.svg
+- Also: https://assets.tarkov.dev/maps/svg/Streets.svg · https://tarkov.dev/map/streets
+- Author: Shebuka / [the-hideout/tarkov-dev-svg-maps](https://github.com/the-hideout/tarkov-dev-svg-maps)
+- Licence upstream: [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/), same permission as Customs below.
+- Frame: published bounds `[[323,-295],[-280,532]]`, `coordinateRotation` 180. Image top-left is `x=323, z=-295` and bottom-right is `x=-280, z=532`. `u=(323-x)/603`, `v=(z+295)/827`. All six floors share this frame, so switching floors does not reset zoom or follow.
+- Floors follow world Y only, with no area boxes: below -6 underground, below 10 ground, below 15 second, below 20 third, below 25 fourth, otherwise fifth. Ground is the Ground Level and First Floor layers, including tunnels and passages. Title-bar buttons are U / 1 / 2 / 3 / 4 / 5. A button holds until height enters another band.
+- Locks are door markers. Streets.svg has no `.locked` room fills. The legend is `Maps/streets-of-tarkov-keycards.json`: 48 keys, 63 doors. Stairs stay on the raster and are not a key.
+- Extract positions: https://json.tarkov.dev/regular/maps (`Maps/streets-of-tarkov-extracts.json`), English and Russian names from `maps_en` / `maps_ru`, fetched with user agent TarkovOverlay/1.0. 19 extracts plus 3 transits (Ground Zero, Interchange, The Lab). An extract or transit is drawn on the floor its Y selects. Transits are not targets for the GPS arrow.
+
 ## Permission
 
 Telegram **EFT TarkDev**, 2026-11-04. The user asked whether they could use the site and its data for their own EFT program. The reply was yes, and asked that a link to the program be sent later. Screenshot: [permission-eft-tarkdev-telegram.png](permission-eft-tarkdev-telegram.png).
@@ -60,11 +73,11 @@ Telegram **EFT TarkDev**, 2026-11-04. The user asked whether they could use the 
 
 ## Other overview rasters
 
-Woods, Lighthouse, Shoreline, Reserve, Interchange, Streets of Tarkov, and Terminal use the matching SVG from the same repository, rasterized as the ground overview only (the tarkov.dev base layer, plus any group marked to stay with it). Upper floors are not baked into these images. Factory and Ground Zero are the floor packs above, not these overviews.
+Woods, Lighthouse, Shoreline, Reserve, Interchange, and Terminal use the matching SVG from the same repository, rasterized as the ground overview only (the tarkov.dev base layer, plus any group marked to stay with it). Upper floors are not baked into these images. Factory, Ground Zero, and Streets of Tarkov are the floor packs above, not these overviews.
 
-- Woods.svg, Lighthouse.svg, Shoreline.svg, Reserve.svg, Interchange.svg, StreetsOfTarkov.svg, Terminal.svg at https://github.com/the-hideout/tarkov-dev-svg-maps
+- Woods.svg, Lighthouse.svg, Shoreline.svg, Reserve.svg, Interchange.svg, Terminal.svg at https://github.com/the-hideout/tarkov-dev-svg-maps
 - Author and licence: Shebuka / CC BY-NC-SA 4.0, same permission as Customs.
-- Lighthouse, Shoreline, Reserve, Streets of Tarkov, and Terminal use the published tarkov.dev frame. Spawns and extracts sit inside it. Terminal's API list has no extracts.
+- Lighthouse, Shoreline, Reserve, and Terminal use the published tarkov.dev frame. Spawns and extracts sit inside it. Terminal's API list has no extracts.
 - Woods extends max Z to `455.58` (published `442`) so RUAF Gate is inside the frame.
 - Interchange extends max X to `621.9` (published `598`) so Path to River (Flare) is inside the frame.
 - Extract positions: https://json.tarkov.dev/regular/maps, English and Russian names from `maps_en` / `maps_ru`, one `Maps/<id>-extracts.json` per map.

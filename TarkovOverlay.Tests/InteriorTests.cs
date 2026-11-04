@@ -15,6 +15,8 @@ public class InteriorTests
         Assert.Equal(25, buildings.Sum(b => b.Floors.Length));
         Assert.Contains(all, b => b.Id == "labs");
         Assert.Contains(all, b => b.MapId == "factory" && b.Id == "factory");
+        Assert.Contains(all, b => b.MapId == "ground-zero" && b.Id == "groundzero");
+        Assert.Contains(all, b => b.MapId == "streets-of-tarkov" && b.Id == "streets");
         Assert.DoesNotContain(buildings, b => b.Id.Contains("boiler", StringComparison.OrdinalIgnoreCase));
         Assert.DoesNotContain(buildings, b => b.Id == "zb1011_building");
         Assert.Contains(buildings, b => b.Id == "zb1011_bunker");
@@ -380,6 +382,106 @@ public class InteriorTests
         var dorms = Load().Single(b => b.Id == "dorms_3story");
         Assert.Null(dorms.FloorByY);
         Assert.True(InteriorCatalog.ExtractOnFloor(dorms, 14.76, 1));
+    }
+
+    [Fact]
+    public void StreetsFollowsHeightAndKeepsAPinnedFloorUntilTheBandChanges()
+    {
+        var streets = Load().Single(b => b.Id == "streets");
+        Assert.Equal("streets-of-tarkov", streets.MapId);
+        Assert.True(streets.CoversMap);
+        Assert.Equal(180, streets.Rotation);
+        Assert.Equal(new[] { 0, 1, 2, 3, 4, 5 }, streets.Floors.Select(f => f.Floor).ToArray());
+        Assert.Equal(new[] { "U", "1", "2", "3", "4", "5" }, streets.Floors.Select(f => f.Caption).ToArray());
+        Assert.Equal(new[] { "Underground", "Ground", "Second", "Third", "Fourth", "Fifth" }, streets.Floors.Select(f => f.Tip).ToArray());
+        Assert.Contains("Shebuka", streets.Credit);
+        Assert.Equal(323, streets.X0, 3);
+        Assert.Equal(-295, streets.Z0, 3);
+        Assert.Equal(-280, streets.X1, 3);
+        Assert.Equal(532, streets.Z1, 3);
+        Assert.Equal(-6d, streets.FloorByY![0].Below!.Value);
+        Assert.Equal(5, streets.FloorByY![^1].Floor);
+        Assert.Null(streets.FloorByY![^1].Below);
+        foreach (var plan in streets.Floors)
+        {
+            Assert.Equal(2421, plan.Width);
+            Assert.Equal(3326, plan.Height);
+            var (w, h) = PngSize(plan.ImagePath);
+            Assert.Equal(2421, w);
+            Assert.Equal(3326, h);
+        }
+
+        var underlay = MapUnderlayCatalog.LoadDirectory(MapsDir()).Single(m => m.Id == "streets-of-tarkov");
+        Assert.Equal(underlay.MinX, streets.MinX);
+        Assert.Equal(underlay.MaxX, streets.MaxX);
+        Assert.Equal(underlay.MinZ, streets.MinZ);
+        Assert.Equal(underlay.MaxZ, streets.MaxZ);
+        Assert.Equal(underlay.Rotation, streets.Rotation);
+
+        var overview = File.ReadAllBytes(Path.Combine(MapsDir(), "images", "streets-of-tarkov.png"));
+        Assert.Equal(overview, File.ReadAllBytes(streets.Floors.Single(f => f.Floor == 1).ImagePath));
+
+        Assert.Equal(0, InteriorCatalog.FloorFromAltitude(streets, -6.0001));
+        Assert.Equal(1, InteriorCatalog.FloorFromAltitude(streets, -6));
+        Assert.Equal(1, InteriorCatalog.FloorFromAltitude(streets, 9.999));
+        Assert.Equal(2, InteriorCatalog.FloorFromAltitude(streets, 10));
+        Assert.Equal(2, InteriorCatalog.FloorFromAltitude(streets, 14.999));
+        Assert.Equal(3, InteriorCatalog.FloorFromAltitude(streets, 15));
+        Assert.Equal(3, InteriorCatalog.FloorFromAltitude(streets, 19.999));
+        Assert.Equal(4, InteriorCatalog.FloorFromAltitude(streets, 20));
+        Assert.Equal(4, InteriorCatalog.FloorFromAltitude(streets, 24.999));
+        Assert.Equal(5, InteriorCatalog.FloorFromAltitude(streets, 25));
+        Assert.Equal(5, InteriorCatalog.FloorFromAltitude(streets, 40));
+        Assert.Null(InteriorCatalog.FloorFromAltitude(streets, double.NaN));
+
+        var onMap = InteriorCatalog.ForMap(Load(), Game("TarkovStreets", "streets-of-tarkov", "maps/city_preset.bundle"));
+        Assert.Single(onMap);
+        Assert.Empty(InteriorCatalog.ForMap(Load().Where(b => b.MapId != "streets-of-tarkov").ToList(), Game("TarkovStreets", "streets-of-tarkov", "maps/city_preset.bundle")));
+
+        var state = InteriorFix.Overview;
+        (state, var building, var floor) = InteriorCatalog.Advance(onMap, state, -67.01, 6.02, 59.32);
+        Assert.Equal("streets", building!.Id);
+        Assert.Equal(1, floor!.Floor);
+        Assert.Null(state.LockBand);
+        Assert.Equal(new[] { "U", "1", "2", "3", "4", "5" }, InteriorCatalog.FloorOptions(building, 1)!.Select(o => o.Caption).ToArray());
+
+        // A point far outside the raster still stays on the city, on the floor Y selects.
+        (state, building, floor) = InteriorCatalog.Advance(onMap, state, 5000, -8, 5000);
+        Assert.Equal(0, floor!.Floor);
+
+        state = InteriorCatalog.PinFloor(onMap, state, 5, -8);
+        Assert.Equal(0, state.LockBand);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 0, -7, 0);
+        Assert.Equal(5, floor!.Floor);
+        Assert.Equal(0, state.LockBand);
+
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, -44.74, 11.04, -72.15);
+        Assert.Equal(2, floor!.Floor);
+        Assert.Null(state.LockBand);
+
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 211.34, -8.16, 82.31);
+        Assert.Equal(0, floor!.Floor);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 16, 16, 16);
+        Assert.Equal(3, floor!.Floor);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 16, 22, 16);
+        Assert.Equal(4, floor!.Floor);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 16, 25, 16);
+        Assert.Equal(5, floor!.Floor);
+
+        Assert.True(InteriorCatalog.ExtractOnFloor(streets, -8.16, 0));
+        Assert.False(InteriorCatalog.ExtractOnFloor(streets, -8.16, 1));
+        Assert.True(InteriorCatalog.ExtractOnFloor(streets, 11.04, 2));
+        Assert.False(InteriorCatalog.ExtractOnFloor(streets, 11.04, 1));
+        Assert.True(InteriorCatalog.ExtractOnFloor(streets, -7.38, 0));
+        Assert.True(InteriorCatalog.ExtractOnFloor(streets, 3.19, 1));
+        Assert.False(InteriorCatalog.ExtractOnFloor(streets, 4.39, 2));
+
+        // Published rect: u=(323-x)/603, v=(z+295)/827. Pinewood hotel room 215 door on ground.
+        Assert.True(streets.TryUv(-67.01, 59.32, out var u, out var v));
+        Assert.Equal((323 - (-67.01)) / 603, u, 4);
+        Assert.Equal((59.32 - (-295)) / 827, v, 4);
+        Assert.InRange(u, 0, 1);
+        Assert.InRange(v, 0, 1);
     }
 
     [Fact]

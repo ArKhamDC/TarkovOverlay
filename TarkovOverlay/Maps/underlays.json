@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Overview rasters other than Labyrinth are Shebuka's SVGs from the-hideout/tarkov-dev-svg-maps (CC BY-NC-SA 4.0), used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. Factory ships Factory.svg on the published frame [[77,-64.5],[-65.5,67.4]], coordinateRotation 90: the overview is the ground floor, and basement, second, and third are separate rasters. Ground Zero ships GroundZero.svg on the official frame x0=249 z0=-124 x1=-99 z1=364, with one raster per height band and door locks painted as markers. The Lab ships Labs.svg on a fitted frame (tarkov.dev publishes no svgBounds for Labs), with locked rooms painted in the keycard color. Extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and the game's own map textures are not licensed for redistribution. Labyrinth has no SVG in that repo, so it stays an original frame drawing. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns.",
+  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Overview rasters other than Labyrinth are Shebuka's SVGs from the-hideout/tarkov-dev-svg-maps (CC BY-NC-SA 4.0), used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. Factory ships Factory.svg on the published frame [[77,-64.5],[-65.5,67.4]], coordinateRotation 90: the overview is the ground floor, and basement, second, and third are separate rasters. Ground Zero ships GroundZero.svg on the official frame x0=249 z0=-124 x1=-99 z1=364, with one raster per height band and door locks painted as markers. Streets of Tarkov ships Streets.svg (the same picture as StreetsOfTarkov.svg) on the published frame [[323,-295],[-280,532]], coordinateRotation 180: the overview is the ground floor, and underground through fifth are separate rasters. Door markers use 48 key colors; there is no locked-room fill. The Lab ships Labs.svg on a fitted frame (tarkov.dev publishes no svgBounds for Labs), with locked rooms painted in the keycard color. Extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and the game's own map textures are not licensed for redistribution. Labyrinth has no SVG in that repo, so it stays an original frame drawing. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns.",
   "maps": [
     {
       "id": "customs",
@@ -3137,17 +3137,17 @@
       ],
       "water": [],
       "ponds": [],
+      "note": "Raster of tarkov.dev Streets.svg (Shebuka; StreetsOfTarkov.svg is the same picture), published frame [[323,-295],[-280,532]], coordinateRotation 180. Image top-left is x=323 z=-295 and bottom-right is x=-280 z=532. The file is the overview and matches the ground floor with lock markers. Floors are Maps/interiors/streets_*.png. Ground is Ground Level and First Floor, including tunnels and passages. Extracts and three transits come from Maps/streets-of-tarkov-extracts.json. Key colors are Maps/streets-of-tarkov-keycards.json. Markers only: Streets.svg has no locked-room fills.",
       "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
       "imageAttribution": {
         "author": "Shebuka",
         "project": "the-hideout/tarkov-dev-svg-maps",
-        "sourceUrl": "https://assets.tarkov.dev/maps/svg/StreetsOfTarkov.svg",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/Streets.svg",
         "license": "CC BY-NC-SA 4.0",
         "permission": "EFT TarkDev Telegram 2026-11-04",
         "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
         "notes": "attribution/SOURCE.md"
-      },
-      "note": "Raster of tarkov.dev StreetsOfTarkov.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/streets-of-tarkov-extracts.json from json.tarkov.dev/regular/maps. Frame is the published rect x0=323 z0=-295 x1=-280 z1=532. Spawn and extract positions from json.tarkov.dev sit inside it."
+      }
     },
     {
       "id": "ground-zero",

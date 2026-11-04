@@ -66,6 +66,12 @@ public class GpsTests
         Assert.True(ExtractNav.OverviewVisible("scav", "scav"));
         Assert.True(ExtractNav.OverviewVisible("shared", "scav"));
         Assert.False(ExtractNav.OverviewVisible("pmc", "scav"));
+        Assert.True(ExtractNav.OverviewVisible("transit", null));
+        Assert.True(ExtractNav.OverviewVisible("transit", "pmc"));
+        Assert.True(ExtractNav.OverviewVisible("Transit", "scav"));
+        Assert.False(ExtractNav.FactionVisible("transit", null));
+        Assert.False(ExtractNav.FactionVisible("transit", "pmc"));
+        Assert.False(ExtractNav.FactionVisible("transit", "scav"));
     }
 
     [Fact]
@@ -78,6 +84,14 @@ public class GpsTests
         Assert.Equal("ZB-1011", pmc!.Extract.NameEn);
         Assert.Equal("Old Gas Station", scav!.Extract.NameEn);
         Assert.InRange(pmc.DistanceMeters, 14, 15);
+
+        var streets = new GameMap("s", "TarkovStreets", "maps/city_preset.bundle", "Streets of Tarkov", "Улицы Таркова", 180, -280, 323, -295, 532, ["streetsoftarkov"],
+        [
+            new MapExtract("Collapsed Crane", "Упавший кран", "pmc", 50, 3, 50),
+            new MapExtract("Transit to The Lab", "Переход на Лабораторию", "transit", 1, -7, 1)
+        ]);
+        var nearest = ExtractNav.Nearest(streets, new Vec3(0, 0, 0), "pmc");
+        Assert.Equal("Collapsed Crane", nearest!.Extract.NameEn);
     }
 
     [Fact]

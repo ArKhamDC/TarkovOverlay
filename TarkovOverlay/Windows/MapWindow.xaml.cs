@@ -42,6 +42,7 @@ public partial class MapWindow : Window
 
     private string _floorSig = "";
     private bool _legendOpen = true;
+    private int _legendCount;
     private Border? _keysButton;
     private static readonly Dictionary<string, Brush> _swatches = new(StringComparer.OrdinalIgnoreCase);
     private string _frameKey = "";
@@ -802,10 +803,21 @@ public partial class MapWindow : Window
 
     private void UpdateLegendButton(MapView? view)
     {
-        var has = view?.Legend is { Length: > 0 };
+        var count = view?.Legend?.Length ?? 0;
+        if (view?.Legend is not null && count != _legendCount)
+        {
+            // A long key list starts closed so the map stays visible. Short lists (Lab, Factory) stay open.
+            if (count > 14 && _legendCount <= 14)
+                _legendOpen = false;
+            else if (count is > 0 and <= 14 && _legendCount > 14)
+                _legendOpen = true;
+            _legendCount = count;
+        }
+
+        var has = count > 0;
         if (_keysButton is null)
         {
-            _keysButton = ZoomButton("Keys", 40, "Keycard colors", ToggleLegend);
+            _keysButton = ZoomButton("Keys", 40, "Key colors", ToggleLegend);
             ZoomBar.Children.Insert(0, _keysButton);
         }
 
@@ -843,31 +855,29 @@ public partial class MapWindow : Window
         }
 
         var colW = sw + 5 + maxText + 8;
-        var cols = entries.Length > 6 && colW * 2 + pad * 2 <= w - 12 ? 2 : 1;
-        var perCol = (int)Math.Ceiling(entries.Length / (double)cols);
-        var rowH = Math.Min(15, Math.Max(11, (h - 16 - pad * 2) / perCol));
-        var boxW = cols * colW + pad * 2;
-        var boxH = perCol * rowH + pad * 2;
-        var panel = new Border
+        var maxW = Math.Max(80, w - 16);
+        var maxH = Math.Max(48, h - 16);
+        var cols = entries.Length > 6 && colW * 2 + pad * 2 <= maxW ? 2 : 1;
+        int perCol;
+        double rowH, boxW, boxH;
+        while (true)
         {
-            Width = boxW,
-            Height = boxH,
-            Background = LabelBg,
-            CornerRadius = new CornerRadius(4),
-            IsHitTestVisible = true,
-            ToolTip = "Keycard colors"
-        };
-        panel.MouseLeftButtonDown += (_, e) => e.Handled = true;
-        Canvas.SetLeft(panel, 8);
-        Canvas.SetTop(panel, 8);
-        MapCanvas.Children.Add(panel);
+            perCol = (int)Math.Ceiling(entries.Length / (double)cols);
+            rowH = Math.Min(15, Math.Max(11, (maxH - pad * 2) / perCol));
+            boxW = cols * colW + pad * 2;
+            boxH = perCol * rowH + pad * 2;
+            if (boxH <= maxH + 0.5 || cols >= entries.Length) break;
+            if ((cols + 1) * colW + pad * 2 > maxW) break;
+            cols++;
+        }
 
+        var host = new Canvas { Width = boxW, Height = boxH, Background = Brushes.Transparent };
         for (var i = 0; i < entries.Length; i++)
         {
             var col = i / perCol;
             var row = i % perCol;
-            var x = 8 + pad + col * colW;
-            var y = 8 + pad + row * rowH;
+            var x = pad + col * colW;
+            var y = pad + row * rowH;
             var entry = entries[i];
             var tip = string.IsNullOrWhiteSpace(entry.Tip) ? captions[i] : entry.Tip;
             var rect = new Rectangle
@@ -883,7 +893,7 @@ public partial class MapWindow : Window
             rect.MouseLeftButtonDown += (_, e) => e.Handled = true;
             Canvas.SetLeft(rect, x);
             Canvas.SetTop(rect, y + Math.Max(0, (rowH - sw) / 2));
-            MapCanvas.Children.Add(rect);
+            host.Children.Add(rect);
 
             var block = new TextBlock
             {
@@ -897,8 +907,41 @@ public partial class MapWindow : Window
             block.MouseLeftButtonDown += (_, e) => e.Handled = true;
             Canvas.SetLeft(block, x + sw + 5);
             Canvas.SetTop(block, y + Math.Max(0, (rowH - font - 2) / 2));
-            MapCanvas.Children.Add(block);
+            host.Children.Add(block);
         }
+
+        var scroll = boxH > maxH + 0.5 || boxW > maxW + 0.5;
+        var panel = new Border
+        {
+            Width = Math.Min(boxW, maxW),
+            Height = Math.Min(boxH, maxH),
+            Background = LabelBg,
+            CornerRadius = new CornerRadius(4),
+            ClipToBounds = true,
+            IsHitTestVisible = true,
+            ToolTip = "Key colors",
+            Child = new ScrollViewer
+            {
+                Content = host,
+                Background = Brushes.Transparent,
+                VerticalScrollBarVisibility = scroll && boxH > maxH ? ScrollBarVisibility.Auto : ScrollBarVisibility.Disabled,
+                HorizontalScrollBarVisibility = scroll && boxW > maxW ? ScrollBarVisibility.Auto : ScrollBarVisibility.Disabled,
+                IsHitTestVisible = true
+            }
+        };
+        panel.MouseLeftButtonDown += (_, e) => e.Handled = true;
+        if (scroll && panel.Child is ScrollViewer scroller)
+        {
+            panel.PreviewMouseWheel += (_, e) =>
+            {
+                scroller.ScrollToVerticalOffset(scroller.VerticalOffset - Math.Sign(e.Delta) * rowH);
+                e.Handled = true;
+            };
+        }
+
+        Canvas.SetLeft(panel, 8);
+        Canvas.SetTop(panel, 8);
+        MapCanvas.Children.Add(panel);
     }
 
     private static Brush Swatch(string hex)
@@ -1079,6 +1122,7 @@ public partial class MapWindow : Window
         "pmc" => PmcBrush,
         "scav" => ScavBrush,
         "shared" => SharedBrush,
+        "transit" => TransitBrush,
         _ => OtherBrush
     };
 
@@ -1093,6 +1137,7 @@ public partial class MapWindow : Window
     private static readonly Brush PmcBrush = Freeze(Color.FromRgb(90, 200, 120));
     private static readonly Brush ScavBrush = Freeze(Color.FromRgb(230, 180, 80));
     private static readonly Brush SharedBrush = Freeze(Color.FromRgb(142, 180, 255));
+    private static readonly Brush TransitBrush = Freeze(Color.FromRgb(255, 154, 60));
     private static readonly Brush OtherBrush = Freeze(Color.FromRgb(200, 205, 210));
     private static readonly Brush QuietBrush = Freeze(Color.FromRgb(230, 180, 70));
     private static readonly Brush LabelBg = Freeze(Color.FromArgb(210, 16, 19, 22));
