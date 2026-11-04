@@ -20,20 +20,36 @@ public sealed class MapUnderlay
     public double MaxZ { get; init; }
     public required string[] Aliases { get; init; }
     public required MapLabel[] Labels { get; init; }
+
+    /// <summary>Full extract list shipped with the underlay, including factions hidden on the overview.</summary>
+    public MapExtract[] Extracts { get; init; } = [];
+
+    /// <summary>Short credit drawn on the map when the underlay is someone else's art.</summary>
+    public string? Credit { get; init; }
 }
 
 /// <summary>Loads <c>Maps/underlays.json</c> and keeps entries whose image file is present.</summary>
 public static class MapUnderlayCatalog
 {
     public static IReadOnlyList<MapUnderlay> LoadFromAppDirectory()
+        => LoadDirectory(Path.Combine(AppContext.BaseDirectory, "Maps"));
+
+    /// <summary>
+    /// Loads <paramref name="mapsDirectory"/>/underlays.json plus any <c>{id}-extracts.json</c> beside it.
+    /// Shipped extracts replace that map's place-name labels with bilingual extract names.
+    /// </summary>
+    public static IReadOnlyList<MapUnderlay> LoadDirectory(string mapsDirectory)
     {
-        var root = Path.Combine(AppContext.BaseDirectory, "Maps");
-        var jsonPath = Path.Combine(root, "underlays.json");
+        var jsonPath = Path.Combine(mapsDirectory, "underlays.json");
         if (!File.Exists(jsonPath)) return [];
-        return Load(File.ReadAllText(jsonPath), Path.Combine(root, "images"));
+        return Load(File.ReadAllText(jsonPath), Path.Combine(mapsDirectory, "images"), ReadShippedExtracts(mapsDirectory));
     }
 
     public static IReadOnlyList<MapUnderlay> Load(string json, string imageDirectory)
+        => Load(json, imageDirectory, null);
+
+    public static IReadOnlyList<MapUnderlay> Load(
+        string json, string imageDirectory, IReadOnlyDictionary<string, MapExtract[]>? shippedExtracts)
     {
         using var doc = JsonDocument.Parse(json);
         if (!doc.RootElement.TryGetProperty("maps", out var maps) || maps.ValueKind != JsonValueKind.Array)
@@ -74,12 +90,21 @@ public static class MapUnderlayCatalog
             {
                 foreach (var label in labelNode.EnumerateArray())
                 {
-                    var text = Str(label, "text");
+                    var text = Str(label, "text") ?? Str(label, "textEn") ?? Str(label, "name");
                     var lx = Num(label, "x");
                     var lz = Num(label, "z");
                     if (string.IsNullOrWhiteSpace(text) || lx is null || lz is null) continue;
-                    labels.Add(new MapLabel(lx.Value, lz.Value, text, Num(label, "priority") ?? 100));
+                    var ru = Str(label, "textRu") ?? Str(label, "nameRu");
+                    labels.Add(new MapLabel(lx.Value, lz.Value, text, Num(label, "priority") ?? 100, string.IsNullOrWhiteSpace(ru) ? null : ru));
                 }
+            }
+
+            var extracts = Array.Empty<MapExtract>();
+            if (shippedExtracts is not null && shippedExtracts.TryGetValue(id, out var shipped) && shipped.Length > 0)
+            {
+                // World x/z from the extracts file. Do not snap them to landmark labels.
+                extracts = shipped;
+                labels = OverviewLabels(shipped);
             }
 
             list.Add(new MapUnderlay
@@ -93,7 +118,9 @@ public static class MapUnderlayCatalog
                 MinZ = Math.Min(z0.Value, z1.Value),
                 MaxZ = Math.Max(z0.Value, z1.Value),
                 Aliases = aliases.ToArray(),
-                Labels = labels.ToArray()
+                Labels = labels.ToArray(),
+                Extracts = extracts,
+                Credit = Str(map, "credit")
             });
         }
 
@@ -111,6 +138,75 @@ public static class MapUnderlayCatalog
             }
         }
         return null;
+    }
+
+    private static Dictionary<string, MapExtract[]> ReadShippedExtracts(string mapsDirectory)
+    {
+        var result = new Dictionary<string, MapExtract[]>(StringComparer.OrdinalIgnoreCase);
+        if (!Directory.Exists(mapsDirectory)) return result;
+        foreach (var path in Directory.EnumerateFiles(mapsDirectory, "*-extracts.json"))
+        {
+            var id = Path.GetFileName(path);
+            const string suffix = "-extracts.json";
+            if (id.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+                id = id[..^suffix.Length];
+            try
+            {
+                using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                if (doc.RootElement.TryGetProperty("map", out var mapId) && mapId.ValueKind == JsonValueKind.String
+                    && !string.IsNullOrWhiteSpace(mapId.GetString()))
+                    id = mapId.GetString()!;
+                var extracts = ParseExtracts(doc.RootElement);
+                if (extracts.Length > 0) result[id] = extracts;
+            }
+            catch (JsonException)
+            {
+                // A broken sidecar must not drop every other underlay.
+            }
+            catch (IOException)
+            {
+            }
+        }
+
+        return result;
+    }
+
+    private static MapExtract[] ParseExtracts(JsonElement root)
+    {
+        if (!root.TryGetProperty("extracts", out var node) || node.ValueKind != JsonValueKind.Array)
+            return [];
+        var list = new List<MapExtract>();
+        foreach (var e in node.EnumerateArray())
+        {
+            // px/py are a precomputed preview. The GPS projects world x/z itself.
+            var x = Num(e, "x");
+            var z = Num(e, "z");
+            var name = Str(e, "name") ?? Str(e, "textEn") ?? Str(e, "text");
+            if (x is null || z is null || string.IsNullOrWhiteSpace(name)) continue;
+            var ru = Str(e, "nameRu") ?? Str(e, "textRu");
+            list.Add(new MapExtract(
+                name,
+                string.IsNullOrWhiteSpace(ru) ? name : ru,
+                Str(e, "faction")?.ToLowerInvariant(),
+                x.Value,
+                Num(e, "y") ?? 0,
+                z.Value,
+                Str(e, "id")));
+        }
+
+        return list.ToArray();
+    }
+
+    private static List<MapLabel> OverviewLabels(IEnumerable<MapExtract> extracts)
+    {
+        var labels = new List<MapLabel>();
+        foreach (var e in extracts)
+        {
+            if (!ExtractNav.OverviewVisible(e.Faction, null)) continue;
+            labels.Add(new MapLabel(e.X, e.Z, e.NameEn, 200, e.NameRu));
+        }
+
+        return labels;
     }
 
     private static string? Str(JsonElement e, string name)

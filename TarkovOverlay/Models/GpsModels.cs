@@ -8,7 +8,7 @@ public readonly record struct Quat(double X, double Y, double Z, double W);
 
 public sealed record ScreenshotFix(Vec3 Position, Quat Rotation, double InGameTime);
 
-public sealed record MapExtract(string NameEn, string NameRu, string? Faction, double X, double Y, double Z);
+public sealed record MapExtract(string NameEn, string NameRu, string? Faction, double X, double Y, double Z, string? Id = null);
 
 public sealed record GameMap(
     string Id,
@@ -31,8 +31,15 @@ public sealed record GpsHud(bool HasBearing, double ArrowDegrees, int Meters, st
 
 public sealed record MapMarker(double X, double Z, string Name, string Faction, bool Nearest);
 
-/// <summary>Place name drawn on top of a map underlay. <paramref name="Priority"/> is higher for larger landmarks.</summary>
-public sealed record MapLabel(double X, double Z, string Text, double Priority);
+/// <summary>
+/// Place name drawn on top of a map underlay. <paramref name="Priority"/> is higher for larger landmarks.
+/// <paramref name="Text"/> is English. <paramref name="TextRu"/> is the Russian label when one is shipped.
+/// </summary>
+public sealed record MapLabel(double X, double Z, string Text, double Priority, string? TextRu = null)
+{
+    public string Display(bool english)
+        => english || string.IsNullOrWhiteSpace(TextRu) ? Text : TextRu;
+}
 
 /// <summary>
 /// Map window contents. When <paramref name="UnderlayImage"/> is set, the bounds are that image's
@@ -53,4 +60,5 @@ public sealed record MapView(
     MapMarker[] Markers,
     string? UnderlayImage = null,
     MapLabel[]? Labels = null,
-    double CompassDegrees = double.NaN);
+    double CompassDegrees = double.NaN,
+    string? Credit = null);

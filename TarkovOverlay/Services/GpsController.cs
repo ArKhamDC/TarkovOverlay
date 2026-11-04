@@ -255,7 +255,8 @@ public sealed class GpsController : IDisposable
             var live = _settings.GpsEnabled && visible && _logs.Tracker.InRaid && GameDetector.IsTarkovRunning();
             if (live)
             {
-                var (gameMap, uncertain) = ResolveMap();
+                var (resolved, uncertain) = ResolveMap();
+                var gameMap = WithShippedExtracts(resolved);
                 var nearest = gameMap is null || _fix is null ? null : ExtractNav.Nearest(gameMap, _fix.Position, _logs.Tracker.SideName);
                 hud = BuildHud(gameMap, uncertain, nearest, _fix);
                 showMap = _settings.GpsMapVisible;
@@ -314,31 +315,39 @@ public sealed class GpsController : IDisposable
         }
 
         var side = _logs.Tracker.SideName;
-        var markers = new List<MapMarker>();
-        foreach (var e in map.Extracts)
+        var underlay = MapUnderlayCatalog.Match(_underlays, map);
+        var shipped = underlay is { Extracts.Length: > 0 };
+        var extracts = shipped ? underlay!.Extracts : map.Extracts;
+        var shown = new List<MapExtract>();
+        foreach (var e in extracts)
         {
-            if (!ExtractNav.FactionVisible(e.Faction, side)) continue;
+            var visible = shipped
+                ? ExtractNav.OverviewVisible(e.Faction, side)
+                : ExtractNav.FactionVisible(e.Faction, side);
+            if (visible) shown.Add(e);
+        }
+        if (shown.Count == 0)
+            shown.AddRange(extracts);
+
+        var markers = new List<MapMarker>(shown.Count);
+        foreach (var e in shown)
             markers.Add(new MapMarker(e.X, e.Z, Pick(e.NameEn, e.NameRu), e.Faction ?? "", nearest is not null && ReferenceEquals(e, nearest.Extract)));
-        }
-        if (markers.Count == 0)
-        {
-            foreach (var e in map.Extracts)
-                markers.Add(new MapMarker(e.X, e.Z, Pick(e.NameEn, e.NameRu), e.Faction ?? "", nearest is not null && ReferenceEquals(e, nearest.Extract)));
-        }
 
         var mapName = Pick(map.NameEn, map.NameRu) + (uncertain ? "?" : "");
         var title = nearest is null
             ? mapName
             : $"{mapName} · {Meters((int)Math.Round(nearest.DistanceMeters))} · {Pick(nearest.Extract.NameEn, nearest.Extract.NameRu)}";
         var heading = fix is null ? 0 : WorldMath.HeadingDegrees(fix.Rotation);
-        var underlay = MapUnderlayCatalog.Match(_underlays, map);
         if (underlay is not null)
         {
+            var labels = shipped
+                ? shown.Select(e => new MapLabel(e.X, e.Z, e.NameEn, 200, e.NameRu)).ToArray()
+                : underlay.Labels;
             return new MapView(
                 title, null, underlay.Rotation,
                 underlay.MinX, underlay.MaxX, underlay.MinZ, underlay.MaxZ,
                 fix?.Position.X, fix?.Position.Z, heading, markers.ToArray(),
-                underlay.ImagePath, underlay.Labels, underlay.CompassDegrees);
+                underlay.ImagePath, labels, underlay.CompassDegrees, underlay.Credit);
         }
 
         var minX = map.MinX;
@@ -369,6 +378,14 @@ public sealed class GpsController : IDisposable
             ? "-"
             : $"{showMap}|{map.Title}|{map.UnderlayImage}|{map.PlayerX:0.#}|{map.PlayerZ:0.#}|{map.Heading:0.#}|{map.Markers.Length}|{nearest}";
         return (overlayVisible ? "1" : "0") + h + m;
+    }
+
+    private GameMap? WithShippedExtracts(GameMap? map)
+    {
+        if (map is null) return null;
+        var underlay = MapUnderlayCatalog.Match(_underlays, map);
+        if (underlay is not { Extracts.Length: > 0 }) return map;
+        return map with { Extracts = underlay.Extracts };
     }
 
     private static string Pick(string en, string ru)

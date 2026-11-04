@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. The tarkov.dev SVG maps (and the raster tiles made from them) are CC BY-NC-SA 4.0 and their authors forbid using them in an in-raid overlay or radar, so they are not shipped. MapGenie tiles and the game's own map textures are not licensed for redistribution. The images here are original drawings on those same frames: roads join the published landmark coordinates in the order those places connect, with water and building footprints. Frames were checked against spawn and extract coordinates from json.tarkov.dev. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns. Terminal and Labyrinth have no published road or landmark geometry, so they stay a plain frame.",
+  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Customs ships the tarkov.dev Customs.svg raster by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. Customs extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and the game's own map textures are not licensed for redistribution. The other images are original drawings on those same frames: roads join the published landmark coordinates in the order those places connect, with water and building footprints. Frames were checked against spawn and extract coordinates from json.tarkov.dev. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns. Terminal and Labyrinth have no published road or landmark geometry, so they stay a plain frame.",
   "maps": [
     {
       "id": "customs",
@@ -477,7 +477,17 @@
         ]
       ],
       "ponds": [],
-      "note": "Orientation matches the in-game compass: Big Red to the east, dorms to the south."
+      "note": "Raster of tarkov.dev Customs.svg (Shebuka), frame x0=698 z0=-307 x1=-372 z1=237, coordinateRotation 180. Extract markers come from Maps/customs-extracts.json (json.tarkov.dev). ZB-1011 and ZB-1012 are on the left; Crossroads, Trailer Park, and RUAF are on the right.",
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+      "imageAttribution": {
+        "author": "Shebuka",
+        "project": "the-hideout/tarkov-dev-svg-maps",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/Customs.svg",
+        "license": "CC BY-NC-SA 4.0",
+        "permission": "EFT TarkDev Telegram 2026-11-04",
+        "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+        "notes": "attribution/SOURCE.md"
+      }
     },
     {
       "id": "factory",

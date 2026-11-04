@@ -77,20 +77,61 @@ public class MapUnderlayTests
     }
 
     [Fact]
-    public void CustomsCompassPutsBigRedEastAndDormsSouth()
+    public void CustomsRasterKeepsApiExtractOrientation()
     {
         var customs = Load().Single(m => m.Id == "customs");
-        var bigRed = Uv(customs, Label(customs, "Big Red"));
-        var dorms = Uv(customs, Label(customs, "Dorms"));
-        var trailer = Uv(customs, Label(customs, "Trailer Park"));
-        Assert.True(bigRed.U > dorms.U);
-        Assert.True(dorms.V > trailer.V);
+        Assert.Equal(180, customs.Rotation);
+        Assert.Equal(-372, customs.MinX);
+        Assert.Equal(698, customs.MaxX);
+        Assert.Equal(-307, customs.MinZ);
+        Assert.Equal(237, customs.MaxZ);
+        var (width, height) = PngSize(customs.ImagePath);
+        Assert.Equal(1400, width);
+        Assert.Equal(705, height);
+        Assert.Contains("Shebuka", customs.Credit);
 
-        var gas = Uv(customs, Label(customs, "Old Gas"));
-        var (u, v) = Uv(customs, 310.7, -174.9);
-        Assert.InRange(Math.Abs(u - gas.U), 0, 0.04);
-        Assert.InRange(Math.Abs(v - gas.V), 0, 0.04);
+        // Published landmark positions still sit on this frame: Big Red east of dorms, dorms south of trailer park.
+        var bigRed = Uv(customs, -215, -119);
+        var dorms = Uv(customs, 200, 150);
+        var trailerPark = Uv(customs, -211, -219);
+        Assert.True(bigRed.U > dorms.U);
+        Assert.True(dorms.V > trailerPark.V);
         Assert.InRange(WorldMath.ScreenAngleDegrees(0, 0, customs.CompassDegrees, customs.Rotation), -0.1, 0.1);
+
+        Assert.Equal(28, customs.Extracts.Length);
+        Assert.Contains(customs.Extracts, e => e.Faction == "scav");
+        Assert.Equal(11, customs.Labels.Length);
+        Assert.DoesNotContain(customs.Labels, l => l.Text is "Administration Gate" or "Railroad to Port" or "Big Red");
+
+        var zb1011 = Extract(customs, "59c2c12e375a1b45a8e5ac1a32c5581b593aa4df");
+        var zb1012 = Extract(customs, "cdae9cc1c431a141431e9022a901eaaa70ef67ea");
+        var crossroads = Extract(customs, "ab12c1f902a669fb0c940820e8cc40d7131e3208");
+        var trailer = Extract(customs, "f4cdf3dbe54ef647a2a798266a39f1761f871b96");
+        var ruaf = Extract(customs, "aa56e9228b8452533873eeffa11b587007f49429");
+        Assert.Equal("ZB-1011", zb1011.NameEn);
+        Assert.Equal("ЗБ-1011", zb1011.NameRu);
+        Assert.Equal("Smugglers' Bunker (ZB-1012)", zb1012.NameEn);
+        Assert.Equal("Бункер Контрабандистов (ЗБ-1012)", zb1012.NameRu);
+        Assert.Equal(621.5, zb1011.X);
+        Assert.Equal(-336.33, crossroads.X);
+
+        var zbU = Uv(customs, zb1011).U;
+        var bunkerU = Uv(customs, zb1012).U;
+        var crossU = Uv(customs, crossroads).U;
+        var trailerU = Uv(customs, trailer).U;
+        var ruafU = Uv(customs, ruaf).U;
+        Assert.True(zbU < 0.15 && bunkerU < 0.3, $"ZB left, got {zbU} {bunkerU}");
+        Assert.True(crossU > 0.9 && trailerU > 0.9 && ruafU > 0.6, $"east exits right, got {crossU} {trailerU} {ruafU}");
+        Assert.True(zbU < crossU && bunkerU < ruafU);
+        // API coordinates stay on the left. They are not pulled over to the Big Red landmark.
+        Assert.True(zbU < bigRed.U - 0.5);
+
+        var label = customs.Labels.Single(l => l.Text == "ZB-1011");
+        Assert.Equal("ЗБ-1011", label.TextRu);
+        Assert.Equal("ZB-1011", label.Display(english: true));
+        Assert.Equal("ЗБ-1011", label.Display(english: false));
+        Assert.Equal(zb1011.X, label.X);
+        Assert.Equal(zb1011.Z, label.Z);
     }
 
     [Fact]
@@ -152,10 +193,10 @@ public class MapUnderlayTests
         return (u, v);
     }
 
-    private static (double U, double V) Uv(MapUnderlay map, MapLabel label) => Uv(map, label.X, label.Z);
+    private static (double U, double V) Uv(MapUnderlay map, MapExtract extract) => Uv(map, extract.X, extract.Z);
 
-    private static MapLabel Label(MapUnderlay map, string text)
-        => map.Labels.Single(l => l.Text == text);
+    private static MapExtract Extract(MapUnderlay map, string id)
+        => map.Extracts.Single(e => e.Id == id);
 
     private static (double x0, double z0, double x1, double z1) Area(string id, string name)
     {
@@ -180,7 +221,7 @@ public class MapUnderlayTests
     private static IReadOnlyList<MapUnderlay> Load()
     {
         var dir = MapsDir();
-        return MapUnderlayCatalog.Load(File.ReadAllText(Path.Combine(dir, "underlays.json")), Path.Combine(dir, "images"));
+        return MapUnderlayCatalog.LoadDirectory(dir);
     }
 
     private static string MapsDir()

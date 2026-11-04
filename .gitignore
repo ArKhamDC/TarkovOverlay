@@ -9,6 +9,7 @@ icons/
 *.webp
 *.png
 !TarkovOverlay/Maps/images/*.png
+!TarkovOverlay/Maps/attribution/*.png
 *.annotated.png
 *.log
 items_cache*.json
