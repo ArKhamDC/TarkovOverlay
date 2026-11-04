@@ -266,7 +266,11 @@ public partial class MapWindow : Window
             return;
         }
 
-        if (!WorldMath.TryFit(view.MinX, view.MaxX, view.MinZ, view.MaxZ, view.Rotation, w, h, out var fit))
+        var camMinX = view.CameraMinX ?? view.MinX;
+        var camMaxX = view.CameraMaxX ?? view.MaxX;
+        var camMinZ = view.CameraMinZ ?? view.MinZ;
+        var camMaxZ = view.CameraMaxZ ?? view.MaxZ;
+        if (!WorldMath.TryFit(camMinX, camMaxX, camMinZ, camMaxZ, view.Rotation, w, h, out var fit))
             return;
 
         Point ToScreen(double x, double z)
@@ -277,19 +281,31 @@ public partial class MapWindow : Window
 
         if (underlay is not null)
         {
+            var frame = new[]
+            {
+                ToScreen(view.MinX, view.MinZ),
+                ToScreen(view.MaxX, view.MinZ),
+                ToScreen(view.MinX, view.MaxZ),
+                ToScreen(view.MaxX, view.MaxZ)
+            };
+            var left = frame.Min(p => p.X);
+            var top = frame.Min(p => p.Y);
             var img = new System.Windows.Controls.Image
             {
                 Source = underlay,
-                Width = fit.UsedW,
-                Height = fit.UsedH,
+                Width = Math.Max(1, frame.Max(p => p.X) - left),
+                Height = Math.Max(1, frame.Max(p => p.Y) - top),
                 Stretch = Stretch.Fill,
                 IsHitTestVisible = false,
-                SnapsToDevicePixels = true
+                SnapsToDevicePixels = true,
+                Opacity = view.FloorMinX is null ? 1 : 0.42
             };
             RenderOptions.SetBitmapScalingMode(img, BitmapScalingMode.HighQuality);
-            Canvas.SetLeft(img, fit.OriginX);
-            Canvas.SetTop(img, fit.OriginY);
+            Canvas.SetLeft(img, left);
+            Canvas.SetTop(img, top);
             MapCanvas.Children.Add(img);
+            if (view.FloorMinX is double fx0 && view.FloorMaxX is double fx1 && view.FloorMinZ is double fz0 && view.FloorMaxZ is double fz1)
+                DrawFloorPlate(ToScreen, fx0, fx1, fz0, fz1);
         }
 
         MapCanvas.Children.Add(new Rectangle
@@ -368,6 +384,25 @@ public partial class MapWindow : Window
             };
             MapCanvas.Children.Add(arrow);
         }
+    }
+
+    private void DrawFloorPlate(Func<double, double, Point> toScreen, double minX, double maxX, double minZ, double maxZ)
+    {
+        var plate = new Polygon
+        {
+            Points = new PointCollection
+            {
+                toScreen(minX, minZ),
+                toScreen(maxX, minZ),
+                toScreen(maxX, maxZ),
+                toScreen(minX, maxZ)
+            },
+            Fill = FloorFill,
+            Stroke = Brushes.White,
+            StrokeThickness = 2,
+            IsHitTestVisible = false
+        };
+        MapCanvas.Children.Add(plate);
     }
 
     private void DrawScale(MapProjection fit)
@@ -567,6 +602,7 @@ public partial class MapWindow : Window
     private static readonly Brush QuietBrush = Freeze(Color.FromRgb(230, 180, 70));
     private static readonly Brush LabelBg = Freeze(Color.FromArgb(210, 16, 19, 22));
     private static readonly Brush LabelFg = Freeze(Color.FromRgb(236, 232, 214));
+    private static readonly Brush FloorFill = Freeze(Color.FromArgb(150, 196, 186, 160));
     private static readonly Brush FrameStroke = Freeze(Color.FromArgb(50, 255, 255, 255));
     private static readonly FontFamily UiFont = new("Segoe UI");
 

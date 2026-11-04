@@ -67,4 +67,12 @@ public sealed record MapView(
     MapMarker[] Markers,
     string? UnderlayImage = null,
     MapLabel[]? Labels = null,
-    double CompassDegrees = double.NaN);
+    double CompassDegrees = double.NaN,
+    double? CameraMinX = null,
+    double? CameraMaxX = null,
+    double? CameraMinZ = null,
+    double? CameraMaxZ = null,
+    double? FloorMinX = null,
+    double? FloorMaxX = null,
+    double? FloorMinZ = null,
+    double? FloorMaxZ = null);

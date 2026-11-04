@@ -422,31 +422,71 @@ def render(spec: dict, path: Path) -> tuple[int, int]:
     for width_m, points in spec.get("roads") or []:
         paint(points, width_m, palette[3], palette[2])
 
-    for area in spec["areas"]:
-        poly = [
-            pix(area["x0"], area["z0"]),
-            pix(area["x1"], area["z0"]),
-            pix(area["x1"], area["z1"]),
-            pix(area["x0"], area["z1"]),
-        ]
-        draw.polygon(poly, fill=palette[5], outline=palette[6])
+    def lighten(color: tuple[int, int, int], amount: int) -> tuple[int, int, int]:
+        return tuple(min(255, channel + amount) for channel in color)
 
-    foot = 12 if spec["id"] in {"factory", "the-lab"} else 26
+    def draw_block(x0: float, z0: float, x1: float, z1: float, fill: tuple[int, int, int]) -> None:
+        xs = sorted((x0, x1))
+        zs = sorted((z0, z1))
+        ring = [pix(xs[0], zs[0]), pix(xs[1], zs[0]), pix(xs[1], zs[1]), pix(xs[0], zs[1])]
+        draw.polygon(ring, fill=fill)
+        span_a, span_b = xs[1] - xs[0], zs[1] - zs[0]
+        if span_a > 8 and span_b > 8:
+            inset_x, inset_z = span_a * 0.16, span_b * 0.16
+            roof = [
+                pix(xs[0] + inset_x, zs[0] + inset_z),
+                pix(xs[1] - inset_x, zs[0] + inset_z),
+                pix(xs[1] - inset_x, zs[1] - inset_z),
+                pix(xs[0] + inset_x, zs[1] - inset_z),
+            ]
+            draw.polygon(roof, fill=lighten(fill, 26))
+            # A spine along the long side so a large footprint reads as a building, not a flat slab.
+            if max(span_a, span_b) > 36:
+                if span_a >= span_b:
+                    mid = (zs[0] + zs[1]) / 2
+                    half = span_b * 0.1
+                    corridor = [pix(xs[0] + inset_x, mid - half), pix(xs[1] - inset_x, mid - half), pix(xs[1] - inset_x, mid + half), pix(xs[0] + inset_x, mid + half)]
+                else:
+                    mid = (xs[0] + xs[1]) / 2
+                    half = span_a * 0.1
+                    corridor = [pix(mid - half, zs[0] + inset_z), pix(mid + half, zs[0] + inset_z), pix(mid + half, zs[1] - inset_z), pix(mid - half, zs[1] - inset_z)]
+                draw.polygon(corridor, fill=lighten(fill, 8))
+        draw.line(ring + [ring[0]], fill=palette[6], width=max(1, round(ppm * 1.4)))
+
+    for area in spec["areas"]:
+        if str(area["name"]).lower() == "mall":
+            plate = lighten(palette[0], 18)
+            ring = [
+                pix(area["x0"], area["z0"]),
+                pix(area["x1"], area["z0"]),
+                pix(area["x1"], area["z1"]),
+                pix(area["x0"], area["z1"]),
+            ]
+            draw.polygon(ring, fill=plate)
+            draw.line(ring + [ring[0]], fill=palette[6], width=max(2, round(ppm * 2)))
+            continue
+        draw_block(area["x0"], area["z0"], area["x1"], area["z1"], palette[5])
+
+    def footprint(name: str) -> tuple[float, float]:
+        lowered = name.lower()
+        if spec["id"] in {"factory", "the-lab"}:
+            return 12, 9
+        if spec["id"] == "interchange":
+            return 16, 12
+        if any(word in lowered for word in ("dorm", "sawmill", "resort", "plant", "chalet", "depot", "warehouse", "bunker", "hotel", "construction", "knight", "bishop", "pawn", "king")):
+            return 34, 24
+        if any(word in lowered for word in ("shack", "tent", "tree", "rock", "nest")):
+            return 12, 10
+        return 20, 15
+
+    blocking = [area for area in spec["areas"] if str(area["name"]).lower() != "mall"]
     for label in spec["labels"]:
         if any(token in label["text"] for token in ("St.", "Ave", "Alley")):
             continue
-        if inside_area(label["x"], label["z"], spec["areas"]):
+        if inside_area(label["x"], label["z"], blocking):
             continue
-        if spec["id"] in {"interchange", "customs", "reserve", "shoreline"}:
-            continue
-        half_x, half_z = foot / 2, foot * 0.35
-        poly = [
-            pix(label["x"] - half_x, label["z"] - half_z),
-            pix(label["x"] + half_x, label["z"] - half_z),
-            pix(label["x"] + half_x, label["z"] + half_z),
-            pix(label["x"] - half_x, label["z"] + half_z),
-        ]
-        draw.polygon(poly, fill=palette[5], outline=palette[6])
+        half_x, half_z = footprint(label["text"])
+        draw_block(label["x"] - half_x, label["z"] - half_z, label["x"] + half_x, label["z"] + half_z, palette[5])
 
     draw.rectangle((1, 1, width - 2, height - 2), outline=palette[6], width=2)
     path.parent.mkdir(parents=True, exist_ok=True)

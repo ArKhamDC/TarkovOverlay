@@ -345,11 +345,29 @@ public sealed class GpsController : IDisposable
         var heading = fix is null ? 0 : WorldMath.HeadingDegrees(fix.Rotation);
         if (underlay is not null)
         {
+            double? camMinX = null, camMaxX = null, camMinZ = null, camMaxZ = null;
+            double? floorMinX = null, floorMaxX = null, floorMinZ = null, floorMaxZ = null;
+            if (floor?.X0 is double fx0 && floor.Z0 is double fz0 && floor.X1 is double fx1 && floor.Z1 is double fz1)
+            {
+                floorMinX = Math.Min(fx0, fx1);
+                floorMaxX = Math.Max(fx0, fx1);
+                floorMinZ = Math.Min(fz0, fz1);
+                floorMaxZ = Math.Max(fz0, fz1);
+                var floorPadX = Math.Max(22, (floorMaxX.Value - floorMinX.Value) * 0.55);
+                var floorPadZ = Math.Max(22, (floorMaxZ.Value - floorMinZ.Value) * 0.55);
+                camMinX = Math.Max(underlay.MinX, floorMinX.Value - floorPadX);
+                camMaxX = Math.Min(underlay.MaxX, floorMaxX.Value + floorPadX);
+                camMinZ = Math.Max(underlay.MinZ, floorMinZ.Value - floorPadZ);
+                camMaxZ = Math.Min(underlay.MaxZ, floorMaxZ.Value + floorPadZ);
+            }
+
             return new MapView(
                 title, null, underlay.Rotation,
                 underlay.MinX, underlay.MaxX, underlay.MinZ, underlay.MaxZ,
                 fix?.Position.X, fix?.Position.Z, heading, markers.ToArray(),
-                underlay.ImagePath, underlay.Labels, underlay.CompassDegrees);
+                underlay.ImagePath, underlay.Labels, underlay.CompassDegrees,
+                camMinX, camMaxX, camMinZ, camMaxZ,
+                floorMinX, floorMaxX, floorMinZ, floorMaxZ);
         }
 
         var minX = map.MinX;
