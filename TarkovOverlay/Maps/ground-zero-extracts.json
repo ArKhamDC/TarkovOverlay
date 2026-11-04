@@ -3,157 +3,102 @@
   "bounds": {
     "x0": 249,
     "z0": -124,
-    "x1": -121.71,
+    "x1": -99,
     "z1": 364
   },
   "coordinateRotation": 180,
   "source": "json.tarkov.dev/regular/maps",
-  "apiNameId": "Sandbox",
-  "note": "Raster of tarkov.dev GroundZero.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/ground-zero-extracts.json from json.tarkov.dev/regular/maps. Fitted frame x0=249 z0=-124 x1=-121.71 z1=364. publishedBounds min x is -99. Pinewood Basement (Co-Op) is about 15 m east of that edge (right of this 180 degree frame), so it was extended by 8 m. Scav Bunker (API name East Gate) and UN Roadblock are hundreds of metres off this SVG (about 582 m and 429 m). Growing the frame to reach them would shrink the map to a corner, so those two stay in the extract file and off the art. Ground Zero level 21 uses this image; its API rows are the six in-frame extracts without factions. This file is the base Sandbox list.",
+  "note": "World x/y/z from https://json.tarkov.dev/regular/maps for ground-zero (Sandbox), fetched 2026-11-04 with User-Agent TarkovOverlay/1.0. Names are maps_en / maps_ru. ground-zero-21 (Sandbox_high) uses the same in-frame extracts; Scav Bunker, UN Roadblock, and Pinewood Basement are the level-1 exits outside this frame. The GroundZero.svg ground raster paints the extract captions. GPS markers use the published Y: below 21 underground, below 28 ground, below 32.3 second, otherwise third. No horizontal shift is applied.",
   "extracts": [
     {
       "id": "58b21021d80db728cd7db688a00677980593bf85",
       "nameKey": "Nakatani_stairs_free_exit",
       "name": "Nakatani Basement Stairs",
       "nameRu": "Спуск в подвал в Nakatani",
-      "textEn": "Nakatani Basement Stairs",
-      "textRu": "Спуск в подвал в Nakatani",
       "faction": "shared",
       "x": -16.12,
       "y": 14.76,
-      "z": 335.06,
-      "px": 1391.0,
-      "py": 2408.18,
-      "kind": "extract",
-      "priority": 200
+      "z": 335.06
     },
     {
       "id": "d36aaa1e0306978ca39f00edec5b4195bf7a57da",
       "nameKey": "Scav_coop_exit",
       "name": "Scav Checkpoint (Co-op)",
       "nameRu": "Блокпост Диких (Совм.)",
-      "textEn": "Scav Checkpoint (Co-op)",
-      "textRu": "Блокпост Диких (Совм.)",
       "faction": "shared",
       "x": 25.22,
       "y": 24.51,
-      "z": -79.54,
-      "px": 1174.1,
-      "py": 233.23,
-      "kind": "extract",
-      "priority": 200
+      "z": -79.54
     },
     {
       "id": "c0be13ca1d5b12f54c2f615533bcb137d26a98ff",
       "nameKey": "groundzero_secret_adaptation",
       "name": "Tartowers Sales Office",
       "nameRu": "Офис продаж Tartowers",
-      "textEn": "Tartowers Sales Office",
-      "textRu": "Офис продаж Tartowers",
       "faction": "pmc",
       "x": 190.8,
       "y": 17.64,
-      "z": 133.39,
-      "px": 305.36,
-      "py": 1350.24,
-      "kind": "extract",
-      "priority": 200
+      "z": 133.39
     },
     {
       "id": "b8427fbbffcf849ead5619fcc6c4d19225468f28",
       "nameKey": "Exit_E10_coop",
       "name": "Pinewood Basement (Co-Op)",
       "nameRu": "Подвал в Pinewood (Совм.)",
-      "textEn": "Pinewood Basement (Co-Op)",
-      "textRu": "Подвал в Pinewood (Совм.)",
       "faction": "shared",
       "x": -113.71,
       "y": -2.93,
-      "z": 65.63,
-      "px": 1903.03,
-      "py": 994.78,
-      "kind": "extract",
-      "priority": 200
+      "z": 65.63
     },
     {
       "id": "22f281b913a76b31fe574b792b65c115fd8bb656",
       "nameKey": "Sniper_exit",
       "name": "Mira Ave (Flare)",
       "nameRu": "Проспект Мира (Сигнал)",
-      "textEn": "Mira Ave (Flare)",
-      "textRu": "Проспект Мира (Сигнал)",
       "faction": "pmc",
       "x": 218.23,
       "y": 17.99,
-      "z": -38.51,
-      "px": 161.44,
-      "py": 448.47,
-      "kind": "extract",
-      "priority": 200
+      "z": -38.51
     },
     {
       "id": "495c627fb5f7498fb7621bf193f16b74e1c952b9",
       "nameKey": "UN Roadblock",
       "name": "UN Roadblock",
       "nameRu": "Южный пост ООН",
-      "textEn": "UN Roadblock",
-      "textRu": "Южный пост ООН",
       "faction": "pmc",
       "x": -527.87,
       "y": 1.68,
-      "z": 288.23,
-      "px": 4076.0,
-      "py": 2162.52,
-      "kind": "extract",
-      "priority": 200
+      "z": 288.23
     },
     {
       "id": "af20846a32f03fec90986c60eb732da7b87f72b0",
       "nameKey": "Unity_free_exit",
       "name": "Emercom Checkpoint",
       "nameRu": "Пункт МЧС",
-      "textEn": "Emercom Checkpoint",
-      "textRu": "Пункт МЧС",
       "faction": "shared",
       "x": 151.63,
       "y": 24.66,
-      "z": -97.46,
-      "px": 510.87,
-      "py": 139.23,
-      "kind": "extract",
-      "priority": 200
+      "z": -97.46
     },
     {
       "id": "47e9492ade77358f16b17e94f44e09fa50b82276",
       "nameKey": "East Gate",
       "name": "Scav Bunker",
       "nameRu": "Бункер Диких",
-      "textEn": "Scav Bunker",
-      "textRu": "Бункер Диких",
       "faction": "scav",
       "x": 220.43,
       "y": 20.54,
-      "z": -705.8,
-      "px": 149.9,
-      "py": -3052.07,
-      "kind": "extract",
-      "priority": 200
+      "z": -705.8
     },
     {
       "id": "e858220a780a95ffbb923225d7649aa134df8836",
       "nameKey": "Sandbox_VExit",
       "name": "Police Cordon V-Ex",
       "nameRu": "А-Выход полицейский кордон",
-      "textEn": "Police Cordon V-Ex",
-      "textRu": "А-Выход полицейский кордон",
       "faction": "pmc",
       "x": -19.51,
       "y": 23.71,
-      "z": 114.94,
-      "px": 1408.79,
-      "py": 1253.46,
-      "kind": "extract",
-      "priority": 200
+      "z": 114.94
     }
   ]
 }

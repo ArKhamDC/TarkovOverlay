@@ -291,6 +291,98 @@ public class InteriorTests
     }
 
     [Fact]
+    public void GroundZeroFollowsHeightAndKeepsAPinnedFloorUntilTheBandChanges()
+    {
+        var map = Load().Single(b => b.Id == "groundzero");
+        Assert.Equal("ground-zero", map.MapId);
+        Assert.True(map.CoversMap);
+        Assert.Equal(180, map.Rotation);
+        Assert.Equal(new[] { -1, 1, 2, 3 }, map.Floors.Select(f => f.Floor).ToArray());
+        Assert.Equal(new[] { "-1", "1", "2", "3" }, map.Floors.Select(f => f.Caption).ToArray());
+        Assert.Equal(new[] { "Underground", "Ground", "Second", "Third" }, map.Floors.Select(f => f.Tip).ToArray());
+        Assert.Contains("Shebuka", map.Credit);
+        Assert.Equal(249, map.X0);
+        Assert.Equal(-124, map.Z0);
+        Assert.Equal(-99, map.X1);
+        Assert.Equal(364, map.Z1);
+        Assert.Empty(map.Floors.SelectMany(f => f.Labels));
+        foreach (var plan in map.Floors)
+        {
+            Assert.Equal(2094, plan.Width);
+            Assert.Equal(2931, plan.Height);
+            var (w, h) = PngSize(plan.ImagePath);
+            Assert.Equal(2094, w);
+            Assert.Equal(2931, h);
+            Assert.Contains("groundzero_", plan.ImagePath, StringComparison.OrdinalIgnoreCase);
+        }
+
+        var overview = File.ReadAllBytes(Path.Combine(MapsDir(), "images", "ground-zero.png"));
+        Assert.Equal(overview, File.ReadAllBytes(map.Floors.Single(f => f.Floor == 1).ImagePath));
+
+        Assert.Equal(-1, InteriorCatalog.FloorFromAltitude(map, 13.5));
+        Assert.Equal(-1, InteriorCatalog.FloorFromAltitude(map, 20.999));
+        Assert.Equal(1, InteriorCatalog.FloorFromAltitude(map, 21));
+        Assert.Equal(1, InteriorCatalog.FloorFromAltitude(map, 27.999));
+        Assert.Equal(2, InteriorCatalog.FloorFromAltitude(map, 28));
+        Assert.Equal(2, InteriorCatalog.FloorFromAltitude(map, 32.3 - 1e-9));
+        Assert.Equal(3, InteriorCatalog.FloorFromAltitude(map, 32.3));
+        Assert.Equal(3, InteriorCatalog.FloorFromAltitude(map, 35.41));
+        Assert.Null(InteriorCatalog.FloorFromAltitude(map, double.NaN));
+
+        var onMap = InteriorCatalog.ForMap(Load(), Game("Sandbox", "ground-zero", "maps/sandbox_preset.bundle"));
+        Assert.Single(onMap);
+        Assert.Single(InteriorCatalog.ForMap(Load(), Game("Sandbox_high", "ground-zero-21", "maps/sandbox_high_preset.bundle")));
+        Assert.Single(InteriorCatalog.ForMap(Load(), Game("Sandbox_start", "ground-zero-tutorial", "maps/sandbox_start_preset.bundle")));
+        Assert.DoesNotContain(InteriorCatalog.ForMap(Load(), Game("laboratory", "the-lab", "maps/laboratory_preset.bundle")), b => b.Id == "groundzero");
+
+        // Official frame, no x shift: the parking-utility lock is the image point (249-x)/348, (z+124)/488.
+        Assert.True(map.TryUv(107.05, 50.64, out var lockU, out var lockV));
+        Assert.Equal((249 - 107.05) / 348, lockU, 6);
+        Assert.Equal((50.64 + 124) / 488, lockV, 6);
+        Assert.InRange(lockU, 0, 1);
+        Assert.InRange(lockV, 0, 1);
+        Assert.True(map.TryUv(264.95, 56.14, out var oobU, out _));
+        Assert.True(oobU < 0, "the second factory-exit lock is outside the frame");
+
+        var state = InteriorFix.Overview;
+        (state, var building, var floor) = InteriorCatalog.Advance(onMap, state, 151.63, 24.66, -97.46);
+        Assert.Equal("groundzero", building!.Id);
+        Assert.Equal(1, floor!.Floor);
+        Assert.Null(state.LockBand);
+        Assert.Equal("Ground", InteriorCatalog.FloorOptions(building, floor.Floor)!.Single(o => o.Selected).Tip);
+        Assert.Equal(new[] { "-1", "1", "2", "3" }, InteriorCatalog.FloorOptions(building, 1)!.Select(o => o.Caption).ToArray());
+
+        (state, building, floor) = InteriorCatalog.Advance(onMap, state, 900, 24, 900);
+        Assert.Equal(1, floor!.Floor);
+
+        state = InteriorCatalog.PinFloor(onMap, state, 3, 24);
+        Assert.Equal(1, state.LockBand);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 80, 25, 140);
+        Assert.Equal(3, floor!.Floor);
+        Assert.Equal(1, state.LockBand);
+
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, -17.98, 30.71, 58.55);
+        Assert.Equal(2, floor!.Floor);
+        Assert.Null(state.LockBand);
+
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 107.05, 13.5, 50.64);
+        Assert.Equal(-1, floor!.Floor);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 0, 35.41, 0);
+        Assert.Equal(3, floor!.Floor);
+
+        Assert.True(InteriorCatalog.ExtractOnFloor(map, 24.66, 1));
+        Assert.False(InteriorCatalog.ExtractOnFloor(map, 24.66, -1));
+        Assert.True(InteriorCatalog.ExtractOnFloor(map, 14.76, -1));
+        Assert.False(InteriorCatalog.ExtractOnFloor(map, 14.76, 1));
+        Assert.True(InteriorCatalog.ExtractOnFloor(map, 30.71, 2));
+        Assert.False(InteriorCatalog.ExtractOnFloor(map, 30.71, 3));
+        Assert.True(InteriorCatalog.ExtractOnFloor(map, 35.41, 3));
+        var dorms = Load().Single(b => b.Id == "dorms_3story");
+        Assert.Null(dorms.FloorByY);
+        Assert.True(InteriorCatalog.ExtractOnFloor(dorms, 14.76, 1));
+    }
+
+    [Fact]
     public void EnteringABuildingSelectsGroundAndLeavingReturnsToOverview()
     {
         var customs = For("bigmap", "customs", "maps/customs_preset.bundle");

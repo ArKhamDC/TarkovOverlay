@@ -204,7 +204,6 @@ public class MapUnderlayTests
             ["reserve"] = (2560, 2322, 11),
             ["interchange"] = (2560, 2106, 9),
             ["streets-of-tarkov"] = (1867, 2560, 19),
-            ["ground-zero"] = (1945, 2560, 9),
             ["terminal"] = (2174, 2560, 0),
         };
 
@@ -220,8 +219,6 @@ public class MapUnderlayTests
             foreach (var extract in map.Extracts)
             {
                 Assert.False(string.IsNullOrWhiteSpace(extract.NameRu), extract.NameEn);
-                if (id == "ground-zero" && extract.NameEn is "UN Roadblock" or "Scav Bunker")
-                    continue;
                 Assert.True(WorldMath.TryImageUv(extract.X, extract.Z, map.MinX, map.MaxX, map.MinZ, map.MaxZ, map.Rotation, out var u, out var v));
                 Assert.InRange(u, 0, 1);
                 Assert.InRange(v, 0, 1);
@@ -248,23 +245,8 @@ public class MapUnderlayTests
         Assert.Equal("Тропа к реке (Сигнал)", flare.NameRu);
         Assert.Equal(613.9, flare.X);
 
-        var ground = maps.Single(m => m.Id == "ground-zero");
-        var pinewood = ground.Extracts.Single(e => e.NameEn == "Pinewood Basement (Co-Op)");
-        Assert.Equal("Подвал в Pinewood (Совм.)", pinewood.NameRu);
-        var (pineU, pineV) = Uv(ground, pinewood);
-        Assert.InRange(pineU, 0.9, 1);
-        Assert.InRange(pineV, 0, 1);
-        var un = ground.Extracts.Single(e => e.NameEn == "UN Roadblock");
-        var bunker = ground.Extracts.Single(e => e.NameEn == "Scav Bunker");
-        Assert.Equal("Южный пост ООН", un.NameRu);
-        Assert.Equal("Бункер Диких", bunker.NameRu);
-        var (unU, unV) = Uv(ground, un);
-        var (bunkerU, bunkerV) = Uv(ground, bunker);
-        Assert.True(unU < 0 || unU > 1 || unV < 0 || unV > 1);
-        Assert.True(bunkerU < 0 || bunkerU > 1 || bunkerV < 0 || bunkerV > 1);
         var level21 = Match(maps, "Sandbox_high", "ground-zero-21", "maps/sandbox_high_preset.bundle");
         Assert.Equal("ground-zero", level21.Id);
-        Assert.Equal(9, level21.Extracts.Length);
 
         var terminal = maps.Single(m => m.Id == "terminal");
         Assert.Empty(terminal.Extracts);
@@ -281,6 +263,66 @@ public class MapUnderlayTests
         Assert.Equal((2880, 2344), PngSize(lab.ImagePath));
         Assert.Equal(28, customs.Extracts.Length);
         Assert.Equal(7, lab.Extracts.Length);
+    }
+
+    [Fact]
+    public void GroundZeroRasterUsesTheOfficialFrameAndDoorKeys()
+    {
+        var map = Load().Single(m => m.Id == "ground-zero");
+        Assert.Equal(180, map.Rotation);
+        Assert.Equal(180, map.CompassDegrees);
+        Assert.Equal(-99, map.MinX);
+        Assert.Equal(249, map.MaxX);
+        Assert.Equal(-124, map.MinZ);
+        Assert.Equal(364, map.MaxZ);
+        Assert.Contains("Shebuka", map.Credit);
+        var (width, height) = PngSize(map.ImagePath);
+        Assert.Equal(2094, width);
+        Assert.Equal(2931, height);
+
+        // Customs-style rotation: image u is (249-x)/348. An x+2 shift is not this frame.
+        Assert.True(WorldMath.TryImageUv(107.05, 50.64, map.MinX, map.MaxX, map.MinZ, map.MaxZ, map.Rotation, out var u, out var v));
+        Assert.Equal((249 - 107.05) / 348.0, u, 6);
+        Assert.Equal((50.64 + 124) / 488.0, v, 6);
+        Assert.True(WorldMath.TryImageUv(107.05 + 2, 50.64, map.MinX, map.MaxX, map.MinZ, map.MaxZ, map.Rotation, out var shifted, out _));
+        Assert.NotEqual(u, shifted);
+
+        Assert.Equal(9, map.Extracts.Length);
+        var emercom = map.Extracts.Single(e => e.NameEn == "Emercom Checkpoint");
+        Assert.Equal("Пункт МЧС", emercom.NameRu);
+        Assert.Equal("shared", emercom.Faction);
+        Assert.Equal(151.63, emercom.X);
+        Assert.Equal(24.66, emercom.Y, 2);
+        Assert.Equal(-97.46, emercom.Z);
+        var nakatani = map.Extracts.Single(e => e.NameEn == "Nakatani Basement Stairs");
+        Assert.Equal("Спуск в подвал в Nakatani", nakatani.NameRu);
+        Assert.Equal(14.76, nakatani.Y, 2);
+        var bunker = map.Extracts.Single(e => e.NameEn == "Scav Bunker");
+        Assert.Equal("scav", bunker.Faction);
+        Assert.Equal("Бункер Диких", bunker.NameRu);
+        Assert.DoesNotContain(map.Labels, l => l.Text == "Scav Bunker");
+        Assert.Equal(8, map.Labels.Length);
+        Assert.Contains(map.Labels, l => l.Text == "Emercom Checkpoint" && l.TextRu == "Пункт МЧС");
+
+        var outside = new[] { "Pinewood Basement (Co-Op)", "UN Roadblock", "Scav Bunker" };
+        foreach (var extract in map.Extracts)
+        {
+            Assert.False(string.IsNullOrWhiteSpace(extract.NameRu));
+            var onImage = WorldMath.TryImageUv(extract.X, extract.Z, map.MinX, map.MaxX, map.MinZ, map.MaxZ, map.Rotation, out var eu, out var ev)
+                          && eu is >= 0 and <= 1 && ev is >= 0 and <= 1;
+            Assert.Equal(!outside.Contains(extract.NameEn), onImage);
+        }
+
+        Assert.Equal(5, map.Keycards.Length);
+        Assert.Equal(
+            new[] { "#ff8c1a", "#ff4d4d", "#3d9bff", "#3ddc5a", "#b05cff" },
+            map.Keycards.Select(k => k.Fill).ToArray());
+        Assert.All(map.Keycards, k => Assert.False(k.RoomFill));
+        Assert.All(map.Keycards, k => Assert.Equal(1, k.Count));
+        Assert.Equal("5448ba0b4bdc2d02308b456c", map.Keycards.Single(k => k.Name == "Factory exit").ItemId);
+        Assert.Contains("outside the frame", map.Keycards.Single(k => k.Name == "Factory exit").Tip, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal("658199aa38c79576a2569e13", map.Keycards.Single(k => k.Name == "Science office").ItemId);
+        Assert.DoesNotContain(map.Keycards, k => k.Name.Contains("stairs", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
