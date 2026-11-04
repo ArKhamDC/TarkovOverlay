@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using System.Text.Json;
 using TarkovOverlay.Models;
 using TarkovOverlay.Services;
@@ -199,7 +200,7 @@ public class MapUnderlayTests
         var expected = new Dictionary<string, (int W, int H, int Extracts)>
         {
             ["woods"] = (2560, 2492, 20),
-            ["lighthouse"] = (1575, 2560, 12),
+            ["lighthouse"] = (2119, 3446, 16),
             ["shoreline"] = (2560, 1695, 19),
             ["reserve"] = (2482, 2283, 11),
             ["interchange"] = (2560, 2106, 9),
@@ -482,6 +483,106 @@ public class MapUnderlayTests
         Assert.False(storage.RoomFill);
         Assert.Equal("66acd6702b17692df20144c0", storage.ItemId);
         Assert.DoesNotContain(factory.Keycards, k => k.Name.Contains("stairs", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void LighthouseRasterIsTheSingleGroundFloorWithKeysAndTransits()
+    {
+        var map = Load().Single(m => m.Id == "lighthouse");
+        Assert.Equal(180, map.Rotation);
+        Assert.Equal(180, map.CompassDegrees);
+        Assert.Equal(-545, map.MinX);
+        Assert.Equal(515, map.MaxX);
+        Assert.Equal(-998, map.MinZ);
+        Assert.Equal(725, map.MaxZ);
+        Assert.Contains("Shebuka", map.Credit);
+        var (width, height) = PngSize(map.ImagePath);
+        Assert.Equal(2119, width);
+        Assert.Equal(3446, height);
+        Assert.Equal("f63ec55672f4094e48a0d80432e723a9d63d981daebe2a0c6f4b7142a58685f7", Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(map.ImagePath))).ToLowerInvariant());
+
+        // Pack projection: u=(515-x)/1060, v=(z+998)/1723. Top-left is x0/z0.
+        var (originU, originV) = Uv(map, 515, -998);
+        var (endU, endV) = Uv(map, -545, 725);
+        Assert.Equal(0, originU, 6);
+        Assert.Equal(0, originV, 6);
+        Assert.Equal(1, endU, 6);
+        Assert.Equal(1, endV, 6);
+        var (lockU, lockV) = Uv(map, -58.59, -293);
+        Assert.Equal((515 - (-58.59)) / 1060.0, lockU, 6);
+        Assert.Equal((-293 + 998) / 1723.0, lockV, 6);
+
+        Assert.Equal("lighthouse", Match(Load(), "Lighthouse", "lighthouse", "maps/lighthouse_preset.bundle").Id);
+
+        Assert.Equal(16, map.Extracts.Length);
+        Assert.Equal(12, map.Extracts.Count(e => e.Faction is "pmc" or "scav" or "shared"));
+        Assert.Equal(4, map.Extracts.Count(e => e.Faction == "transit"));
+        var train = map.Extracts.Single(e => e.NameEn == "Armored Train");
+        Assert.Equal("Бронепоезд", train.NameRu);
+        Assert.Equal("shared", train.Faction);
+        Assert.Equal(6.27, train.X);
+        Assert.Equal(13.34, train.Y, 2);
+        Assert.Equal(-869.48, train.Z);
+        Assert.Equal("cc16b27f07697867c3afe8731a5323f8b6db7574", train.Id);
+        var shoreline = map.Extracts.Where(e => e.NameEn == "Path to Shoreline").ToArray();
+        Assert.Equal(2, shoreline.Length);
+        Assert.Contains(shoreline, e => e.Faction == "pmc");
+        Assert.Contains(shoreline, e => e.Faction == "scav");
+        var toShore = map.Extracts.Single(e => e.Id == "21");
+        Assert.Equal("Transit to Shoreline", toShore.NameEn);
+        Assert.Equal("Переход на Берег", toShore.NameRu);
+        Assert.Equal("transit", toShore.Faction);
+        Assert.Equal(-338.35, toShore.X);
+        Assert.Equal(17.54, toShore.Y, 2);
+        Assert.Equal(-165.53, toShore.Z);
+        Assert.Contains(map.Extracts, e => e.NameEn == "Transit to Reserve" && e.NameRu == "Переход на Резерв" && e.Id == "22");
+        Assert.Contains(map.Extracts, e => e.NameEn == "Transit to Woods" && e.Id == "23");
+        Assert.Contains(map.Extracts, e => e.NameEn == "Transit to Icebreaker" && e.NameRu == "Переход на Ледокол" && e.Id == "51");
+        foreach (var extract in map.Extracts)
+        {
+            Assert.False(string.IsNullOrWhiteSpace(extract.NameRu));
+            Assert.True(WorldMath.TryImageUv(extract.X, extract.Z, map.MinX, map.MaxX, map.MinZ, map.MaxZ, map.Rotation, out var eu, out var ev));
+            Assert.InRange(eu, 0, 1);
+            Assert.InRange(ev, 0, 1);
+        }
+
+        Assert.Equal(11, map.Labels.Length);
+        Assert.Contains(map.Labels, l => l.Text == "Armored Train" && l.TextRu == "Бронепоезд");
+        Assert.Contains(map.Labels, l => l.Text == "Transit to Icebreaker" && l.TextRu == "Переход на Ледокол");
+        Assert.Contains(map.Labels, l => l.Text == "Southern Road");
+        Assert.DoesNotContain(map.Labels, l => l.Text == "Industrial Zone Gates");
+        Assert.DoesNotContain(map.Labels, l => l.Text == "Southern Road Landslide");
+        Assert.DoesNotContain(map.Labels, l => l.Text is "Boathouses" or "Water Treatment");
+
+        Assert.Equal(23, map.Keycards.Length);
+        Assert.Equal(19, map.Keycards.Count(k => k.ItemId is not null));
+        Assert.All(map.Keycards, k => Assert.False(k.RoomFill));
+        var emergency = map.Keycards.Single(k => k.ItemId == "5448ba0b4bdc2d02308b456c");
+        Assert.Equal("Factory emergency exit key", emergency.Name);
+        Assert.Equal("#ff3fe7", emergency.Fill);
+        Assert.Equal(8, emergency.Count);
+        Assert.Contains("raid", emergency.Tip, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(1, map.Keycards.Single(k => k.Name == "Cold storage room key").Count);
+        Assert.Equal("61a6446f4b5f8b70f451b166", map.Keycards.Single(k => k.Name == "Cold storage room key").ItemId);
+        Assert.Equal(
+            new[]
+            {
+                "#ff3f3f", "#3f77ff", "#afff3f", "#ff3fe7", "#3fffde", "#ffa73f", "#6f3fff", "#48ff3f",
+                "#ff3f80", "#3fb7ff", "#efff3f", "#d63fff", "#3fff9e", "#ff663f", "#3f50ff", "#88ff3f",
+                "#ff3fc0", "#3ff8ff", "#ffce3f", "#3ddc5a", "#e6e65a", "#5ad0e6", "#ff9a3c"
+            },
+            map.Keycards.Select(k => k.Fill).ToArray());
+        Assert.Equal(23, map.Keycards.Select(k => k.Fill).Distinct(StringComparer.OrdinalIgnoreCase).Count());
+        Assert.Equal("PMC extract", map.Keycards[^4].Name);
+        Assert.Equal("Transit", map.Keycards[^1].Name);
+        Assert.Equal(0, map.Keycards[^1].Count);
+        Assert.Null(map.Keycards[^1].ItemId);
+        Assert.Contains("Not a door key", map.Keycards[^1].Tip);
+
+        using var interiors = JsonDocument.Parse(File.ReadAllText(Path.Combine(MapsDir(), "interiors.json")));
+        Assert.DoesNotContain(
+            interiors.RootElement.GetProperty("maps").EnumerateArray(),
+            m => m.GetProperty("id").GetString() == "lighthouse");
     }
 
     [Fact]

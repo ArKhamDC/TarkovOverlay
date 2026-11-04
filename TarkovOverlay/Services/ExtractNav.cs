@@ -14,9 +14,11 @@ public static class ExtractNav
     /// <summary>
     /// Extracts drawn on the map overview. PMC and shared are the default.
     /// A known scav raid shows scav and shared instead. The full list, including the other faction, stays on the map data.
+    /// Transits stay on the map for either side. They are not extract targets for the arrow.
     /// </summary>
     public static bool OverviewVisible(string? faction, string? side)
     {
+        if (IsTransit(faction)) return true;
         if (string.Equals(side, "scav", StringComparison.OrdinalIgnoreCase))
             return FactionVisible(faction, "scav");
         var kind = faction?.Trim().ToLowerInvariant();
@@ -37,6 +39,7 @@ public static class ExtractNav
         var bestD = double.PositiveInfinity;
         foreach (var e in extracts)
         {
+            if (IsTransit(e.Faction)) continue;
             if (!FactionVisible(e.Faction, side)) continue;
             var d = WorldMath.HorizontalMeters(pos.X, pos.Z, e.X, e.Z);
             if (d < bestD)
@@ -50,4 +53,7 @@ public static class ExtractNav
             ? null
             : new NearestExtract(best, bestD, WorldMath.BearingDegrees(pos.X, pos.Z, best.X, best.Z));
     }
+
+    private static bool IsTransit(string? faction)
+        => string.Equals(faction?.Trim(), "transit", StringComparison.OrdinalIgnoreCase);
 }
