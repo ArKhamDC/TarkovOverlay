@@ -102,6 +102,15 @@ public static class WorldMath
         return true;
     }
 
+    /// <summary>Inverse of <see cref="Project"/>.</summary>
+    public static (double X, double Z) Unproject(double projectedX, double projectedY, double degrees)
+    {
+        var rad = degrees * Math.PI / 180.0;
+        var c = Math.Cos(rad);
+        var s = Math.Sin(rad);
+        return (projectedX * c + projectedY * s, -projectedX * s + projectedY * c);
+    }
+
     /// <summary>Clockwise degrees from screen-up for a player facing <paramref name="headingDegrees"/> after the map rotation.</summary>
     public static double ScreenAngleDegrees(double x, double z, double headingDegrees, double mapRotationDegrees)
     {
@@ -153,5 +162,117 @@ public readonly record struct MapProjection(
     {
         var p = WorldMath.Project(worldX, worldZ, RotationDegrees);
         return (OriginX + (p.X - MinPX) * Scale, OriginY + (MaxPY - p.Y) * Scale);
+    }
+
+    public (double X, double Z) FromScreen(double screenX, double screenY)
+    {
+        var px = MinPX + (screenX - OriginX) / Scale;
+        var py = MaxPY - (screenY - OriginY) / Scale;
+        return WorldMath.Unproject(px, py, RotationDegrees);
+    }
+}
+
+/// <summary>
+/// Zoom and follow for a letterboxed <see cref="MapProjection"/>.
+/// One scale and origin still feed <see cref="MapProjection.ToScreen"/>, so the underlay,
+/// extracts, room labels, and the player marker stay on the same projection.
+/// The player glyph itself is drawn at a fixed size in <c>MapWindow</c>; this type only moves it.
+/// </summary>
+public static class MapCamera
+{
+    public const double MinZoom = 1;
+    public const double MaxZoom = 8;
+    public const double Step = 1.25;
+    /// <summary>Player may sit this far from the view center before the next fix recenters. Stops sub-meter jitter from sliding the map.</summary>
+    public const double DeadzonePixels = 22;
+    public const double DefaultSpanMeters = 220;
+    public const double TightFrameZoom = 2;
+
+    public static double ClampZoom(double zoom)
+    {
+        if (double.IsNaN(zoom) || double.IsInfinity(zoom)) return 1;
+        return Math.Clamp(zoom, MinZoom, MaxZoom);
+    }
+
+    /// <summary>
+    /// Zoom that shows about <see cref="DefaultSpanMeters"/> across the shorter side of the view.
+    /// A building-sized frame zooms to <see cref="TightFrameZoom"/> so follow still has room to pan.
+    /// </summary>
+    public static double DefaultZoom(MapProjection fit, double viewW, double viewH)
+    {
+        if (fit.Scale < 1e-9 || viewW < 2 || viewH < 2) return 1;
+        var shorter = Math.Min(viewW, viewH);
+        var zoom = shorter / (fit.Scale * DefaultSpanMeters);
+        var frameShort = Math.Min(fit.UsedW, fit.UsedH) / fit.Scale;
+        if (frameShort < DefaultSpanMeters * 1.15)
+            zoom = Math.Max(zoom, TightFrameZoom);
+        return ClampZoom(zoom);
+    }
+
+    /// <summary>
+    /// Scale <paramref name="fit"/> by <paramref name="zoom"/> and place
+    /// (<paramref name="anchorX"/>, <paramref name="anchorZ"/>) at the view center.
+    /// Zoom 1 with the anchor on the letterboxed frame center matches <paramref name="fit"/>.
+    /// </summary>
+    public static MapProjection Apply(
+        MapProjection fit, double viewW, double viewH, double zoom, double anchorX, double anchorZ)
+    {
+        zoom = ClampZoom(zoom);
+        var anchor = fit.ToScreen(anchorX, anchorZ);
+        var panX = viewW / 2 - anchor.X * zoom;
+        var panY = viewH / 2 - anchor.Y * zoom;
+        return fit with
+        {
+            OriginX = panX + fit.OriginX * zoom,
+            OriginY = panY + fit.OriginY * zoom,
+            Scale = fit.Scale * zoom,
+            UsedW = fit.UsedW * zoom,
+            UsedH = fit.UsedH * zoom
+        };
+    }
+
+    /// <summary>Change zoom while keeping the world point under (<paramref name="focusScreenX"/>, <paramref name="focusScreenY"/>) fixed.</summary>
+    public static (double AnchorX, double AnchorZ, double Zoom) ZoomAbout(
+        MapProjection fit, double viewW, double viewH,
+        double zoom, double anchorX, double anchorZ,
+        double focusScreenX, double focusScreenY, double newZoom)
+    {
+        newZoom = ClampZoom(newZoom);
+        var current = Apply(fit, viewW, viewH, zoom, anchorX, anchorZ);
+        var (worldX, worldZ) = current.FromScreen(focusScreenX, focusScreenY);
+        var focus = fit.ToScreen(worldX, worldZ);
+        var anchorContentX = focus.X - (focusScreenX - viewW / 2) / newZoom;
+        var anchorContentY = focus.Y - (focusScreenY - viewH / 2) / newZoom;
+        var anchor = fit.FromScreen(anchorContentX, anchorContentY);
+        return (anchor.X, anchor.Z, newZoom);
+    }
+
+    /// <summary>
+    /// Drag the map by (<paramref name="dx"/>, <paramref name="dy"/>) screen pixels.
+    /// Positive dx follows the pointer to the right.
+    /// </summary>
+    public static (double X, double Z) Pan(
+        MapProjection fit, double viewW, double viewH, double zoom,
+        double anchorX, double anchorZ, double dx, double dy)
+    {
+        var view = Apply(fit, viewW, viewH, zoom, anchorX, anchorZ);
+        return view.FromScreen(viewW / 2 - dx, viewH / 2 - dy);
+    }
+
+    /// <summary>
+    /// Keep the current anchor while the player is inside the deadzone.
+    /// Outside it, put the player on the view center.
+    /// </summary>
+    public static (double X, double Z) Follow(
+        MapProjection fit, double viewW, double viewH, double zoom,
+        double anchorX, double anchorZ, double playerX, double playerZ, double deadzonePixels)
+    {
+        var view = Apply(fit, viewW, viewH, zoom, anchorX, anchorZ);
+        var at = view.ToScreen(playerX, playerZ);
+        var dx = at.X - viewW / 2;
+        var dy = at.Y - viewH / 2;
+        if (dx * dx + dy * dy <= deadzonePixels * deadzonePixels)
+            return (anchorX, anchorZ);
+        return (playerX, playerZ);
     }
 }
