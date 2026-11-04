@@ -8,4 +8,4 @@ The user asked, in Russian, whether they could use the tarkov.dev site and its d
 
 Screenshot: [permission-eft-tarkdev-telegram.png](permission-eft-tarkdev-telegram.png)
 
-This covers the Customs.svg, Factory.svg, and Labs.svg rasters by Shebuka (`the-hideout/tarkov-dev-svg-maps`, CC BY-NC-SA 4.0) shipped as GPS underlays, the interior floor rasters of those SVGs under `Maps/interiors/`, and extract positions from `https://json.tarkov.dev/regular/maps`. See [SOURCE.md](SOURCE.md).
+This covers the Customs.svg, Factory.svg, GroundZero.svg, and Labs.svg rasters by Shebuka (`the-hideout/tarkov-dev-svg-maps`, CC BY-NC-SA 4.0) shipped as GPS underlays, the interior floor rasters of those SVGs under `Maps/interiors/`, and extract positions from `https://json.tarkov.dev/regular/maps`. See [SOURCE.md](SOURCE.md).

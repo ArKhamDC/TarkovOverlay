@@ -1,0 +1,51 @@
+{
+  "map": "ground-zero",
+  "source": "Door markers painted on GroundZero.svg rasters, colored by the key from json.tarkov.dev ground-zero locks. GroundZero.svg has no locked-room fills. Six locks are published; the Factory emergency exit key at x=264.95 is outside the frame and is not drawn. The same five markers apply to ground-zero-21.",
+  "entries": [
+    {
+      "key": "parking_utility",
+      "name": "Parking utility",
+      "fill": "#ff8c1a",
+      "itemId": "658199972dc4e60f6d556a2f",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Underground parking utility room key. Orange door marker on the underground floor."
+    },
+    {
+      "key": "factory_exit",
+      "name": "Factory exit",
+      "fill": "#ff4d4d",
+      "itemId": "5448ba0b4bdc2d02308b456c",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Factory emergency exit key. Red marker in the underground garage. A second lock at x=264.95 is outside the frame and is not drawn."
+    },
+    {
+      "key": "bank_register",
+      "name": "Bank register",
+      "fill": "#3d9bff",
+      "itemId": "6581998038c79576a2569e11",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Unity Credit Bank cash register key. Blue door marker on the ground floor."
+    },
+    {
+      "key": "horse_toilet",
+      "name": "Horse toilet",
+      "fill": "#3ddc5a",
+      "itemId": "658199a0490414548c0fa83b",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Horse restaurant toilet key. Green door marker on the ground floor."
+    },
+    {
+      "key": "science_office",
+      "name": "Science office",
+      "fill": "#b05cff",
+      "itemId": "658199aa38c79576a2569e13",
+      "count": 1,
+      "roomFill": false,
+      "tip": "TerraGroup science office key. Violet door marker on the second floor."
+    }
+  ]
+}
