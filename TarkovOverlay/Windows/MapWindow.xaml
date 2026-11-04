@@ -28,12 +28,14 @@
                     <RowDefinition Height="26" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <Grid x:Name="TitleBar" Background="#FF14181C" MouseLeftButtonDown="OnTitleDown" Cursor="SizeAll">
-                    <TextBlock x:Name="TitleText" Margin="10,0,18,0" VerticalAlignment="Center"
+                <DockPanel x:Name="TitleBar" Background="#FF14181C" MouseLeftButtonDown="OnTitleDown" Cursor="SizeAll" LastChildFill="True">
+                    <StackPanel x:Name="ZoomBar" DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center"
+                                Margin="0,0,6,0" Background="Transparent" />
+                    <StackPanel x:Name="FloorBar" DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center"
+                                Margin="0,0,2,0" Visibility="Collapsed" Background="Transparent" />
+                    <TextBlock x:Name="TitleText" Margin="10,0,8,0" VerticalAlignment="Center"
                                Foreground="White" FontFamily="Segoe UI" FontSize="12" TextTrimming="CharacterEllipsis" />
-                    <StackPanel x:Name="FloorBar" Orientation="Horizontal" HorizontalAlignment="Right"
-                                VerticalAlignment="Center" Margin="0,0,6,0" Visibility="Collapsed" Background="Transparent" />
-                </Grid>
+                </DockPanel>
                 <Canvas x:Name="MapCanvas" Grid.Row="1" ClipToBounds="True" Background="Transparent" />
                 <Canvas Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="14" Height="14"
                         IsHitTestVisible="False" Margin="0,0,4,4">

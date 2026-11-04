@@ -13,7 +13,8 @@ using TarkovOverlay.Utils;
 namespace TarkovOverlay.Windows;
 
 /// <summary>
-/// Separate topmost map window. Drag the title to move, drag the edges to resize.
+/// Separate topmost map window. Drag the title to move, drag the edges to resize, drag the map to pan.
+/// +/- zoom the underlay around the player. A live position keeps that marker near the center.
 /// It does not take keyboard focus from the game. The GPS arrow stays on the price overlay.
 /// </summary>
 public partial class MapWindow : Window
@@ -40,11 +41,31 @@ public partial class MapWindow : Window
     public event Action<int>? FloorSelected;
 
     private string _floorSig = "";
+    private string _frameKey = "";
+    private bool _cameraReady;
+    private double _zoom = 1;
+    private double _anchorX;
+    private double _anchorZ;
+    private double _seenX;
+    private double _seenZ;
+    private bool _haveFollow;
+    private bool _userZoomed;
+    private bool _recenterFrame;
+    private bool _dragMap;
+    private Point _dragLast;
 
     public MapWindow()
     {
         InitializeComponent();
         BuildEdges();
+        BuildZoomBar();
+        MapCanvas.MouseLeftButtonDown += OnMapDown;
+        MapCanvas.MouseMove += OnMapMove;
+        MapCanvas.MouseLeftButtonUp += OnMapUp;
+        MapCanvas.LostMouseCapture += (_, _) =>
+        {
+            if (Mouse.LeftButton != MouseButtonState.Pressed) _dragMap = false;
+        };
         SizeChanged += (_, _) => Draw();
         Loaded += (_, _) => Draw();
         new WindowInteropHelper(this).EnsureHandle();
@@ -189,7 +210,15 @@ public partial class MapWindow : Window
         ApplyGesture(now.X - _start.X, now.Y - _start.Y);
     }
 
-    private void OnGestureUp(object sender, MouseButtonEventArgs e) => FinishGesture();
+    private void OnGestureUp(object sender, MouseButtonEventArgs e)
+    {
+        if (_dragMap)
+        {
+            _dragMap = false;
+            if (MapCanvas.IsMouseCaptured) MapCanvas.ReleaseMouseCapture();
+        }
+        FinishGesture();
+    }
 
     protected override void OnLostMouseCapture(MouseEventArgs e)
     {
@@ -270,8 +299,11 @@ public partial class MapWindow : Window
             return;
         }
 
-        if (!WorldMath.TryFit(view.MinX, view.MaxX, view.MinZ, view.MaxZ, view.Rotation, w, h, out var fit))
+        if (!WorldMath.TryFit(view.MinX, view.MaxX, view.MinZ, view.MaxZ, view.Rotation, w, h, out var basis))
             return;
+
+        UpdateCamera(view, basis, w, h);
+        var fit = MapCamera.Apply(basis, w, h, _zoom, _anchorX, _anchorZ);
 
         Point ToScreen(double x, double z)
         {
@@ -309,12 +341,8 @@ public partial class MapWindow : Window
 
         if (underlay is not null)
         {
-            DrawScale(fit);
-            DrawLabels(view, fit, ToScreen);
-            DrawImageLabels(view, fit);
-            DrawCredit(view, fit);
-            if (!double.IsNaN(view.CompassDegrees))
-                DrawNorth(fit, WorldMath.ScreenAngleDegrees(0, 0, view.CompassDegrees, view.Rotation));
+            DrawLabels(view, fit, w, h, ToScreen);
+            DrawImageLabels(view, fit, w, h);
         }
 
         foreach (var marker in view.Markers.OrderBy(m => m.Nearest))
@@ -374,16 +402,227 @@ public partial class MapWindow : Window
             };
             MapCanvas.Children.Add(arrow);
         }
+
+        if (underlay is not null)
+        {
+            DrawScale(fit, w, h);
+            DrawCredit(view, w, h);
+            if (!double.IsNaN(view.CompassDegrees))
+                DrawNorth(w, WorldMath.ScreenAngleDegrees(0, 0, view.CompassDegrees, view.Rotation));
+        }
     }
 
-    private void DrawScale(MapProjection fit)
+    private void UpdateCamera(MapView view, MapProjection basis, double w, double h)
+    {
+        var key = FrameKey(view);
+        if (!_cameraReady || key != _frameKey)
+        {
+            _frameKey = key;
+            _cameraReady = true;
+            _userZoomed = false;
+            _haveFollow = false;
+            _recenterFrame = false;
+            if (view.PlayerX is { } px && view.PlayerZ is { } pz)
+            {
+                _zoom = MapCamera.DefaultZoom(basis, w, h);
+                _anchorX = px;
+                _anchorZ = pz;
+                _seenX = px;
+                _seenZ = pz;
+                _haveFollow = true;
+            }
+            else
+            {
+                _zoom = 1;
+                (_anchorX, _anchorZ) = basis.FromScreen(w / 2, h / 2);
+            }
+            return;
+        }
+
+        if (_recenterFrame)
+        {
+            _recenterFrame = false;
+            (_anchorX, _anchorZ) = basis.FromScreen(w / 2, h / 2);
+        }
+
+        if (_dragMap) return;
+        if (view.PlayerX is not { } playerX || view.PlayerZ is not { } playerZ) return;
+
+        if (!_haveFollow)
+        {
+            if (!_userZoomed)
+                _zoom = MapCamera.DefaultZoom(basis, w, h);
+            _anchorX = playerX;
+            _anchorZ = playerZ;
+            _seenX = playerX;
+            _seenZ = playerZ;
+            _haveFollow = true;
+            return;
+        }
+
+        if (WorldMath.HorizontalMeters(_seenX, _seenZ, playerX, playerZ) <= 0.05) return;
+        (_anchorX, _anchorZ) = MapCamera.Follow(
+            basis, w, h, _zoom, _anchorX, _anchorZ, playerX, playerZ, MapCamera.DeadzonePixels);
+        _seenX = playerX;
+        _seenZ = playerZ;
+    }
+
+    private void StepZoom(double factor)
+    {
+        var view = _view;
+        var w = MapCanvas.ActualWidth;
+        var h = MapCanvas.ActualHeight;
+        if (view is null || w < 2 || h < 2) return;
+        if (view.UnderlayImage is null && view.Markers.Length == 0 && view.PlayerX is null) return;
+        if (!WorldMath.TryFit(view.MinX, view.MaxX, view.MinZ, view.MaxZ, view.Rotation, w, h, out var basis))
+            return;
+        if (!_cameraReady) UpdateCamera(view, basis, w, h);
+
+        var next = MapCamera.ClampZoom(_zoom * factor);
+        if (Math.Abs(next - _zoom) < 1e-9) return;
+
+        var focusX = w / 2;
+        var focusY = h / 2;
+        if (view.PlayerX is { } px && view.PlayerZ is { } pz)
+        {
+            var at = MapCamera.Apply(basis, w, h, _zoom, _anchorX, _anchorZ).ToScreen(px, pz);
+            focusX = at.X;
+            focusY = at.Y;
+        }
+
+        var (ax, az, zoom) = MapCamera.ZoomAbout(basis, w, h, _zoom, _anchorX, _anchorZ, focusX, focusY, next);
+        _anchorX = ax;
+        _anchorZ = az;
+        _zoom = zoom;
+        _userZoomed = true;
+        Draw();
+    }
+
+    private void Recenter()
+    {
+        _dragMap = false;
+        if (MapCanvas.IsMouseCaptured) MapCanvas.ReleaseMouseCapture();
+        if (_view?.PlayerX is { } px && _view.PlayerZ is { } pz)
+        {
+            _anchorX = px;
+            _anchorZ = pz;
+            _seenX = px;
+            _seenZ = pz;
+            _haveFollow = true;
+        }
+        else
+        {
+            _recenterFrame = true;
+        }
+        Draw();
+    }
+
+    private void PanBy(double dx, double dy)
+    {
+        var view = _view;
+        var w = MapCanvas.ActualWidth;
+        var h = MapCanvas.ActualHeight;
+        if (view is null || w < 2 || h < 2) return;
+        if (!WorldMath.TryFit(view.MinX, view.MaxX, view.MinZ, view.MaxZ, view.Rotation, w, h, out var basis))
+            return;
+        if (!_cameraReady) UpdateCamera(view, basis, w, h);
+        (_anchorX, _anchorZ) = MapCamera.Pan(basis, w, h, _zoom, _anchorX, _anchorZ, dx, dy);
+        Draw();
+    }
+
+    private void OnMapDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount >= 2)
+        {
+            e.Handled = true;
+            Recenter();
+            return;
+        }
+        _dragMap = true;
+        _dragLast = e.GetPosition(MapCanvas);
+        MapCanvas.CaptureMouse();
+        e.Handled = true;
+    }
+
+    private void OnMapMove(object sender, MouseEventArgs e)
+    {
+        if (!_dragMap) return;
+        if (e.LeftButton != MouseButtonState.Pressed)
+        {
+            _dragMap = false;
+            return;
+        }
+        var now = e.GetPosition(MapCanvas);
+        var dx = now.X - _dragLast.X;
+        var dy = now.Y - _dragLast.Y;
+        _dragLast = now;
+        if (dx * dx + dy * dy < 0.25) return;
+        PanBy(dx, dy);
+        if (_dragMap && !MapCanvas.IsMouseCaptured) MapCanvas.CaptureMouse();
+        e.Handled = true;
+    }
+
+    private void OnMapUp(object sender, MouseButtonEventArgs e)
+    {
+        if (!_dragMap) return;
+        _dragMap = false;
+        if (MapCanvas.IsMouseCaptured) MapCanvas.ReleaseMouseCapture();
+        Draw();
+        e.Handled = true;
+    }
+
+    private void BuildZoomBar()
+    {
+        ZoomBar.Children.Add(ZoomButton("−", 22, "Zoom out", () => StepZoom(1 / MapCamera.Step)));
+        ZoomBar.Children.Add(ZoomButton("+", 22, "Zoom in", () => StepZoom(MapCamera.Step)));
+        ZoomBar.Children.Add(ZoomButton("Center", 54, "Center on player", Recenter));
+    }
+
+    private Border ZoomButton(string caption, double width, string tip, Action click)
+    {
+        var button = new Border
+        {
+            Width = width,
+            Height = 18,
+            Margin = new Thickness(2, 0, 0, 0),
+            CornerRadius = new CornerRadius(3),
+            Background = FloorOff,
+            BorderBrush = FloorEdge,
+            BorderThickness = new Thickness(1),
+            Cursor = Cursors.Hand,
+            ToolTip = tip,
+            Child = new TextBlock
+            {
+                Text = caption,
+                Foreground = Brushes.White,
+                FontFamily = UiFont,
+                FontSize = caption.Length > 1 ? 10 : 13,
+                FontWeight = FontWeights.SemiBold,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                IsHitTestVisible = false
+            }
+        };
+        button.MouseLeftButtonDown += (_, e) =>
+        {
+            click();
+            e.Handled = true;
+        };
+        return button;
+    }
+
+    private static string FrameKey(MapView view)
+        => FormattableString.Invariant(
+            $"{view.Rotation:0.###}|{view.MinX:0.###}|{view.MaxX:0.###}|{view.MinZ:0.###}|{view.MaxZ:0.###}");
+
+    private void DrawScale(MapProjection fit, double w, double h)
     {
         var meters = 100;
-        while (meters > 5 && meters * fit.Scale > fit.UsedW * 0.4) meters /= 2;
+        while (meters > 5 && meters * fit.Scale > w * 0.4) meters /= 2;
         var length = meters * fit.Scale;
-        if (length < 8 || fit.UsedH < 36) return;
-        var x = fit.OriginX + 10;
-        var y = fit.OriginY + fit.UsedH - 14;
+        if (length < 8 || h < 36) return;
+        var x = 10.0;
+        var y = h - 14;
         MapCanvas.Children.Add(new Line
         {
             X1 = x,
@@ -402,17 +641,17 @@ public partial class MapWindow : Window
             FontSize = 11,
             IsHitTestVisible = false
         };
-        caption.Measure(new Size(fit.UsedW, fit.UsedH));
+        caption.Measure(new Size(w, h));
         Canvas.SetLeft(caption, x);
-        Canvas.SetTop(caption, Math.Max(fit.OriginY + 2, y - caption.DesiredSize.Height - 2));
+        Canvas.SetTop(caption, Math.Max(2, y - caption.DesiredSize.Height - 2));
         MapCanvas.Children.Add(caption);
     }
 
-    private void DrawNorth(MapProjection fit, double angle)
+    private void DrawNorth(double w, double angle)
     {
-        if (fit.UsedW < 48 || fit.UsedH < 48) return;
-        var cx = fit.OriginX + fit.UsedW / 2;
-        var cy = fit.OriginY + 16;
+        if (w < 48) return;
+        var cx = w / 2;
+        var cy = 16.0;
         var rad = angle * Math.PI / 180.0;
         var nx = cx + Math.Sin(rad) * 14;
         var ny = cy - Math.Cos(rad) * 14;
@@ -441,7 +680,7 @@ public partial class MapWindow : Window
         MapCanvas.Children.Add(letter);
     }
 
-    private void DrawLabels(MapView view, MapProjection fit, Func<double, double, Point> toScreen)
+    private void DrawLabels(MapView view, MapProjection fit, double w, double h, Func<double, double, Point> toScreen)
     {
         var labels = view.Labels;
         if (labels is null || labels.Length == 0) return;
@@ -455,6 +694,8 @@ public partial class MapWindow : Window
             if (at.X < fit.OriginX + 4 || at.Y < fit.OriginY + 4
                 || at.X > fit.OriginX + fit.UsedW - 4 || at.Y > fit.OriginY + fit.UsedH - 4)
                 continue;
+            if (at.X < 4 || at.Y < 4 || at.X > w - 4 || at.Y > h - 4)
+                continue;
             if (NearMarker(view, toScreen, at)) continue;
 
             var block = new TextBlock
@@ -465,11 +706,11 @@ public partial class MapWindow : Window
                 FontSize = 12,
                 IsHitTestVisible = false
             };
-            block.Measure(new Size(fit.UsedW, fit.UsedH));
+            block.Measure(new Size(w, h));
             var width = block.DesiredSize.Width;
             var height = block.DesiredSize.Height;
-            var x = Math.Clamp(at.X + 6, fit.OriginX + 2, Math.Max(fit.OriginX + 2, fit.OriginX + fit.UsedW - width - 2));
-            var y = Math.Clamp(at.Y - height - 2, fit.OriginY + 2, Math.Max(fit.OriginY + 2, fit.OriginY + fit.UsedH - height - 2));
+            var x = Math.Clamp(at.X + 6, 2, Math.Max(2, w - width - 2));
+            var y = Math.Clamp(at.Y - height - 2, 2, Math.Max(2, h - height - 2));
             var rect = new Rect(x - 2, y - 1, width + 4, height + 2);
             if (placed.Any(p => p.IntersectsWith(rect))) continue;
             placed.Add(rect);
@@ -492,7 +733,7 @@ public partial class MapWindow : Window
         }
     }
 
-    private void DrawImageLabels(MapView view, MapProjection fit)
+    private void DrawImageLabels(MapView view, MapProjection fit, double w, double h)
     {
         var labels = view.ImageLabels;
         if (labels is null || labels.Length == 0) return;
@@ -502,6 +743,7 @@ public partial class MapWindow : Window
             if (label.U < -0.02 || label.U > 1.02 || label.V < -0.02 || label.V > 1.02) continue;
             var atX = fit.OriginX + label.U * fit.UsedW;
             var atY = fit.OriginY + label.V * fit.UsedH;
+            if (atX < -20 || atY < -12 || atX > w + 20 || atY > h + 12) continue;
             var block = new TextBlock
             {
                 Text = label.Text,
@@ -511,11 +753,9 @@ public partial class MapWindow : Window
                 FontWeight = FontWeights.SemiBold,
                 IsHitTestVisible = false
             };
-            block.Measure(new Size(fit.UsedW, fit.UsedH));
+            block.Measure(new Size(w, h));
             var x = atX - block.DesiredSize.Width / 2;
             var y = atY - block.DesiredSize.Height / 2;
-            x = Math.Clamp(x, fit.OriginX + 1, Math.Max(fit.OriginX + 1, fit.OriginX + fit.UsedW - block.DesiredSize.Width - 1));
-            y = Math.Clamp(y, fit.OriginY + 1, Math.Max(fit.OriginY + 1, fit.OriginY + fit.UsedH - block.DesiredSize.Height - 1));
             var shadow = new TextBlock
             {
                 Text = label.Text,
@@ -542,11 +782,9 @@ public partial class MapWindow : Window
             _floorSig = "";
             FloorBar.Children.Clear();
             FloorBar.Visibility = Visibility.Collapsed;
-            TitleText.Margin = new Thickness(10, 0, 18, 0);
             return;
         }
 
-        TitleText.Margin = new Thickness(10, 0, 16 + floors.Length * 30, 0);
         var sig = string.Join("|", floors.Select(f => f.Selected ? f.Floor + "*" : f.Floor.ToString()));
         if (sig == _floorSig && FloorBar.Children.Count == floors.Length) return;
         _floorSig = sig;
@@ -594,25 +832,32 @@ public partial class MapWindow : Window
     }
 
     /// <summary>
-    /// Wheel events reach this window only when it is focused. The title-bar buttons are the control that
-    /// still works while the game stays in front.
+    /// Wheel events reach this window only when it is focused. Floor plans keep the wheel for U/1/2/3.
+    /// Everywhere else the wheel zooms. The title-bar buttons work while the game stays in front.
     /// </summary>
     private void OnMapWheel(object sender, MouseWheelEventArgs e)
     {
+        if (e.Delta == 0) return;
         var floors = _view?.Floors;
-        if (floors is null || floors.Length < 2 || e.Delta == 0) return;
-        var ordered = floors.OrderBy(f => f.Floor).ToArray();
-        var index = Array.FindIndex(ordered, f => f.Selected);
-        if (index < 0) index = 0;
-        var next = index + (e.Delta > 0 ? 1 : -1);
-        if ((uint)next < (uint)ordered.Length)
-            FloorSelected?.Invoke(ordered[next].Floor);
+        if (floors is { Length: >= 2 })
+        {
+            var ordered = floors.OrderBy(f => f.Floor).ToArray();
+            var index = Array.FindIndex(ordered, f => f.Selected);
+            if (index < 0) index = 0;
+            var next = index + (e.Delta > 0 ? 1 : -1);
+            if ((uint)next < (uint)ordered.Length)
+                FloorSelected?.Invoke(ordered[next].Floor);
+            e.Handled = true;
+            return;
+        }
+
+        StepZoom(e.Delta > 0 ? MapCamera.Step : 1 / MapCamera.Step);
         e.Handled = true;
     }
 
-    private void DrawCredit(MapView view, MapProjection fit)
+    private void DrawCredit(MapView view, double w, double h)
     {
-        if (string.IsNullOrWhiteSpace(view.Credit) || fit.UsedW < 160 || fit.UsedH < 48) return;
+        if (string.IsNullOrWhiteSpace(view.Credit) || w < 160 || h < 48) return;
         var block = new TextBlock
         {
             Text = view.Credit,
@@ -621,10 +866,10 @@ public partial class MapWindow : Window
             FontSize = 10,
             IsHitTestVisible = false
         };
-        block.Measure(new Size(fit.UsedW, fit.UsedH));
-        var x = fit.OriginX + fit.UsedW - block.DesiredSize.Width - 8;
-        var y = fit.OriginY + fit.UsedH - block.DesiredSize.Height - 6;
-        if (x < fit.OriginX + 8) return;
+        block.Measure(new Size(w, h));
+        var x = w - block.DesiredSize.Width - 8;
+        var y = h - block.DesiredSize.Height - 6;
+        if (x < 8) return;
         Canvas.SetLeft(block, x);
         Canvas.SetTop(block, y);
         MapCanvas.Children.Add(block);
