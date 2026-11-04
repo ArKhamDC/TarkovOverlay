@@ -223,6 +223,78 @@ public class MapUnderlayTests
     }
 
     [Fact]
+    public void FactoryRasterUsesThePublishedFrameAndKeyColors()
+    {
+        var factory = Load().Single(m => m.Id == "factory");
+        Assert.Equal(90, factory.Rotation);
+        Assert.Equal(90, factory.CompassDegrees);
+        Assert.Equal(-65.5, factory.MinX, 3);
+        Assert.Equal(77, factory.MaxX, 3);
+        Assert.Equal(-64.5, factory.MinZ, 3);
+        Assert.Equal(67.4, factory.MaxZ, 3);
+        Assert.Contains("Shebuka", factory.Credit);
+        var (width, height) = PngSize(factory.ImagePath);
+        Assert.Equal(1047, width);
+        Assert.Equal(1130, height);
+
+        Assert.True(WorldMath.TryImageUv(-19.08, -48.57, factory.MinX, factory.MaxX, factory.MinZ, factory.MaxZ, factory.Rotation, out var u, out var v));
+        Assert.Equal((67.4 - (-48.57)) / 131.9, u, 4);
+        Assert.Equal((77 - (-19.08)) / 142.5, v, 4);
+
+        Assert.Equal(10, factory.Extracts.Length);
+        var med = factory.Extracts.Single(e => e.NameEn == "Med Tent Gate");
+        Assert.Equal("Ворота у медицинской палатки", med.NameRu);
+        Assert.Equal("pmc", med.Faction);
+        Assert.Equal(1.99, med.Y, 2);
+        var cellars = factory.Extracts.Single(e => e.NameEn == "Cellars");
+        Assert.Equal("Подвалы", cellars.NameRu);
+        Assert.Equal(-3.29, cellars.Y, 2);
+        var office = factory.Extracts.Single(e => e.NameEn == "Office Window");
+        Assert.Equal("Офисное окно", office.NameRu);
+        Assert.Equal("scav", office.Faction);
+        Assert.Equal(8.73, office.Y, 2);
+        var gate3 = factory.Extracts.Where(e => e.NameEn == "Gate 3").ToArray();
+        Assert.Equal(2, gate3.Length);
+        Assert.Contains(gate3, e => e.Faction == "pmc" && e.Y > 3);
+        Assert.Contains(gate3, e => e.Faction == "scav" && e.Y < 3);
+        Assert.Contains(factory.Extracts, e => e.NameEn == "Gate 2" && e.Faction == "pmc");
+        var courtyard = factory.Extracts.Single(e => e.NameEn == "Courtyard Gate");
+        Assert.Equal("Ворота во дворе", courtyard.NameRu);
+        foreach (var extract in factory.Extracts)
+        {
+            Assert.True(WorldMath.TryImageUv(extract.X, extract.Z, factory.MinX, factory.MaxX, factory.MinZ, factory.MaxZ, factory.Rotation, out var eu, out var ev));
+            Assert.False(string.IsNullOrWhiteSpace(extract.NameRu));
+            if (extract.NameEn == "Courtyard Gate")
+            {
+                Assert.InRange(eu, -0.02, 0);
+                Assert.InRange(ev, 0, 1);
+            }
+            else
+            {
+                Assert.InRange(eu, 0, 1);
+                Assert.InRange(ev, 0, 1);
+            }
+        }
+
+        Assert.Equal(7, factory.Labels.Length);
+        Assert.Contains(factory.Labels, l => l.Text == "Cellars" && l.TextRu == "Подвалы");
+        Assert.DoesNotContain(factory.Labels, l => l.Text == "Office Window");
+
+        Assert.Equal(2, factory.Keycards.Length);
+        var emergency = factory.Keycards.Single(k => k.Name == "Emergency exit");
+        var storage = factory.Keycards.Single(k => k.Name == "TerraGroup storage");
+        Assert.Equal("#ff8c1a", emergency.Fill);
+        Assert.Equal(3, emergency.Count);
+        Assert.False(emergency.RoomFill);
+        Assert.Equal("5448ba0b4bdc2d02308b456c", emergency.ItemId);
+        Assert.Equal("#b05cff", storage.Fill);
+        Assert.Equal(1, storage.Count);
+        Assert.False(storage.RoomFill);
+        Assert.Equal("66acd6702b17692df20144c0", storage.ItemId);
+        Assert.DoesNotContain(factory.Keycards, k => k.Name.Contains("stairs", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
     public void ScreenPositionMatchesImageUvAndLetterboxes()
     {
         var customs = Load().Single(m => m.Id == "customs");

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Customs ships the tarkov.dev Customs.svg raster by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. The Lab ships Labs.svg from that same project on a fitted frame (tarkov.dev publishes no svgBounds for Labs), with locked rooms painted in the keycard color. Customs extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and the game's own map textures are not licensed for redistribution. Images other than Customs and The Lab are original drawings on those same frames: roads join the published landmark coordinates in the order those places connect, with water and building footprints. Frames were checked against spawn and extract coordinates from json.tarkov.dev. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns. Terminal and Labyrinth have no published road or landmark geometry, so they stay a plain frame.",
+  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Customs ships the tarkov.dev Customs.svg raster by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. The Lab ships Labs.svg from that same project on a fitted frame (tarkov.dev publishes no svgBounds for Labs), with locked rooms painted in the keycard color. Factory ships Factory.svg from that same project on the published frame [[77,-64.5],[-65.5,67.4]], coordinateRotation 90. Its overview is the ground floor until a position arrives; door markers use the emergency-exit and TerraGroup-storage colors. Customs and Factory extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and the game's own map textures are not licensed for redistribution. Images other than Customs, Factory, and The Lab are original drawings on those same frames: roads join the published landmark coordinates in the order those places connect, with water and building footprints. Frames were checked against spawn and extract coordinates from json.tarkov.dev. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns. Terminal and Labyrinth have no published road or landmark geometry, so they stay a plain frame.",
   "maps": [
     {
       "id": "customs",
@@ -780,7 +780,17 @@
       ],
       "water": [],
       "ponds": [],
-      "note": "A few spawns sit a few meters south of the published frame."
+      "note": "Raster of tarkov.dev Factory.svg (Shebuka), published frame [[77,-64.5],[-65.5,67.4]], coordinateRotation 90. Image top-left is x=77 z=67.4 and bottom-right is x=-65.5 z=-64.5. The file is the overview and matches the ground floor with lock markers. Floors are Maps/interiors/factory_*.png. Extracts come from Maps/factory-extracts.json (night-factory is an alias). Key colors are Maps/factory-keycards.json. Markers only: Factory.svg has no locked-room fills. Courtyard Gate sits just outside this frame.",
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+      "imageAttribution": {
+        "author": "Shebuka",
+        "project": "the-hideout/tarkov-dev-svg-maps",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/Factory.svg",
+        "license": "CC BY-NC-SA 4.0",
+        "permission": "EFT TarkDev Telegram 2026-11-04",
+        "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+        "notes": "attribution/SOURCE.md"
+      }
     },
     {
       "id": "woods",

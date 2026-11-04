@@ -14,6 +14,7 @@ public class InteriorTests
         Assert.Equal(12, buildings.Count);
         Assert.Equal(25, buildings.Sum(b => b.Floors.Length));
         Assert.Contains(all, b => b.Id == "labs");
+        Assert.Contains(all, b => b.MapId == "factory" && b.Id == "factory");
         Assert.DoesNotContain(buildings, b => b.Id.Contains("boiler", StringComparison.OrdinalIgnoreCase));
         Assert.DoesNotContain(buildings, b => b.Id == "zb1011_building");
         Assert.Contains(buildings, b => b.Id == "zb1011_bunker");
@@ -88,7 +89,7 @@ public class InteriorTests
             foreach (var (x, z) in samples)
             {
                 Assert.True(building.TryUv(x, z, out var u, out var v), building.Id);
-                if (building.Rotation == 270)
+                if (building.Rotation is 90 or 270)
                 {
                     Assert.Equal((z - building.Z0) / (building.Z1 - building.Z0), u, 6);
                     Assert.Equal((x - building.X0) / (building.X1 - building.X0), v, 6);
@@ -198,6 +199,95 @@ public class InteriorTests
         Assert.True(labs.TryUv(-274.47, -316.97, out var violetU, out var violetV));
         Assert.True(violetV < redV - 0.02, $"violet should sit above red, got {violetV} vs {redV}");
         Assert.InRange(Math.Abs(violetU - redU), 0, 0.08);
+    }
+
+    [Fact]
+    public void FactoryFollowsHeightAndKeepsAPinnedFloorUntilTheBandChanges()
+    {
+        var factory = Load().Single(b => b.Id == "factory" && b.MapId == "factory");
+        Assert.True(factory.CoversMap);
+        Assert.Equal(90, factory.Rotation);
+        Assert.Equal(new[] { -1, 1, 2, 3 }, factory.Floors.Select(f => f.Floor).ToArray());
+        Assert.Equal(new[] { "-1", "1", "2", "3" }, factory.Floors.Select(f => f.Caption).ToArray());
+        Assert.Equal(new[] { "Basement", "Ground", "Second", "Third" }, factory.Floors.Select(f => f.Tip).ToArray());
+        Assert.Contains("Shebuka", factory.Credit);
+        Assert.Equal(77, factory.X0, 3);
+        Assert.Equal(67.4, factory.Z0, 3);
+        Assert.Equal(-65.5, factory.X1, 3);
+        Assert.Equal(-64.5, factory.Z1, 3);
+        foreach (var plan in factory.Floors)
+        {
+            Assert.Equal(1047, plan.Width);
+            Assert.Equal(1130, plan.Height);
+            var (w, h) = PngSize(plan.ImagePath);
+            Assert.Equal(1047, w);
+            Assert.Equal(1130, h);
+        }
+
+        var overview = File.ReadAllBytes(Path.Combine(MapsDir(), "images", "factory.png"));
+        Assert.Equal(overview, File.ReadAllBytes(factory.Floors.Single(f => f.Floor == 1).ImagePath));
+
+        Assert.Equal(-1, InteriorCatalog.FloorFromAltitude(factory, -1.01));
+        Assert.Equal(1, InteriorCatalog.FloorFromAltitude(factory, -1));
+        Assert.Equal(1, InteriorCatalog.FloorFromAltitude(factory, 2.99));
+        Assert.Equal(2, InteriorCatalog.FloorFromAltitude(factory, 3));
+        Assert.Equal(2, InteriorCatalog.FloorFromAltitude(factory, 5.99));
+        Assert.Equal(3, InteriorCatalog.FloorFromAltitude(factory, 6));
+        Assert.Equal(3, InteriorCatalog.FloorFromAltitude(factory, 9.08));
+        Assert.Null(InteriorCatalog.FloorFromAltitude(factory, double.NaN));
+
+        var onMap = InteriorCatalog.ForMap(Load(), Game("factory4_day", "factory", "maps/factory_day_preset.bundle"));
+        Assert.Single(onMap);
+        Assert.Single(InteriorCatalog.ForMap(Load(), Game("factory4_night", "night-factory", "maps/factory_night_preset.bundle")));
+        Assert.Single(InteriorCatalog.ForMap(Load(), Game("factory_event", "infected-factory", "maps/factory_event_preset.bundle")));
+
+        var state = InteriorFix.Overview;
+        (state, var building, var floor) = InteriorCatalog.Advance(onMap, state, -19.08, 1.45, -48.57);
+        Assert.Equal("factory", building!.Id);
+        Assert.Equal(1, floor!.Floor);
+        Assert.Null(state.LockBand);
+        Assert.Equal("Ground", InteriorCatalog.FloorOptions(building, floor.Floor)!.Single(o => o.Selected).Tip);
+        Assert.Equal(new[] { "-1", "1", "2", "3" }, InteriorCatalog.FloorOptions(building, 1)!.Select(o => o.Caption).ToArray());
+
+        (state, building, floor) = InteriorCatalog.Advance(onMap, state, 500, -2, 500);
+        Assert.Equal(-1, floor!.Floor);
+
+        state = InteriorCatalog.PinFloor(onMap, state, 3, -2);
+        Assert.Equal(-1, state.LockBand);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 0, -1.5, 0);
+        Assert.Equal(3, floor!.Floor);
+        Assert.Equal(-1, state.LockBand);
+
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, -19.08, 1.2, -48.57);
+        Assert.Equal(1, floor!.Floor);
+        Assert.Null(state.LockBand);
+
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 58.43, 3.17, 63.3);
+        Assert.Equal(2, floor!.Floor);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 17.83, 8.73, 39.89);
+        Assert.Equal(3, floor!.Floor);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 73.89, -3.29, -29.08);
+        Assert.Equal(-1, floor!.Floor);
+
+        Assert.True(InteriorCatalog.ExtractOnFloor(factory, -3.29, -1));
+        Assert.False(InteriorCatalog.ExtractOnFloor(factory, -3.29, 1));
+        Assert.True(InteriorCatalog.ExtractOnFloor(factory, 1.99, 1));
+        Assert.True(InteriorCatalog.ExtractOnFloor(factory, 3.17, 2));
+        Assert.False(InteriorCatalog.ExtractOnFloor(factory, 3.17, 1));
+        Assert.True(InteriorCatalog.ExtractOnFloor(factory, 8.73, 3));
+        Assert.False(InteriorCatalog.ExtractOnFloor(factory, 8.73, 2));
+
+        // Published rect: u=(67.4-z)/131.9, v=(77-x)/142.5. Ground emergency-exit door.
+        Assert.True(factory.TryUv(-19.08, -48.57, out var u, out var v));
+        Assert.Equal((67.4 - (-48.57)) / 131.9, u, 4);
+        Assert.Equal((77 - (-19.08)) / 142.5, v, 4);
+        Assert.InRange(u, 0, 1);
+        Assert.InRange(v, 0, 1);
+
+        // TerraGroup storage keycard is the basement door, not the ground emergency exit.
+        Assert.True(factory.TryUv(-20.43, 44.06, out var cardU, out var cardV));
+        Assert.True(cardV > v);
+        Assert.InRange(cardU, 0, 1);
     }
 
     [Fact]
