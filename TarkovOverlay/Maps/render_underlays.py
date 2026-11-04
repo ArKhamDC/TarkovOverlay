@@ -2,9 +2,9 @@
 """Regenerate Maps/underlays.json and Maps/images/*.png.
 
 Bounds and place-name positions come from the-hideout/tarkov-dev src/data/maps.json
-(MIT). The PNGs are original drawings aligned to those frames. This script does
-not read or copy the tarkov-dev SVG map art. Customs.png is the shipped Shebuka
-raster and is left in place; extract positions live in customs-extracts.json.
+(MIT). Labyrinth is still an original drawing on that frame. Every other overview
+PNG is a shipped Shebuka raster (the-hideout/tarkov-dev-svg-maps) and is left in
+place, including its fitted bounds, credit, and extracts sidecar.
 
 Usage:
   python3 render_underlays.py --maps /path/to/maps.json
@@ -164,8 +164,21 @@ NOTES = {
     "customs": "Raster of tarkov.dev Customs.svg (Shebuka), frame x0=698 z0=-307 x1=-372 z1=237, coordinateRotation 180. Extract markers come from Maps/customs-extracts.json (json.tarkov.dev). ZB-1011 and ZB-1012 are on the left; Crossroads, Trailer Park, and RUAF are on the right.",
 }
 
-# Shipped art this script must not overwrite. customs-extracts.json supplies extract positions.
-SHIPPED_RASTERS = {"customs"}
+# Shipped SVG rasters this script must not overwrite or rebuild.
+# Labyrinth stays a generated drawing: tarkov-dev-svg-maps has no Labyrinth.svg.
+SHIPPED_RASTERS = {
+    "customs",
+    "factory",
+    "woods",
+    "lighthouse",
+    "shoreline",
+    "reserve",
+    "interchange",
+    "streets-of-tarkov",
+    "ground-zero",
+    "the-lab",
+    "terminal",
+}
 CUSTOMS_CREDIT = "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0"
 
 
@@ -485,28 +498,32 @@ def main() -> None:
             doc = json.load(response)
 
     specs = build(doc)
+    out_json = ROOT / "underlays.json"
+    if out_json.exists():
+        previous = {m["id"]: m for m in json.loads(out_json.read_text())["maps"]}
+        specs = [previous[s["id"]] if s["id"] in SHIPPED_RASTERS and s["id"] in previous else s for s in specs]
     payload = {
         "version": 1,
         "source": (
-            "World bounds and coordinateRotation are the interactive frames in "
-            "the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels "
-            "in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base "
-            "location and is used only for the compass tick. "
-            "Customs ships the tarkov.dev Customs.svg raster by Shebuka "
-            "(the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), used with permission from EFT TarkDev on "
-            "2026-11-04; see Maps/attribution/SOURCE.md. Customs extract positions come from "
-            "json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie "
-            "tiles and the game's own map textures are not licensed for redistribution. "
-            "The other images are original drawings on those same frames: roads join the published landmark "
-            "coordinates in the order those places connect, with water and building footprints. "
-            "Frames were checked against spawn and extract coordinates from json.tarkov.dev. "
-            "Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns. "
-            "Terminal and Labyrinth have no published road or landmark geometry, so they stay a plain frame."
+            "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev "
+            "src/data/maps.json (MIT License). Place-name positions are the labels in that file. "
+            "cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and "
+            "is used only for the compass tick. Overview rasters other than Labyrinth are Shebuka's SVGs "
+            "from the-hideout/tarkov-dev-svg-maps (CC BY-NC-SA 4.0), used with permission from EFT TarkDev "
+            "on 2026-11-04; see Maps/attribution/SOURCE.md. Factory ships Factory.svg on the published frame "
+            "[[77,-64.5],[-65.5,67.4]], coordinateRotation 90: the overview is the ground floor, and basement, "
+            "second, and third are separate rasters. Ground Zero ships GroundZero.svg on the official frame "
+            "x0=249 z0=-124 x1=-99 z1=364, with one raster per height band and door locks painted as markers. "
+            "The Lab ships Labs.svg on a fitted frame (tarkov.dev publishes no svgBounds for Labs), "
+            "with locked rooms painted in the keycard color. Extract positions come from "
+            "json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and "
+            "the game's own map textures are not licensed for redistribution. Labyrinth has no SVG in "
+            "that repo, so it stays an original frame drawing. Icebreaker is omitted: its published bounds "
+            "match Factory and do not contain Icebreaker spawns."
         ),
         "maps": specs,
     }
-    out_json = ROOT / "underlays.json"
-    out_json.write_text(json.dumps(payload, indent=2) + "\n")
+    out_json.write_text(json.dumps(payload, indent=2).replace("\\u00b7", "·") + "\n")
     for spec in specs:
         image_path = ROOT / "images" / spec["image"]
         if spec["id"] in SHIPPED_RASTERS and image_path.exists():

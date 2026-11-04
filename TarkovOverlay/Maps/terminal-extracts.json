@@ -1,0 +1,14 @@
+{
+  "map": "terminal",
+  "bounds": {
+    "x0": 463,
+    "z0": -580,
+    "x1": -433,
+    "z1": 475
+  },
+  "coordinateRotation": 180,
+  "source": "json.tarkov.dev/regular/maps",
+  "apiNameId": "Terminal",
+  "note": "Raster of tarkov.dev Terminal.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/terminal-extracts.json from json.tarkov.dev/regular/maps. Frame is the published rect x0=463 z0=-580 x1=-433 z1=475. json.tarkov.dev publishes no Terminal extracts. Player spawns sit inside the frame.",
+  "extracts": []
+}

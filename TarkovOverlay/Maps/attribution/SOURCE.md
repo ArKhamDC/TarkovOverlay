@@ -58,4 +58,15 @@ Telegram **EFT TarkDev**, 2026-11-04. The user asked whether they could use the 
 > Здравствуйте. Да конечно)
 > Обязательно отправьте нам потом ссылку, возможно мы её подключим к нашей программе помощи новичкам!
 
-Other GPS underlays in this project are original drawings on the published tarkov.dev frames, not SVG rasters. Customs, Factory, Ground Zero, and The Lab are the rasters from tarkov-dev-svg-maps.
+## Other overview rasters
+
+Woods, Lighthouse, Shoreline, Reserve, Interchange, Streets of Tarkov, and Terminal use the matching SVG from the same repository, rasterized as the ground overview only (the tarkov.dev base layer, plus any group marked to stay with it). Upper floors are not baked into these images. Factory and Ground Zero are the floor packs above, not these overviews.
+
+- Woods.svg, Lighthouse.svg, Shoreline.svg, Reserve.svg, Interchange.svg, StreetsOfTarkov.svg, Terminal.svg at https://github.com/the-hideout/tarkov-dev-svg-maps
+- Author and licence: Shebuka / CC BY-NC-SA 4.0, same permission as Customs.
+- Lighthouse, Shoreline, Reserve, Streets of Tarkov, and Terminal use the published tarkov.dev frame. Spawns and extracts sit inside it. Terminal's API list has no extracts.
+- Woods extends max Z to `455.58` (published `442`) so RUAF Gate is inside the frame.
+- Interchange extends max X to `621.9` (published `598`) so Path to River (Flare) is inside the frame.
+- Extract positions: https://json.tarkov.dev/regular/maps, English and Russian names from `maps_en` / `maps_ru`, one `Maps/<id>-extracts.json` per map.
+
+Labyrinth has no SVG in that repository. Its underlay stays the original frame drawing.

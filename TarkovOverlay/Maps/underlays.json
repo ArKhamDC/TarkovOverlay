@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Customs ships the tarkov.dev Customs.svg raster by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. The Lab ships Labs.svg from that same project on a fitted frame (tarkov.dev publishes no svgBounds for Labs), with locked rooms painted in the keycard color. Factory ships Factory.svg from that same project on the published frame [[77,-64.5],[-65.5,67.4]], coordinateRotation 90. Its overview is the ground floor until a position arrives; door markers use the emergency-exit and TerraGroup-storage colors. Ground Zero ships GroundZero.svg from that same project on the official bounds, with one raster per height band and door locks painted as markers. Customs, Factory, and Ground Zero extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and the game's own map textures are not licensed for redistribution. Images other than Customs, Factory, Ground Zero, and The Lab are original drawings on those same frames: roads join the published landmark coordinates in the order those places connect, with water and building footprints. Frames were checked against spawn and extract coordinates from json.tarkov.dev. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns. Terminal and Labyrinth have no published road or landmark geometry, so they stay a plain frame.",
+  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Overview rasters other than Labyrinth are Shebuka's SVGs from the-hideout/tarkov-dev-svg-maps (CC BY-NC-SA 4.0), used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. Factory ships Factory.svg on the published frame [[77,-64.5],[-65.5,67.4]], coordinateRotation 90: the overview is the ground floor, and basement, second, and third are separate rasters. Ground Zero ships GroundZero.svg on the official frame x0=249 z0=-124 x1=-99 z1=364, with one raster per height band and door locks painted as markers. The Lab ships Labs.svg on a fitted frame (tarkov.dev publishes no svgBounds for Labs), with locked rooms painted in the keycard color. Extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and the game's own map textures are not licensed for redistribution. Labyrinth has no SVG in that repo, so it stays an original frame drawing. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns.",
   "maps": [
     {
       "id": "customs",
@@ -780,7 +780,7 @@
       ],
       "water": [],
       "ponds": [],
-      "note": "Raster of tarkov.dev Factory.svg (Shebuka), published frame [[77,-64.5],[-65.5,67.4]], coordinateRotation 90. Image top-left is x=77 z=67.4 and bottom-right is x=-65.5 z=-64.5. The file is the overview and matches the ground floor with lock markers. Floors are Maps/interiors/factory_*.png. Extracts come from Maps/factory-extracts.json (night-factory is an alias). Key colors are Maps/factory-keycards.json. Markers only: Factory.svg has no locked-room fills. Courtyard Gate sits just outside this frame.",
+      "note": "Raster of tarkov.dev Factory.svg (Shebuka), published frame [[77,-64.5],[-65.5,67.4]], coordinateRotation 90. Image top-left is x=77 z=67.4 and bottom-right is x=-65.5 z=-64.5. The file is the overview and matches the ground floor with lock markers. Floors are Maps/interiors/factory_*.png and share this frame. Extracts come from Maps/factory-extracts.json (night-factory is an alias). Key colors are Maps/factory-keycards.json. Markers only: Factory.svg has no locked-room fills. Courtyard Gate and a few eastern player spawns sit just outside. A wider Z span (-80.81 to 76.94) would cover them, but this raster is the ground-floor image, so the frame stays published.",
       "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
       "imageAttribution": {
         "author": "Shebuka",
@@ -811,7 +811,7 @@
         "x0": 646,
         "z0": -914,
         "x1": -761,
-        "z1": 442
+        "z1": 455.58
       },
       "aliases": [
         "woods",
@@ -1047,7 +1047,18 @@
           -470,
           28
         ]
-      ]
+      ],
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+      "imageAttribution": {
+        "author": "Shebuka",
+        "project": "the-hideout/tarkov-dev-svg-maps",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/Woods.svg",
+        "license": "CC BY-NC-SA 4.0",
+        "permission": "EFT TarkDev Telegram 2026-11-04",
+        "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+        "notes": "attribution/SOURCE.md"
+      },
+      "note": "Raster of tarkov.dev Woods.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/woods-extracts.json from json.tarkov.dev/regular/maps. Fitted frame x0=646 z0=-914 x1=-761 z1=455.58. publishedBounds max z is 442. RUAF Gate is about 6 m south of that edge (bottom of this 180 degree frame), so it was extended by 8 m. Every other spawn and extract already sat inside the published frame."
     },
     {
       "id": "lighthouse",
@@ -1321,7 +1332,18 @@
           -356,
           36
         ]
-      ]
+      ],
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+      "imageAttribution": {
+        "author": "Shebuka",
+        "project": "the-hideout/tarkov-dev-svg-maps",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/Lighthouse.svg",
+        "license": "CC BY-NC-SA 4.0",
+        "permission": "EFT TarkDev Telegram 2026-11-04",
+        "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+        "notes": "attribution/SOURCE.md"
+      },
+      "note": "Raster of tarkov.dev Lighthouse.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/lighthouse-extracts.json from json.tarkov.dev/regular/maps. Frame is the published rect x0=515 z0=-998 x1=-545 z1=725. Spawn and extract positions from json.tarkov.dev sit inside it."
     },
     {
       "id": "shoreline",
@@ -1644,7 +1666,18 @@
           -118,
           70
         ]
-      ]
+      ],
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+      "imageAttribution": {
+        "author": "Shebuka",
+        "project": "the-hideout/tarkov-dev-svg-maps",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/Shoreline.svg",
+        "license": "CC BY-NC-SA 4.0",
+        "permission": "EFT TarkDev Telegram 2026-11-04",
+        "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+        "notes": "attribution/SOURCE.md"
+      },
+      "note": "Raster of tarkov.dev Shoreline.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/shoreline-extracts.json from json.tarkov.dev/regular/maps. Frame is the published rect x0=504 z0=-415 x1=-1056 z1=618. Spawn and extract positions from json.tarkov.dev sit inside it."
     },
     {
       "id": "reserve",
@@ -2010,7 +2043,17 @@
       ],
       "water": [],
       "ponds": [],
-      "note": "Frame rotation is the tarkov.dev interactive map (180). json.tarkov.dev coordinateToCardinalRotation for Reserve is 195.209, so compass north is about 15 degrees clockwise of image up."
+      "note": "Raster of tarkov.dev Reserve.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/reserve-extracts.json from json.tarkov.dev/regular/maps. Frame is the published rect x0=289 z0=-293 x1=-303 z1=244. Spawn and extract positions from json.tarkov.dev sit inside it. json.tarkov.dev coordinateToCardinalRotation for Reserve is 195.209, so compass north is about 15 degrees clockwise of image up.",
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+      "imageAttribution": {
+        "author": "Shebuka",
+        "project": "the-hideout/tarkov-dev-svg-maps",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/Reserve.svg",
+        "license": "CC BY-NC-SA 4.0",
+        "permission": "EFT TarkDev Telegram 2026-11-04",
+        "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+        "notes": "attribution/SOURCE.md"
+      }
     },
     {
       "id": "interchange",
@@ -2028,7 +2071,7 @@
         ]
       ],
       "bounds": {
-        "x0": 598,
+        "x0": 621.9,
         "z0": -442,
         "x1": -433,
         "z1": 426
@@ -2589,7 +2632,18 @@
         ]
       ],
       "water": [],
-      "ponds": []
+      "ponds": [],
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+      "imageAttribution": {
+        "author": "Shebuka",
+        "project": "the-hideout/tarkov-dev-svg-maps",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/Interchange.svg",
+        "license": "CC BY-NC-SA 4.0",
+        "permission": "EFT TarkDev Telegram 2026-11-04",
+        "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+        "notes": "attribution/SOURCE.md"
+      },
+      "note": "Raster of tarkov.dev Interchange.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/interchange-extracts.json from json.tarkov.dev/regular/maps. Fitted frame x0=621.9 z0=-442 x1=-433 z1=426. publishedBounds max x is 598. The PMC sniper extract is about 16 m west of that edge (left of this 180 degree frame), so it was extended by 8 m."
     },
     {
       "id": "streets-of-tarkov",
@@ -3082,7 +3136,18 @@
         ]
       ],
       "water": [],
-      "ponds": []
+      "ponds": [],
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+      "imageAttribution": {
+        "author": "Shebuka",
+        "project": "the-hideout/tarkov-dev-svg-maps",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/StreetsOfTarkov.svg",
+        "license": "CC BY-NC-SA 4.0",
+        "permission": "EFT TarkDev Telegram 2026-11-04",
+        "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+        "notes": "attribution/SOURCE.md"
+      },
+      "note": "Raster of tarkov.dev StreetsOfTarkov.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/streets-of-tarkov-extracts.json from json.tarkov.dev/regular/maps. Frame is the published rect x0=323 z0=-295 x1=-280 z1=532. Spawn and extract positions from json.tarkov.dev sit inside it."
     },
     {
       "id": "ground-zero",
@@ -3292,7 +3357,7 @@
       ],
       "water": [],
       "ponds": [],
-      "note": "Raster of tarkov.dev GroundZero.svg (Shebuka), official frame x0=249 z0=-124 x1=-99 z1=364, coordinateRotation 180. The pack measured 296 of 523 loot containers on building pixels (about 57%); an x+2 shift would raise that to 329 but moves the five painted door markers off their pixels, so it is not applied. Floors are Maps/interiors/groundzero_*.png (below 21 underground, below 28 ground, below 32.3 second, otherwise third). Extracts are Maps/ground-zero-extracts.json. Door-key colors are Maps/ground-zero-keycards.json: five markers are drawn, and the second Factory emergency exit key at x=264.95 is outside the frame. Scav Bunker (East Gate), UN Roadblock, and Pinewood Basement lie outside the frame. All published Ground Zero spawns sit inside it.",
+      "note": "Raster of tarkov.dev GroundZero.svg (Shebuka), official frame x0=249 z0=-124 x1=-99 z1=364, coordinateRotation 180. The pack measured 296 of 523 loot containers on building pixels (about 57%); an x+2 shift would raise that to 329 but moves the five painted door markers off their pixels, so it is not applied. Floors are Maps/interiors/groundzero_*.png (below 21 underground, below 28 ground, below 32.3 second, otherwise third) and share this frame. Extracts are Maps/ground-zero-extracts.json. Door-key colors are Maps/ground-zero-keycards.json: five markers are drawn, and the second Factory emergency exit key at x=264.95 is outside the frame. Scav Bunker (East Gate), UN Roadblock, and Pinewood Basement lie outside the frame. An east pad to x=-121.71 would cover Pinewood, but this overview is the ground-floor raster, so the frame stays official. All published Ground Zero spawns sit inside it.",
       "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
       "imageAttribution": {
         "author": "Shebuka",
@@ -3674,7 +3739,18 @@
       "areas": [],
       "roads": [],
       "water": [],
-      "ponds": []
+      "ponds": [],
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+      "imageAttribution": {
+        "author": "Shebuka",
+        "project": "the-hideout/tarkov-dev-svg-maps",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/Terminal.svg",
+        "license": "CC BY-NC-SA 4.0",
+        "permission": "EFT TarkDev Telegram 2026-11-04",
+        "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+        "notes": "attribution/SOURCE.md"
+      },
+      "note": "Raster of tarkov.dev Terminal.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/terminal-extracts.json from json.tarkov.dev/regular/maps. Frame is the published rect x0=463 z0=-580 x1=-433 z1=475. json.tarkov.dev publishes no Terminal extracts. Player spawns sit inside the frame."
     }
   ]
 }

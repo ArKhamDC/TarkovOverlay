@@ -193,6 +193,79 @@ public class MapUnderlayTests
     }
 
     [Fact]
+    public void SvgOverviewsReplaceThePlaceholderRasters()
+    {
+        var maps = Load();
+        var expected = new Dictionary<string, (int W, int H, int Extracts)>
+        {
+            ["woods"] = (2560, 2492, 20),
+            ["lighthouse"] = (1575, 2560, 12),
+            ["shoreline"] = (2560, 1695, 19),
+            ["reserve"] = (2560, 2322, 11),
+            ["interchange"] = (2560, 2106, 9),
+            ["streets-of-tarkov"] = (1867, 2560, 19),
+            ["terminal"] = (2174, 2560, 0),
+        };
+
+        foreach (var (id, size) in expected)
+        {
+            var map = maps.Single(m => m.Id == id);
+            Assert.Contains("Shebuka", map.Credit);
+            var (width, height) = PngSize(map.ImagePath);
+            Assert.Equal(size.W, width);
+            Assert.Equal(size.H, height);
+            Assert.True(new FileInfo(map.ImagePath).Length > 40_000, id);
+            Assert.Equal(size.Extracts, map.Extracts.Length);
+            foreach (var extract in map.Extracts)
+            {
+                Assert.False(string.IsNullOrWhiteSpace(extract.NameRu), extract.NameEn);
+                Assert.True(WorldMath.TryImageUv(extract.X, extract.Z, map.MinX, map.MaxX, map.MinZ, map.MaxZ, map.Rotation, out var u, out var v));
+                Assert.InRange(u, 0, 1);
+                Assert.InRange(v, 0, 1);
+            }
+        }
+
+        var factory = maps.Single(m => m.Id == "factory");
+        var courtyard = factory.Extracts.Single(e => e.NameEn == "Courtyard Gate");
+        Assert.Equal("Ворота во дворе", courtyard.NameRu);
+        Assert.Equal("pmc", courtyard.Faction);
+        Assert.Contains(factory.Extracts, e => e.NameEn == "Gate 2");
+        var night = Match(maps, "factory4_night", "night-factory", "maps/factory_night_preset.bundle");
+        Assert.Equal("factory", night.Id);
+        Assert.Equal(10, night.Extracts.Length);
+
+        var woods = maps.Single(m => m.Id == "woods");
+        var zb = woods.Extracts.Single(e => e.NameEn == "ZB-016");
+        Assert.Equal("ЗБ-016", zb.NameRu);
+        var ruaf = woods.Extracts.Single(e => e.NameEn == "RUAF Gate" && e.Faction == "pmc");
+        var (ruafU, ruafV) = Uv(woods, ruaf);
+        Assert.InRange(ruafV, 0.9, 1);
+
+        var flare = maps.Single(m => m.Id == "interchange").Extracts.Single(e => e.NameEn == "Path to River (Flare)");
+        Assert.Equal("Тропа к реке (Сигнал)", flare.NameRu);
+        Assert.Equal(613.9, flare.X);
+
+        var level21 = Match(maps, "Sandbox_high", "ground-zero-21", "maps/sandbox_high_preset.bundle");
+        Assert.Equal("ground-zero", level21.Id);
+
+        var terminal = maps.Single(m => m.Id == "terminal");
+        Assert.Empty(terminal.Extracts);
+        Assert.Contains("Shebuka", terminal.Credit);
+
+        var labyrinth = maps.Single(m => m.Id == "the-labyrinth");
+        Assert.Null(labyrinth.Credit);
+        Assert.Empty(labyrinth.Extracts);
+        Assert.True(new FileInfo(labyrinth.ImagePath).Length < 30_000);
+
+        var customs = maps.Single(m => m.Id == "customs");
+        var lab = maps.Single(m => m.Id == "the-lab");
+        Assert.Equal((1400, 705), PngSize(customs.ImagePath));
+        Assert.Equal((2880, 2344), PngSize(lab.ImagePath));
+        Assert.Equal(28, customs.Extracts.Length);
+        Assert.Equal(7, lab.Extracts.Length);
+    }
+
+    [Fact]
     public void GroundZeroRasterUsesTheOfficialFrameAndDoorKeys()
     {
         var map = Load().Single(m => m.Id == "ground-zero");
