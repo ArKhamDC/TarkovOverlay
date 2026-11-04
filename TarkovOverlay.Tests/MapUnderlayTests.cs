@@ -81,7 +81,7 @@ public class MapUnderlayTests
     {
         var customs = Load().Single(m => m.Id == "customs");
         var bigRed = Uv(customs, Label(customs, "Big Red"));
-        var dorms = Uv(customs, Label(customs, "Dorms"));
+        var dorms = Uv(customs, Label(customs, "3-story dorms"));
         var trailer = Uv(customs, Label(customs, "Trailer Park"));
         Assert.True(bigRed.U > dorms.U);
         Assert.True(dorms.V > trailer.V);

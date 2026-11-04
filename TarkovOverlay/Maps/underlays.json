@@ -48,12 +48,6 @@
           "priority": 140
         },
         {
-          "x": 200,
-          "z": 150,
-          "text": "Dorms",
-          "priority": 140
-        },
-        {
           "x": 201,
           "z": -127,
           "text": "Fortress",
@@ -172,6 +166,18 @@
           "z": -59,
           "text": "Warehouse 17",
           "priority": 90.0
+        },
+        {
+          "x": 181.5,
+          "z": 157.0,
+          "text": "3-story dorms",
+          "priority": 160
+        },
+        {
+          "x": 226.5,
+          "z": 159.0,
+          "text": "2-story dorms",
+          "priority": 160
         }
       ],
       "areas": [

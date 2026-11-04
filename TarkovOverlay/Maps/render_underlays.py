@@ -453,7 +453,24 @@ def render(spec: dict, path: Path) -> tuple[int, int]:
                 draw.polygon(corridor, fill=lighten(fill, 8))
         draw.line(ring + [ring[0]], fill=palette[6], width=max(1, round(ppm * 1.4)))
 
+    # The published dorms footprint is one yard around both buildings.
+    # On this compass frame the three-story block is the eastern one (lower X)
+    # and the two-story block is the western one, with the courtyard between them.
+    if spec["id"] == "customs":
+        draw_block(170, 128, 193, 186, palette[5])
+        draw_block(216, 138, 237, 180, palette[5])
+        try:
+            from PIL import ImageFont
+            mark = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 16)
+            for mx, mz, glyph in ((181.5, 157, "3"), (226.5, 159, "2")):
+                px, py = pix(mx, mz)
+                draw.text((px - 5, py - 8), glyph, fill=(48, 38, 28), font=mark)
+        except OSError:
+            pass
+
     for area in spec["areas"]:
+        if str(area["name"]).lower() == "dorms":
+            continue
         if str(area["name"]).lower() == "mall":
             plate = lighten(palette[0], 18)
             ring = [
@@ -494,6 +511,13 @@ def render(spec: dict, path: Path) -> tuple[int, int]:
     return width, height
 
 
+def customs_dorm_labels(labels: list[dict]) -> list[dict]:
+    kept = [label for label in labels if label["text"] != "Dorms"]
+    kept.append({"x": 181.5, "z": 157.0, "text": "3-story dorms", "priority": 160})
+    kept.append({"x": 226.5, "z": 159.0, "text": "2-story dorms", "priority": 160})
+    return kept
+
+
 def build(doc: list) -> list[dict]:
     source = interactive_maps(doc)
     specs = []
@@ -519,7 +543,7 @@ def build(doc: list) -> list[dict]:
             "publishedBounds": bounds,
             "bounds": {"x0": bounds[0][0], "z0": bounds[0][1], "x1": bounds[1][0], "z1": bounds[1][1]},
             "aliases": sorted(alias),
-            "labels": collect_labels(inter),
+            "labels": customs_dorm_labels(collect_labels(inter)) if map_id == "customs" else collect_labels(inter),
             "areas": collect_areas(inter),
             "floors": collect_floors(inter),
             "roads": [*ROADS.get(map_id, []), *street_roads(inter, inter["coordinateRotation"])],
