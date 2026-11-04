@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Overview rasters other than Labyrinth are Shebuka's SVGs from the-hideout/tarkov-dev-svg-maps (CC BY-NC-SA 4.0), used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. Factory ships Factory.svg on the published frame [[77,-64.5],[-65.5,67.4]], coordinateRotation 90: the overview is the ground floor, and basement, second, and third are separate rasters. Ground Zero ships GroundZero.svg on the official frame x0=249 z0=-124 x1=-99 z1=364, with one raster per height band and door locks painted as markers. The Lab ships Labs.svg on a fitted frame (tarkov.dev publishes no svgBounds for Labs), with locked rooms painted in the keycard color. Extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and the game's own map textures are not licensed for redistribution. Labyrinth has no SVG in that repo, so it stays an original frame drawing. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns.",
+  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Overview rasters other than Labyrinth are Shebuka's SVGs from the-hideout/tarkov-dev-svg-maps (CC BY-NC-SA 4.0), used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. Factory ships Factory.svg on the published frame [[77,-64.5],[-65.5,67.4]], coordinateRotation 90: the overview is the ground floor, and basement, second, and third are separate rasters. Ground Zero ships GroundZero.svg on the official frame x0=249 z0=-124 x1=-99 z1=364, with one raster per height band and door locks painted as markers. Shoreline ships Shoreline.svg on the published frame [[504,-415],[-1056,618]], coordinateRotation 180: the overview is the ground floor, upper floors apply only inside the health resort, and underground only inside the west-wing and admin boxes. 23 resort rooms are painted in the key color. The Lab ships Labs.svg on a fitted frame (tarkov.dev publishes no svgBounds for Labs), with locked rooms painted in the keycard color. Extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and the game's own map textures are not licensed for redistribution. Labyrinth has no SVG in that repo, so it stays an original frame drawing. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns.",
   "maps": [
     {
       "id": "customs",
@@ -1667,6 +1667,7 @@
           70
         ]
       ],
+      "note": "Raster of tarkov.dev Shoreline.svg (Shebuka), published frame [[504,-415],[-1056,618]], coordinateRotation 180. Image top-left is x=504 z=-415 and bottom-right is x=-1056 z=618. u=(504-x)/1560, v=(z+415)/1033. The file is the overview and matches the ground floor. Floors are Maps/interiors/shoreline_*.png. Underground is y<-5 inside the west-wing or admin box. Inside the resort (x -373.8..-130.7, z -172.9..-61.8), first is -5<=y<-1, second is -1<=y<2, third is y>=2. Hills outside the resort stay on ground. Extracts and transits come from Maps/shoreline-extracts.json. Key colors are Maps/shoreline-keycards.json: 32 keys, 34 locks, 23 resort rooms filled.",
       "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
       "imageAttribution": {
         "author": "Shebuka",
@@ -1676,8 +1677,7 @@
         "permission": "EFT TarkDev Telegram 2026-11-04",
         "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
         "notes": "attribution/SOURCE.md"
-      },
-      "note": "Raster of tarkov.dev Shoreline.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/shoreline-extracts.json from json.tarkov.dev/regular/maps. Frame is the published rect x0=504 z0=-415 x1=-1056 z1=618. Spawn and extract positions from json.tarkov.dev sit inside it."
+      }
     },
     {
       "id": "reserve",

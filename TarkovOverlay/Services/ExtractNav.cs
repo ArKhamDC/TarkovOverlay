@@ -7,7 +7,8 @@ public static class ExtractNav
     public static bool FactionVisible(string? faction, string? side)
     {
         if (side is not ("pmc" or "scav")) return true;
-        if (string.IsNullOrEmpty(faction) || faction is "shared") return true;
+        if (string.IsNullOrEmpty(faction) || faction is "shared"
+            || faction.Equals("transit", StringComparison.OrdinalIgnoreCase)) return true;
         return string.Equals(faction, side, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -20,7 +21,7 @@ public static class ExtractNav
         if (string.Equals(side, "scav", StringComparison.OrdinalIgnoreCase))
             return FactionVisible(faction, "scav");
         var kind = faction?.Trim().ToLowerInvariant();
-        return string.IsNullOrEmpty(kind) || kind is "pmc" or "shared";
+        return string.IsNullOrEmpty(kind) || kind is "pmc" or "shared" or "transit";
     }
 
     public static NearestExtract? Nearest(GameMap map, Vec3 pos, string? side)

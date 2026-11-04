@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "Customs interior floors are crops of Customs.svg by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), the same map as the Customs overview. EFT TarkDev allowed use of the site and its data for this program on 2026-11-04; see Maps/attribution/SOURCE.md. rectXZ x0/z0 is the image top-left and x1/z1 the bottom-right in the overview world frame (coordinateRotation 180). Floor 0 is underground. Dorm room numbers are verified placements in image pixels; only confidence verified is shipped. Stairs stay painted on the raster. Boiler is omitted: Customs.svg has no boiler group. The Lab is one underground complex from Labs.svg (same author and licence): there is no outdoor overview. rectXZ uses coordinateRotation 270. Height picks the floor: below -0.9 technical, below 3 first, otherwise second. Locked rooms are painted on the rasters in the keycard color. Factory is one indoor complex from Factory.svg (same author and licence) on the published frame, coordinateRotation 90. factory.png is the overview until a position arrives, then height picks the floor: below -1 basement, below 3 ground, below 6 second, otherwise third. Locks are door markers, not room fills. Ground Zero is the whole GroundZero.svg on the official frame (coordinateRotation 180). ground-zero.png is the overview until a position arrives, then height picks the floor: below 21 underground, below 28 ground, below 32.3 second, otherwise third. Door locks are painted markers, not room fills. The official bounds are not shifted.",
+  "source": "Customs interior floors are crops of Customs.svg by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), the same map as the Customs overview. EFT TarkDev allowed use of the site and its data for this program on 2026-11-04; see Maps/attribution/SOURCE.md. rectXZ x0/z0 is the image top-left and x1/z1 the bottom-right in the overview world frame (coordinateRotation 180). Floor 0 is underground. Dorm room numbers are verified placements in image pixels; only confidence verified is shipped. Stairs stay painted on the raster. Boiler is omitted: Customs.svg has no boiler group. The Lab is one underground complex from Labs.svg (same author and licence): there is no outdoor overview. rectXZ uses coordinateRotation 270. Height picks the floor: below -0.9 technical, below 3 first, otherwise second. Locked rooms are painted on the rasters in the keycard color. Factory is one indoor complex from Factory.svg (same author and licence) on the published frame, coordinateRotation 90. factory.png is the overview until a position arrives, then height picks the floor: below -1 basement, below 3 ground, below 6 second, otherwise third. Locks are door markers, not room fills. Ground Zero is the whole GroundZero.svg on the official frame (coordinateRotation 180). ground-zero.png is the overview until a position arrives, then height picks the floor: below 21 underground, below 28 ground, below 32.3 second, otherwise third. Door locks are painted markers, not room fills. The official bounds are not shifted. Shoreline is the whole Shoreline.svg on the published frame, coordinateRotation 180. shoreline.png is the overview and matches the ground floor. Underground is y<-5 inside the west-wing or admin box; inside the resort, first is -5<=y<-1, second is -1<=y<2, third is y>=2; everywhere else, including hills, is ground. 23 resort rooms are painted in the key color. Other locks are door markers.",
   "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
   "maps": [
     {
@@ -1219,6 +1219,142 @@
               "image": "factory_third.png",
               "width": 1047,
               "height": 1130
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shoreline",
+      "coordinateRotation": 180,
+      "aliases": [
+        "shoreline",
+        "shorelinepreset"
+      ],
+      "buildings": [
+        {
+          "id": "shoreline",
+          "name": "Shoreline",
+          "nameRu": "Берег",
+          "coversMap": true,
+          "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+          "rectXZ": {
+            "x0": 504,
+            "z0": -415,
+            "x1": -1056,
+            "z1": 618
+          },
+          "floorRules": [
+            {
+              "floor": 0,
+              "below": -5,
+              "boxes": [
+                {
+                  "name": "west wing",
+                  "x0": -137,
+                  "z0": -68,
+                  "x1": -237,
+                  "z1": -104
+                },
+                {
+                  "name": "admin",
+                  "x0": -234,
+                  "z0": -134,
+                  "x1": -268,
+                  "z1": -163
+                }
+              ]
+            },
+            {
+              "floor": 4,
+              "atLeast": 2,
+              "boxes": [
+                {
+                  "name": "resort",
+                  "x0": -373.8,
+                  "z0": -172.9,
+                  "x1": -130.7,
+                  "z1": -61.8
+                }
+              ]
+            },
+            {
+              "floor": 3,
+              "atLeast": -1,
+              "below": 2,
+              "boxes": [
+                {
+                  "name": "resort",
+                  "x0": -373.8,
+                  "z0": -172.9,
+                  "x1": -130.7,
+                  "z1": -61.8
+                }
+              ]
+            },
+            {
+              "floor": 2,
+              "atLeast": -5,
+              "below": -1,
+              "boxes": [
+                {
+                  "name": "resort",
+                  "x0": -373.8,
+                  "z0": -172.9,
+                  "x1": -130.7,
+                  "z1": -61.8
+                }
+              ]
+            },
+            {
+              "floor": 1
+            }
+          ],
+          "floors": [
+            {
+              "floor": 0,
+              "floorKey": "underground",
+              "caption": "U",
+              "tip": "Underground",
+              "image": "shoreline_underground.png",
+              "width": 3119,
+              "height": 2065
+            },
+            {
+              "floor": 1,
+              "floorKey": "ground",
+              "caption": "G",
+              "tip": "Ground",
+              "image": "shoreline_ground.png",
+              "width": 3119,
+              "height": 2065
+            },
+            {
+              "floor": 2,
+              "floorKey": "first",
+              "caption": "1",
+              "tip": "First",
+              "image": "shoreline_first.png",
+              "width": 3119,
+              "height": 2065
+            },
+            {
+              "floor": 3,
+              "floorKey": "second",
+              "caption": "2",
+              "tip": "Second",
+              "image": "shoreline_second.png",
+              "width": 3119,
+              "height": 2065
+            },
+            {
+              "floor": 4,
+              "floorKey": "third",
+              "caption": "3",
+              "tip": "Third",
+              "image": "shoreline_third.png",
+              "width": 3119,
+              "height": 2065
             }
           ]
         }

@@ -383,6 +383,115 @@ public class InteriorTests
     }
 
     [Fact]
+    public void ShorelineUsesResortAndUndergroundBoxesAndKeepsAPinUntilThatRuleChanges()
+    {
+        var shore = Load().Single(b => b.Id == "shoreline" && b.MapId == "shoreline");
+        Assert.True(shore.CoversMap);
+        Assert.Equal(180, shore.Rotation);
+        Assert.Null(shore.FloorByY);
+        Assert.NotNull(shore.FloorRules);
+        Assert.Equal(new[] { 0, 1, 2, 3, 4 }, shore.Floors.Select(f => f.Floor).ToArray());
+        Assert.Equal(new[] { "U", "G", "1", "2", "3" }, shore.Floors.Select(f => f.Caption).ToArray());
+        Assert.Equal(new[] { "Underground", "Ground", "First", "Second", "Third" }, shore.Floors.Select(f => f.Tip).ToArray());
+        Assert.Contains("Shebuka", shore.Credit);
+        Assert.Equal(504, shore.X0, 3);
+        Assert.Equal(-415, shore.Z0, 3);
+        Assert.Equal(-1056, shore.X1, 3);
+        Assert.Equal(618, shore.Z1, 3);
+        foreach (var plan in shore.Floors)
+        {
+            Assert.Equal(3119, plan.Width);
+            Assert.Equal(2065, plan.Height);
+            var (w, h) = PngSize(plan.ImagePath);
+            Assert.Equal(3119, w);
+            Assert.Equal(2065, h);
+        }
+
+        var overview = File.ReadAllBytes(Path.Combine(MapsDir(), "images", "shoreline.png"));
+        Assert.Equal(overview, File.ReadAllBytes(shore.Floors.Single(f => f.Floor == 1).ImagePath));
+
+        const double resortX = -252.25;
+        const double resortZ = -117.35;
+        Assert.Equal(4, InteriorCatalog.FloorFromRule(shore, resortX, 3, resortZ));
+        Assert.Equal(4, InteriorCatalog.FloorFromRule(shore, resortX, 2, resortZ));
+        Assert.Equal(3, InteriorCatalog.FloorFromRule(shore, resortX, 1.999, resortZ));
+        Assert.Equal(3, InteriorCatalog.FloorFromRule(shore, resortX, -1, resortZ));
+        Assert.Equal(2, InteriorCatalog.FloorFromRule(shore, resortX, -1.001, resortZ));
+        Assert.Equal(2, InteriorCatalog.FloorFromRule(shore, resortX, -5, resortZ));
+        // Below -5 inside the resort, but outside both underground boxes, stays on the ground floor.
+        Assert.Equal(1, InteriorCatalog.FloorFromRule(shore, resortX, -6, resortZ));
+        Assert.Equal(2, InteriorCatalog.FloorFromRule(shore, -187, -5, -86));
+        Assert.Equal(0, InteriorCatalog.FloorFromRule(shore, -187, -5.001, -86));
+        Assert.Equal(0, InteriorCatalog.FloorFromRule(shore, -197.04, -5.96, -79.97));
+        Assert.Equal(0, InteriorCatalog.FloorFromRule(shore, -256.87, -7.71, -149.78));
+        Assert.Equal(0, InteriorCatalog.FloorFromRule(shore, -195.13, -9.83, -82.93));
+        Assert.Equal(1, InteriorCatalog.FloorFromRule(shore, 0, 40, 200));
+        Assert.Equal(1, InteriorCatalog.FloorFromRule(shore, -496, 80, 257));
+        Assert.Equal(1, InteriorCatalog.FloorFromRule(shore, -296.95, -6.63, -100.89));
+        Assert.Equal(1, InteriorCatalog.FloorFromRule(shore, -373.9, 10, -117));
+        Assert.Equal(4, InteriorCatalog.FloorFromRule(shore, -373.8, 10, -117));
+        Assert.Null(InteriorCatalog.FloorFromRule(shore, resortX, double.NaN, resortZ));
+
+        var onMap = InteriorCatalog.ForMap(Load(), Game("Shoreline", "shoreline", "maps/shoreline_preset.bundle"));
+        Assert.Single(onMap);
+
+        var state = InteriorFix.Overview;
+        (state, var building, var floor) = InteriorCatalog.Advance(onMap, state, 376.36, -55.94, 319.25);
+        Assert.Equal("shoreline", building!.Id);
+        Assert.Equal(1, floor!.Floor);
+        Assert.Null(state.LockBand);
+        Assert.Equal(new[] { "U", "G", "1", "2", "3" }, InteriorCatalog.FloorOptions(building, 1)!.Select(o => o.Caption).ToArray());
+        Assert.Equal("Ground", InteriorCatalog.FloorOptions(building, 1)!.Single(o => o.Selected).Tip);
+
+        (state, _, floor) = InteriorCatalog.Advance(onMap, InteriorFix.Overview, 0, double.NaN, 200);
+        Assert.Equal(1, floor!.Floor);
+
+        state = InteriorFix.Overview;
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 0, 40, 200);
+        Assert.Equal(1, floor!.Floor);
+        state = InteriorCatalog.PinFloor(onMap, state, 4, 0, 40, 200);
+        Assert.Equal(1, state.LockBand);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, -496, 15, 257);
+        Assert.Equal(4, floor!.Floor);
+        Assert.Equal(1, state.LockBand);
+
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, resortX, 0, resortZ);
+        Assert.Equal(3, floor!.Floor);
+        Assert.Null(state.LockBand);
+
+        state = InteriorCatalog.PinFloor(onMap, state, 2, resortX, 0, resortZ);
+        Assert.Equal(3, state.LockBand);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, resortX, 1.5, resortZ);
+        Assert.Equal(2, floor!.Floor);
+        Assert.Equal(3, state.LockBand);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, resortX, 2.5, resortZ);
+        Assert.Equal(4, floor!.Floor);
+        Assert.Null(state.LockBand);
+
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, -187, -6, -86);
+        Assert.Equal(0, floor!.Floor);
+        state = InteriorCatalog.PinFloor(onMap, state, 2, -187, -6, -86);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, -256.87, -7.71, -149.78);
+        Assert.Equal(2, floor!.Floor);
+        Assert.Equal(0, state.LockBand);
+
+        Assert.True(InteriorCatalog.ExtractOnFloor(shore, -256.87, -7.71, -149.78, 0));
+        Assert.False(InteriorCatalog.ExtractOnFloor(shore, -256.87, -7.71, -149.78, 1));
+        Assert.True(InteriorCatalog.ExtractOnFloor(shore, -296.95, -6.63, -100.89, 1));
+        Assert.False(InteriorCatalog.ExtractOnFloor(shore, -296.95, -6.63, -100.89, 0));
+        Assert.True(InteriorCatalog.ExtractOnFloor(shore, 0, 40, 200, 1));
+        Assert.False(InteriorCatalog.ExtractOnFloor(shore, 0, 40, 200, 4));
+        Assert.True(InteriorCatalog.ExtractOnFloor(shore, resortX, 3, resortZ, 4));
+        Assert.False(InteriorCatalog.ExtractOnFloor(shore, resortX, 3, resortZ, 1));
+
+        Assert.True(shore.TryUv(376.36, 319.25, out var u, out var v));
+        Assert.Equal((504 - 376.36) / 1560.0, u, 4);
+        Assert.Equal((319.25 + 415) / 1033.0, v, 4);
+        Assert.True(shore.TryUv(-859.05, 0.49, out var roadU, out _));
+        Assert.True(u < roadU);
+    }
+
+    [Fact]
     public void EnteringABuildingSelectsGroundAndLeavingReturnsToOverview()
     {
         var customs = For("bigmap", "customs", "maps/customs_preset.bundle");

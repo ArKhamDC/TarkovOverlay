@@ -100,8 +100,10 @@ public sealed class GpsController : IDisposable
     {
         lock (_gate)
         {
+            var x = _fix?.Position.X ?? double.NaN;
             var y = _fix?.Position.Y ?? double.NaN;
-            _interior = InteriorCatalog.PinFloor(_interiors, _interior, floor, y);
+            var z = _fix?.Position.Z ?? double.NaN;
+            _interior = InteriorCatalog.PinFloor(_interiors, _interior, floor, x, y, z);
             _sig = "\0";
         }
         Publish();
@@ -427,7 +429,7 @@ public sealed class GpsController : IDisposable
         foreach (var marker in markers)
         {
             if (!building.Contains(marker.X, marker.Z)) continue;
-            if (!InteriorCatalog.ExtractOnFloor(building, marker.Y, floor.Floor)) continue;
+            if (!InteriorCatalog.ExtractOnFloor(building, marker.X, marker.Y, marker.Z, floor.Floor)) continue;
             inside.Add(marker);
         }
 

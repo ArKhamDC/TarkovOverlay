@@ -200,7 +200,6 @@ public class MapUnderlayTests
         {
             ["woods"] = (2560, 2492, 20),
             ["lighthouse"] = (1575, 2560, 12),
-            ["shoreline"] = (2560, 1695, 19),
             ["reserve"] = (2560, 2322, 11),
             ["interchange"] = (2560, 2106, 9),
             ["streets-of-tarkov"] = (1867, 2560, 19),
@@ -425,6 +424,81 @@ public class MapUnderlayTests
         Assert.False(storage.RoomFill);
         Assert.Equal("66acd6702b17692df20144c0", storage.ItemId);
         Assert.DoesNotContain(factory.Keycards, k => k.Name.Contains("stairs", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void ShorelineRasterUsesThePublishedFrameAndKeyColors()
+    {
+        var shore = Load().Single(m => m.Id == "shoreline");
+        Assert.Equal(180, shore.Rotation);
+        Assert.Equal(180, shore.CompassDegrees);
+        Assert.Equal(-1056, shore.MinX, 3);
+        Assert.Equal(504, shore.MaxX, 3);
+        Assert.Equal(-415, shore.MinZ, 3);
+        Assert.Equal(618, shore.MaxZ, 3);
+        Assert.Contains("Shebuka", shore.Credit);
+        var (width, height) = PngSize(shore.ImagePath);
+        Assert.Equal(3119, width);
+        Assert.Equal(2065, height);
+
+        Assert.True(WorldMath.TryImageUv(376.36, 319.25, shore.MinX, shore.MaxX, shore.MinZ, shore.MaxZ, shore.Rotation, out var tunnelU, out var tunnelV));
+        Assert.Equal((504 - 376.36) / 1560.0, tunnelU, 4);
+        Assert.Equal((319.25 + 415) / 1033.0, tunnelV, 4);
+        var (roadU, _) = Uv(shore, -859.05, 0.49);
+        Assert.True(tunnelU < roadU);
+
+        Assert.Equal(23, shore.Extracts.Length);
+        Assert.Equal(19, shore.Extracts.Count(e => e.Faction is "pmc" or "scav" or "shared"));
+        Assert.Equal(4, shore.Extracts.Count(e => e.Faction == "transit"));
+        var tunnel = shore.Extracts.Single(e => e.NameEn == "Tunnel");
+        Assert.Equal("Тоннель", tunnel.NameRu);
+        Assert.Equal("pmc", tunnel.Faction);
+        var basement = shore.Extracts.Single(e => e.NameEn == "Admin Basement");
+        Assert.Equal("Подвал в адм. корпусе", basement.NameRu);
+        Assert.Equal("scav", basement.Faction);
+        Assert.Equal(-7.71, basement.Y, 2);
+        var gym = shore.Extracts.Single(e => e.NameEn == "East Wing Gym Entrance");
+        Assert.Equal(-6.63, gym.Y, 2);
+        var roads = shore.Extracts.Where(e => e.NameEn == "Road to Customs").ToArray();
+        Assert.Equal(2, roads.Length);
+        Assert.Contains(roads, e => e.Faction == "pmc");
+        Assert.Contains(roads, e => e.Faction == "scav");
+        var labyrinth = shore.Extracts.Single(e => e.NameEn == "Transit to Labyrinth?");
+        Assert.Equal("Переход на Лабиринт?", labyrinth.NameRu);
+        Assert.Equal("transit", labyrinth.Faction);
+        Assert.Equal(-9.83, labyrinth.Y, 2);
+        Assert.Contains(shore.Extracts, e => e.NameEn == "Transit to Icebreaker" && e.Faction == "transit");
+        foreach (var extract in shore.Extracts)
+        {
+            Assert.False(string.IsNullOrWhiteSpace(extract.NameRu));
+            Assert.True(WorldMath.TryImageUv(extract.X, extract.Z, shore.MinX, shore.MaxX, shore.MinZ, shore.MaxZ, shore.Rotation, out var eu, out var ev), extract.NameEn);
+            Assert.InRange(eu, 0, 1);
+            Assert.InRange(ev, 0, 1);
+        }
+
+        Assert.Equal(16, shore.Labels.Length);
+        Assert.Contains(shore.Labels, l => l.Text == "Tunnel" && l.TextRu == "Тоннель");
+        Assert.Contains(shore.Labels, l => l.Text == "Transit to Lighthouse");
+        Assert.DoesNotContain(shore.Labels, l => l.Text == "Admin Basement");
+
+        Assert.Equal(32, shore.Keycards.Length);
+        Assert.Equal(34, shore.Keycards.Sum(k => k.Count));
+        Assert.Equal(23, shore.Keycards.Count(k => k.RoomFill));
+        Assert.Equal(23, shore.Keycards.Where(k => k.RoomFill).Sum(k => k.Count));
+        Assert.Equal(32, shore.Keycards.Select(k => k.Fill).Distinct(StringComparer.OrdinalIgnoreCase).Count());
+        var utility = shore.Keycards.Single(k => k.Name == "Utility");
+        Assert.False(utility.RoomFill);
+        Assert.Equal(2, utility.Count);
+        Assert.Equal("#ff3fc0", utility.Fill);
+        Assert.Equal("5a0ea79b86f7741d4a35298e", utility.ItemId);
+        var west301 = shore.Keycards.Single(k => k.Name == "W301");
+        Assert.True(west301.RoomFill);
+        Assert.Equal("#553fff", west301.Fill);
+        Assert.False(shore.Keycards.Single(k => k.Name == "W104").RoomFill);
+        Assert.False(shore.Keycards.Single(k => k.Name == "W112").RoomFill);
+        Assert.False(shore.Keycards.Single(k => k.Name == "Knossos").RoomFill);
+        Assert.Equal(2, shore.Keycards.Single(k => k.Name == "HEP").Count);
+        Assert.DoesNotContain(shore.Keycards, k => k.Name.Contains("stairs", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
