@@ -124,6 +124,34 @@ public class MapUnderlayTests
     }
 
     [Fact]
+    public void HeightSelectsTheFloorInsideThatFootprint()
+    {
+        var maps = Load();
+        var customs = maps.Single(m => m.Id == "customs");
+        var dormsSecond = MapUnderlayCatalog.FloorAt(customs.Floors, 200, 4, 150);
+        Assert.NotNull(dormsSecond);
+        Assert.Equal("2nd Floor", dormsSecond!.Name);
+        Assert.Contains("dorm", dormsSecond.Place, StringComparison.OrdinalIgnoreCase);
+        Assert.Null(MapUnderlayCatalog.FloorAt(customs.Floors, 200, 1, 150));
+        Assert.Equal("3rd Floor", MapUnderlayCatalog.FloorAt(customs.Floors, 200, 8, 150)!.Name);
+        Assert.Null(MapUnderlayCatalog.FloorAt(customs.Floors, 0, 4, 0));
+
+        var reserve = maps.Single(m => m.Id == "reserve");
+        var bunker = MapUnderlayCatalog.FloorAt(reserve.Floors, 80, -10, -100);
+        Assert.NotNull(bunker);
+        Assert.Equal("Bunkers", bunker!.Name);
+        Assert.Null(MapUnderlayCatalog.FloorAt(reserve.Floors, 80, 2, -100));
+
+        Assert.True(WorldMath.TryFit(dormsSecond.X0!.Value, dormsSecond.X1!.Value, dormsSecond.Z0!.Value, dormsSecond.Z1!.Value, customs.Rotation, 420, 320, out var zoom));
+        var (sx, sy) = zoom.ToScreen(200, 150);
+        Assert.InRange(sx, zoom.OriginX, zoom.OriginX + zoom.UsedW);
+        Assert.InRange(sy, zoom.OriginY, zoom.OriginY + zoom.UsedH);
+        var outside = zoom.ToScreen(customs.MinX, customs.MinZ);
+        Assert.True(outside.X < zoom.OriginX || outside.X > zoom.OriginX + zoom.UsedW
+            || outside.Y < zoom.OriginY || outside.Y > zoom.OriginY + zoom.UsedH);
+    }
+
+    [Fact]
     public void ScreenPositionMatchesImageUvAndLetterboxes()
     {
         var customs = Load().Single(m => m.Id == "customs");
