@@ -193,6 +193,66 @@ public class MapUnderlayTests
     }
 
     [Fact]
+    public void GroundZeroRasterUsesTheOfficialFrameAndDoorKeys()
+    {
+        var map = Load().Single(m => m.Id == "ground-zero");
+        Assert.Equal(180, map.Rotation);
+        Assert.Equal(180, map.CompassDegrees);
+        Assert.Equal(-99, map.MinX);
+        Assert.Equal(249, map.MaxX);
+        Assert.Equal(-124, map.MinZ);
+        Assert.Equal(364, map.MaxZ);
+        Assert.Contains("Shebuka", map.Credit);
+        var (width, height) = PngSize(map.ImagePath);
+        Assert.Equal(2094, width);
+        Assert.Equal(2931, height);
+
+        // Customs-style rotation: image u is (249-x)/348. An x+2 shift is not this frame.
+        Assert.True(WorldMath.TryImageUv(107.05, 50.64, map.MinX, map.MaxX, map.MinZ, map.MaxZ, map.Rotation, out var u, out var v));
+        Assert.Equal((249 - 107.05) / 348.0, u, 6);
+        Assert.Equal((50.64 + 124) / 488.0, v, 6);
+        Assert.True(WorldMath.TryImageUv(107.05 + 2, 50.64, map.MinX, map.MaxX, map.MinZ, map.MaxZ, map.Rotation, out var shifted, out _));
+        Assert.NotEqual(u, shifted);
+
+        Assert.Equal(9, map.Extracts.Length);
+        var emercom = map.Extracts.Single(e => e.NameEn == "Emercom Checkpoint");
+        Assert.Equal("Пункт МЧС", emercom.NameRu);
+        Assert.Equal("shared", emercom.Faction);
+        Assert.Equal(151.63, emercom.X);
+        Assert.Equal(24.66, emercom.Y, 2);
+        Assert.Equal(-97.46, emercom.Z);
+        var nakatani = map.Extracts.Single(e => e.NameEn == "Nakatani Basement Stairs");
+        Assert.Equal("Спуск в подвал в Nakatani", nakatani.NameRu);
+        Assert.Equal(14.76, nakatani.Y, 2);
+        var bunker = map.Extracts.Single(e => e.NameEn == "Scav Bunker");
+        Assert.Equal("scav", bunker.Faction);
+        Assert.Equal("Бункер Диких", bunker.NameRu);
+        Assert.DoesNotContain(map.Labels, l => l.Text == "Scav Bunker");
+        Assert.Equal(8, map.Labels.Length);
+        Assert.Contains(map.Labels, l => l.Text == "Emercom Checkpoint" && l.TextRu == "Пункт МЧС");
+
+        var outside = new[] { "Pinewood Basement (Co-Op)", "UN Roadblock", "Scav Bunker" };
+        foreach (var extract in map.Extracts)
+        {
+            Assert.False(string.IsNullOrWhiteSpace(extract.NameRu));
+            var onImage = WorldMath.TryImageUv(extract.X, extract.Z, map.MinX, map.MaxX, map.MinZ, map.MaxZ, map.Rotation, out var eu, out var ev)
+                          && eu is >= 0 and <= 1 && ev is >= 0 and <= 1;
+            Assert.Equal(!outside.Contains(extract.NameEn), onImage);
+        }
+
+        Assert.Equal(5, map.Keycards.Length);
+        Assert.Equal(
+            new[] { "#ff8c1a", "#ff4d4d", "#3d9bff", "#3ddc5a", "#b05cff" },
+            map.Keycards.Select(k => k.Fill).ToArray());
+        Assert.All(map.Keycards, k => Assert.False(k.RoomFill));
+        Assert.All(map.Keycards, k => Assert.Equal(1, k.Count));
+        Assert.Equal("5448ba0b4bdc2d02308b456c", map.Keycards.Single(k => k.Name == "Factory exit").ItemId);
+        Assert.Contains("outside the frame", map.Keycards.Single(k => k.Name == "Factory exit").Tip, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal("658199aa38c79576a2569e13", map.Keycards.Single(k => k.Name == "Science office").ItemId);
+        Assert.DoesNotContain(map.Keycards, k => k.Name.Contains("stairs", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
     public void ReserveTrainExtractLandsOnTheTrainDepot()
     {
         var reserve = Load().Single(m => m.Id == "reserve");
