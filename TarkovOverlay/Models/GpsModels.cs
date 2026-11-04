@@ -35,6 +35,20 @@ public sealed record MapMarker(double X, double Z, string Name, string Faction, 
 public sealed record MapLabel(double X, double Z, string Text, double Priority);
 
 /// <summary>
+/// A height band where the player is on a named floor. Bounds are optional;
+/// when set, the band applies only inside that footprint.
+/// </summary>
+public sealed record MapFloor(
+    string Name,
+    string Place,
+    double MinY,
+    double MaxY,
+    double? X0,
+    double? Z0,
+    double? X1,
+    double? Z1);
+
+/// <summary>
 /// Map window contents. When <paramref name="UnderlayImage"/> is set, the bounds are that image's
 /// world frame and <paramref name="Rotation"/> is its coordinateRotation. Otherwise this is the
 /// extract schematic fitted around the player.

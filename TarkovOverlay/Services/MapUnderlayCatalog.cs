@@ -20,6 +20,7 @@ public sealed class MapUnderlay
     public double MaxZ { get; init; }
     public required string[] Aliases { get; init; }
     public required MapLabel[] Labels { get; init; }
+    public MapFloor[] Floors { get; init; } = [];
 }
 
 /// <summary>Loads <c>Maps/underlays.json</c> and keeps entries whose image file is present.</summary>
@@ -93,11 +94,71 @@ public static class MapUnderlayCatalog
                 MinZ = Math.Min(z0.Value, z1.Value),
                 MaxZ = Math.Max(z0.Value, z1.Value),
                 Aliases = aliases.ToArray(),
-                Labels = labels.ToArray()
+                Labels = labels.ToArray(),
+                Floors = ReadFloors(map)
             });
         }
 
         return list;
+    }
+
+    /// <summary>
+    /// The floor whose height band contains <paramref name="y"/>. When several overlap,
+    /// the higher band wins, and a smaller footprint wins a tie. Null means the ground layer.
+    /// </summary>
+    public static MapFloor? FloorAt(IReadOnlyList<MapFloor> floors, double x, double y, double z)
+    {
+        MapFloor? best = null;
+        var bestArea = double.PositiveInfinity;
+        foreach (var floor in floors)
+        {
+            if (y < floor.MinY || y >= floor.MaxY) continue;
+            var area = double.PositiveInfinity;
+            if (floor.X0 is double x0 && floor.Z0 is double z0 && floor.X1 is double x1 && floor.Z1 is double z1)
+            {
+                var minX = Math.Min(x0, x1);
+                var maxX = Math.Max(x0, x1);
+                var minZ = Math.Min(z0, z1);
+                var maxZ = Math.Max(z0, z1);
+                if (x < minX || x > maxX || z < minZ || z > maxZ) continue;
+                area = (maxX - minX) * (maxZ - minZ);
+            }
+
+            if (best is null
+                || floor.MinY > best.MinY + 1e-6
+                || (Math.Abs(floor.MinY - best.MinY) <= 1e-6 && area < bestArea))
+            {
+                best = floor;
+                bestArea = area;
+            }
+        }
+
+        return best;
+    }
+
+    private static MapFloor[] ReadFloors(JsonElement map)
+    {
+        if (!map.TryGetProperty("floors", out var node) || node.ValueKind != JsonValueKind.Array)
+            return [];
+        var floors = new List<MapFloor>();
+        foreach (var floor in node.EnumerateArray())
+        {
+            var name = Str(floor, "name");
+            var minY = Num(floor, "minY");
+            var maxY = Num(floor, "maxY");
+            if (string.IsNullOrWhiteSpace(name) || minY is null || maxY is null || maxY <= minY) continue;
+            floors.Add(new MapFloor(
+                name,
+                Str(floor, "place") ?? "",
+                minY.Value,
+                maxY.Value,
+                Num(floor, "x0"),
+                Num(floor, "z0"),
+                Num(floor, "x1"),
+                Num(floor, "z1")));
+        }
+
+        return floors.ToArray();
     }
 
     public static MapUnderlay? Match(IReadOnlyList<MapUnderlay> underlays, GameMap map)

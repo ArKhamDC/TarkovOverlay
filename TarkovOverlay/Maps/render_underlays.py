@@ -246,6 +246,40 @@ def collect_areas(inter: dict) -> list[dict]:
     return areas
 
 
+def collect_floors(inter: dict) -> list[dict]:
+    """Height bands from tarkov.dev map layers. A player Y inside one of these is on that floor."""
+    floors = []
+    for layer in inter.get("layers") or []:
+        name = str(layer.get("name") or "").strip()
+        if not name:
+            continue
+        for extent in layer.get("extents") or []:
+            height = extent.get("height")
+            if not isinstance(height, list) or len(height) < 2:
+                continue
+            min_y, max_y = float(height[0]), float(height[1])
+            boxes = []
+            for raw in extent.get("bounds") or []:
+                if not isinstance(raw, list) or len(raw) < 2 or not isinstance(raw[0], list):
+                    continue
+                place = str(raw[2]).strip() if len(raw) > 2 else ""
+                boxes.append({
+                    "name": name,
+                    "place": place,
+                    "minY": min_y,
+                    "maxY": max_y,
+                    "x0": raw[0][0],
+                    "z0": raw[0][1],
+                    "x1": raw[1][0],
+                    "z1": raw[1][1],
+                })
+            if boxes:
+                floors.extend(boxes)
+            else:
+                floors.append({"name": name, "place": "", "minY": min_y, "maxY": max_y})
+    return floors
+
+
 def collect_labels(inter: dict) -> list[dict]:
     labels = []
     for raw in inter.get("labels") or []:
@@ -447,6 +481,7 @@ def build(doc: list) -> list[dict]:
             "aliases": sorted(alias),
             "labels": collect_labels(inter),
             "areas": collect_areas(inter),
+            "floors": collect_floors(inter),
             "roads": [*ROADS.get(map_id, []), *street_roads(inter, inter["coordinateRotation"])],
             "water": water_shapes(map_id, bounds)[0],
             "ponds": water_shapes(map_id, bounds)[1],

@@ -274,6 +274,288 @@
           "z1": -137
         }
       ],
+      "floors": [
+        {
+          "name": "2nd Floor",
+          "place": "dorms",
+          "minY": 2.7,
+          "maxY": 6.5,
+          "x0": 243,
+          "z0": 190,
+          "x1": 165,
+          "z1": 125
+        },
+        {
+          "name": "2nd Floor",
+          "place": "mechanic",
+          "minY": 2.7,
+          "maxY": 6.5,
+          "x0": 116,
+          "z0": -83,
+          "x1": 72,
+          "z1": -170
+        },
+        {
+          "name": "2nd Floor",
+          "place": "switch 2nd",
+          "minY": 2.7,
+          "maxY": 6.5,
+          "x0": 356,
+          "z0": -30,
+          "x1": 341,
+          "z1": -84
+        },
+        {
+          "name": "2nd Floor",
+          "place": "switch 2nd",
+          "minY": 2.7,
+          "maxY": 6.5,
+          "x0": 334,
+          "z0": -52,
+          "x1": 321,
+          "z1": -59
+        },
+        {
+          "name": "2nd Floor",
+          "place": "scav checkpoint",
+          "minY": 2.7,
+          "maxY": 6.5,
+          "x0": 589,
+          "z0": 10,
+          "x1": 577,
+          "z1": -1
+        },
+        {
+          "name": "2nd Floor",
+          "place": "dead scav warehouse",
+          "minY": 2.7,
+          "maxY": 6.5,
+          "x0": 580,
+          "z0": -104,
+          "x1": 532,
+          "z1": -134
+        },
+        {
+          "name": "2nd Floor",
+          "place": "pump 2nd",
+          "minY": 2.7,
+          "maxY": 6.5,
+          "x0": 625,
+          "z0": -120,
+          "x1": 599,
+          "z1": -139
+        },
+        {
+          "name": "2nd Floor",
+          "place": "dead scav warehouse",
+          "minY": 5.7,
+          "maxY": 1000.0,
+          "x0": 580,
+          "z0": -104,
+          "x1": 532,
+          "z1": -134
+        },
+        {
+          "name": "2nd Floor",
+          "place": "big red 2nd",
+          "minY": 5.7,
+          "maxY": 1000.0,
+          "x0": -199,
+          "z0": -90,
+          "x1": -223,
+          "z1": -131
+        },
+        {
+          "name": "2nd Floor",
+          "place": "skeleton",
+          "minY": 5.7,
+          "maxY": 1000.0,
+          "x0": 239,
+          "z0": 3,
+          "x1": 169,
+          "z1": -160
+        },
+        {
+          "name": "2nd Floor",
+          "place": "switch snipe",
+          "minY": 5.7,
+          "maxY": 1000.0,
+          "x0": 336,
+          "z0": -56,
+          "x1": 316,
+          "z1": -95
+        },
+        {
+          "name": "2nd Floor",
+          "place": "USEC 2nd",
+          "minY": 5.7,
+          "maxY": 1000.0,
+          "x0": 584,
+          "z0": -46,
+          "x1": 556,
+          "z1": -92
+        },
+        {
+          "name": "2nd Floor",
+          "place": "construction 2nd",
+          "minY": 5.7,
+          "maxY": 1000.0,
+          "x0": 93,
+          "z0": 0,
+          "x1": 65,
+          "z1": -22
+        },
+        {
+          "name": "2nd Floor",
+          "place": "chemical warehouse sniper scav",
+          "minY": 14.0,
+          "maxY": 15.0,
+          "x0": 497,
+          "z0": -44,
+          "x1": 450,
+          "z1": -90
+        },
+        {
+          "name": "2nd Floor",
+          "place": "warehouse 17",
+          "minY": 3.9,
+          "maxY": 7.6,
+          "x0": 73,
+          "z0": 57,
+          "x1": 22,
+          "z1": -38
+        },
+        {
+          "name": "2nd Floor",
+          "place": "boiler",
+          "minY": 4.4,
+          "maxY": 6.5,
+          "x0": 119,
+          "z0": -57,
+          "x1": 100,
+          "z1": -42
+        },
+        {
+          "name": "2nd Floor",
+          "place": "oilrig & panda",
+          "minY": 4.6,
+          "maxY": 7.9,
+          "x0": 279,
+          "z0": -79,
+          "x1": 246,
+          "z1": -1.4
+        },
+        {
+          "name": "3rd Floor",
+          "place": "dorms",
+          "minY": 5.7,
+          "maxY": 1000.0,
+          "x0": 243,
+          "z0": 190,
+          "x1": 165,
+          "z1": 125
+        },
+        {
+          "name": "3rd Floor",
+          "place": "warehouse 17",
+          "minY": 7.7,
+          "maxY": 11.3,
+          "x0": 73,
+          "z0": -73,
+          "x1": 22,
+          "z1": -38
+        },
+        {
+          "name": "3rd Floor",
+          "place": "boiler",
+          "minY": 6.7,
+          "maxY": 11.6,
+          "x0": 126,
+          "z0": -64,
+          "x1": 88,
+          "z1": -35
+        },
+        {
+          "name": "3rd Floor",
+          "place": "oilrig & panda",
+          "minY": 8.0,
+          "maxY": 11.1,
+          "x0": 279,
+          "z0": -79,
+          "x1": 246,
+          "z1": -1.4
+        },
+        {
+          "name": "4th Floor",
+          "place": "oilrig & panda",
+          "minY": 11.2,
+          "maxY": 54.7,
+          "x0": 279,
+          "z0": -79,
+          "x1": 246,
+          "z1": -1.4
+        },
+        {
+          "name": "Underground",
+          "place": "zb-1011",
+          "minY": -1000.0,
+          "maxY": 0.5,
+          "x0": 635,
+          "z0": -137,
+          "x1": 620,
+          "z1": -125
+        },
+        {
+          "name": "Underground",
+          "place": "zb-1012",
+          "minY": -1000.0,
+          "maxY": 0.5,
+          "x0": 473,
+          "z0": -122,
+          "x1": 458,
+          "z1": -110
+        },
+        {
+          "name": "Underground",
+          "place": "old gas",
+          "minY": -1000.0,
+          "maxY": 0.5,
+          "x0": 314,
+          "z0": -173,
+          "x1": 308,
+          "z1": -184
+        },
+        {
+          "name": "Underground",
+          "place": "switch basement",
+          "minY": -1000.0,
+          "maxY": 0.5,
+          "x0": 349,
+          "z0": -88,
+          "x1": 323,
+          "z1": -32
+        },
+        {
+          "name": "Underground",
+          "place": "zb-013",
+          "minY": -1000.0,
+          "maxY": 0.5,
+          "x0": 219,
+          "z0": -158,
+          "x1": 193,
+          "z1": -137
+        },
+        {
+          "name": "Underground",
+          "place": "boiler room",
+          "minY": -1000.0,
+          "maxY": 0.5,
+          "x0": 122,
+          "z0": -61,
+          "x1": 88,
+          "z1": -40
+        }
+      ],
       "roads": [
         [
           16,
@@ -678,6 +960,26 @@
         }
       ],
       "areas": [],
+      "floors": [
+        {
+          "name": "2nd Floor",
+          "place": "",
+          "minY": 3.0,
+          "maxY": 6.0
+        },
+        {
+          "name": "3rd Floor",
+          "place": "",
+          "minY": 6.0,
+          "maxY": 10000.0
+        },
+        {
+          "name": "Tunnels",
+          "place": "",
+          "minY": -10000.0,
+          "maxY": -1.0
+        }
+      ],
       "roads": [
         [
           5,
@@ -896,6 +1198,7 @@
         }
       ],
       "areas": [],
+      "floors": [],
       "roads": [
         [
           15,
@@ -1189,6 +1492,7 @@
         }
       ],
       "areas": [],
+      "floors": [],
       "roads": [
         [
           14,
@@ -1464,6 +1768,40 @@
           "z0": -68,
           "x1": -237,
           "z1": -104
+        }
+      ],
+      "floors": [
+        {
+          "name": "2nd Floor",
+          "place": "",
+          "minY": -1.0,
+          "maxY": 2.0
+        },
+        {
+          "name": "3rd Floor",
+          "place": "",
+          "minY": 2.0,
+          "maxY": 1000.0
+        },
+        {
+          "name": "Underground",
+          "place": "west wing",
+          "minY": -1000.0,
+          "maxY": -5.0,
+          "x0": -137,
+          "z0": -68,
+          "x1": -237,
+          "z1": -104
+        },
+        {
+          "name": "Underground",
+          "place": "admin",
+          "minY": -1000.0,
+          "maxY": -5.0,
+          "x0": -234,
+          "z0": -134,
+          "x1": -268,
+          "z1": -163
         }
       ],
       "roads": [
@@ -1872,6 +2210,328 @@
           "z0": -13,
           "x1": -78,
           "z1": 39
+        }
+      ],
+      "floors": [
+        {
+          "name": "2nd Floor",
+          "place": "dome",
+          "minY": 22.1,
+          "maxY": 25.7,
+          "x0": 1,
+          "z0": 164,
+          "x1": -17,
+          "z1": 199
+        },
+        {
+          "name": "2nd Floor",
+          "place": "pawns",
+          "minY": -3.5,
+          "maxY": -0.64,
+          "x0": -77,
+          "z0": 26,
+          "x1": -177,
+          "z1": 106
+        },
+        {
+          "name": "2nd Floor",
+          "place": "checkpoint fence tower",
+          "minY": -3.5,
+          "maxY": -0.64,
+          "x0": 62,
+          "z0": 59,
+          "x1": 51,
+          "z1": 108
+        },
+        {
+          "name": "2nd Floor",
+          "place": "black bishop",
+          "minY": -3.5,
+          "maxY": -0.64,
+          "x0": -104,
+          "z0": -37,
+          "x1": -177,
+          "z1": 5
+        },
+        {
+          "name": "2nd Floor",
+          "place": "white bishop",
+          "minY": -3.9,
+          "maxY": -0.6,
+          "x0": -47,
+          "z0": -47,
+          "x1": -85,
+          "z1": -18
+        },
+        {
+          "name": "2nd Floor",
+          "place": "white king",
+          "minY": -4.3,
+          "maxY": -2.2,
+          "x0": -19.91,
+          "z0": -13,
+          "x1": -78,
+          "z1": 39
+        },
+        {
+          "name": "2nd Floor",
+          "place": "knights",
+          "minY": -3.8,
+          "maxY": -1.1,
+          "x0": 99,
+          "z0": -50,
+          "x1": -2,
+          "z1": 7
+        },
+        {
+          "name": "2nd Floor",
+          "place": "train depot",
+          "minY": -1.9,
+          "maxY": 11.3,
+          "x0": 191,
+          "z0": -175,
+          "x1": 137,
+          "z1": -120
+        },
+        {
+          "name": "2nd Floor",
+          "place": "towers",
+          "minY": 1.0,
+          "maxY": 8.0,
+          "x0": -109,
+          "z0": -156,
+          "x1": -119,
+          "z1": -147
+        },
+        {
+          "name": "2nd Floor",
+          "place": "towers",
+          "minY": 1.0,
+          "maxY": 8.0,
+          "x0": 289,
+          "z0": -92,
+          "x1": 299,
+          "z1": -82
+        },
+        {
+          "name": "2nd Floor",
+          "place": "towers",
+          "minY": 1.0,
+          "maxY": 8.0,
+          "x0": 3,
+          "z0": -210,
+          "x1": -7,
+          "z1": -200
+        },
+        {
+          "name": "2nd Floor",
+          "place": "towers",
+          "minY": 1.0,
+          "maxY": 8.0,
+          "x0": 195,
+          "z0": -260,
+          "x1": 185,
+          "z1": -250
+        },
+        {
+          "name": "2nd Floor",
+          "place": "towers",
+          "minY": 1.0,
+          "maxY": 8.0,
+          "x0": 276,
+          "z0": 17,
+          "x1": 266,
+          "z1": 27
+        },
+        {
+          "name": "2nd Floor",
+          "place": "scav lands",
+          "minY": -4.1,
+          "maxY": -1.2,
+          "x0": -128,
+          "z0": -139,
+          "x1": -146,
+          "z1": -120
+        },
+        {
+          "name": "3rd Floor",
+          "place": "dome",
+          "minY": 25.7,
+          "maxY": 29.3,
+          "x0": 1,
+          "z0": 164,
+          "x1": -17,
+          "z1": 199
+        },
+        {
+          "name": "3rd Floor",
+          "place": "pawns",
+          "minY": -0.64,
+          "maxY": 2.23,
+          "x0": -77,
+          "z0": 26,
+          "x1": -177,
+          "z1": 106
+        },
+        {
+          "name": "3rd Floor",
+          "place": "black bishop",
+          "minY": -0.64,
+          "maxY": 2.23,
+          "x0": -104,
+          "z0": -37,
+          "x1": -177,
+          "z1": 5
+        },
+        {
+          "name": "3rd Floor",
+          "place": "white bishop",
+          "minY": -0.6,
+          "maxY": 10.0,
+          "x0": -47,
+          "z0": -47,
+          "x1": -85,
+          "z1": -18
+        },
+        {
+          "name": "3rd Floor",
+          "place": "white king",
+          "minY": -2.2,
+          "maxY": 2.14,
+          "x0": -19.91,
+          "z0": -13,
+          "x1": -78,
+          "z1": 39
+        },
+        {
+          "name": "3rd Floor",
+          "place": "knights",
+          "minY": -1.1,
+          "maxY": 1.6,
+          "x0": 99,
+          "z0": -50,
+          "x1": -2,
+          "z1": 7
+        },
+        {
+          "name": "4th Floor",
+          "place": "dome",
+          "minY": 29.3,
+          "maxY": 36.0,
+          "x0": 1,
+          "z0": 164,
+          "x1": -17,
+          "z1": 199
+        },
+        {
+          "name": "4th Floor",
+          "place": "pawns",
+          "minY": 2.23,
+          "maxY": 5.0,
+          "x0": -77,
+          "z0": 26,
+          "x1": -177,
+          "z1": 106
+        },
+        {
+          "name": "4th Floor",
+          "place": "white king",
+          "minY": 2.15,
+          "maxY": 6.6,
+          "x0": -19.91,
+          "z0": -13,
+          "x1": -78,
+          "z1": 39
+        },
+        {
+          "name": "4th Floor",
+          "place": "knights",
+          "minY": 1.6,
+          "maxY": 4.7,
+          "x0": 99,
+          "z0": -50,
+          "x1": -2,
+          "z1": 7
+        },
+        {
+          "name": "5th Floor",
+          "place": "pawns",
+          "minY": 5.0,
+          "maxY": 9.5,
+          "x0": -77,
+          "z0": 26,
+          "x1": -177,
+          "z1": 106
+        },
+        {
+          "name": "Bunkers",
+          "place": "storage bunker",
+          "minY": -10000.0,
+          "maxY": -7.27,
+          "x0": 128,
+          "z0": -208,
+          "x1": 18,
+          "z1": -33
+        },
+        {
+          "name": "Bunkers",
+          "place": "command bunkers",
+          "minY": -10000.0,
+          "maxY": -7.27,
+          "x0": -46,
+          "z0": -42,
+          "x1": -176,
+          "z1": 127
+        },
+        {
+          "name": "Bunkers",
+          "place": "D2",
+          "minY": -10000.0,
+          "maxY": -12.0,
+          "x0": -40,
+          "z0": 124,
+          "x1": -124,
+          "z1": 189
+        },
+        {
+          "name": "Bunkers",
+          "place": "dome tunnels",
+          "minY": -10000.0,
+          "maxY": 18.0,
+          "x0": 23,
+          "z0": 173,
+          "x1": -65,
+          "z1": 189
+        },
+        {
+          "name": "Bunkers",
+          "place": "bunker hermetic door bunkers",
+          "minY": -7.27,
+          "maxY": -3.2,
+          "x0": 74,
+          "z0": -196,
+          "x1": 19,
+          "z1": -149
+        },
+        {
+          "name": "Bunkers",
+          "place": "E1 bunkers",
+          "minY": -11.0,
+          "maxY": -4.6,
+          "x0": -246,
+          "z0": -79,
+          "x1": -274,
+          "z1": -53
+        },
+        {
+          "name": "Bunkers",
+          "place": "bunkers",
+          "minY": -11.0,
+          "maxY": -4.6,
+          "x0": 238,
+          "z0": -26,
+          "x1": 126,
+          "z1": 45
         }
       ],
       "roads": [
@@ -2490,6 +3150,28 @@
           "z1": -327
         }
       ],
+      "floors": [
+        {
+          "name": "2nd Floor",
+          "place": "mall",
+          "minY": 25.0,
+          "maxY": 34.0,
+          "x0": 120,
+          "z0": 218,
+          "x1": -222,
+          "z1": -327
+        },
+        {
+          "name": "3rd Floor",
+          "place": "mall",
+          "minY": 34.0,
+          "maxY": 1000.0,
+          "x0": 120,
+          "z0": 218,
+          "x1": -222,
+          "z1": -327
+        }
+      ],
       "roads": [
         [
           18,
@@ -2877,6 +3559,38 @@
         }
       ],
       "areas": [],
+      "floors": [
+        {
+          "name": "2nd Floor",
+          "place": "",
+          "minY": 10.0,
+          "maxY": 15.0
+        },
+        {
+          "name": "3rd Floor",
+          "place": "",
+          "minY": 15.0,
+          "maxY": 20.0
+        },
+        {
+          "name": "4th Floor",
+          "place": "",
+          "minY": 20.0,
+          "maxY": 25.0
+        },
+        {
+          "name": "5th Floor",
+          "place": "",
+          "minY": 25.0,
+          "maxY": 10000.0
+        },
+        {
+          "name": "Underground",
+          "place": "",
+          "minY": -10000.0,
+          "maxY": -6.0
+        }
+      ],
       "roads": [
         [
           18,
@@ -3192,6 +3906,50 @@
           "z1": 80
         }
       ],
+      "floors": [
+        {
+          "name": "2nd Floor",
+          "place": "",
+          "minY": 28.0,
+          "maxY": 32.3
+        },
+        {
+          "name": "2nd Floor",
+          "place": "m showroom",
+          "minY": 26.0,
+          "maxY": 31.0,
+          "x0": 98,
+          "z0": 216,
+          "x1": 91,
+          "z1": 228
+        },
+        {
+          "name": "3rd Floor",
+          "place": "",
+          "minY": 32.3,
+          "maxY": 1000.0
+        },
+        {
+          "name": "Garage",
+          "place": "garage",
+          "minY": -1000.0,
+          "maxY": 21.0,
+          "x0": 117,
+          "z0": -100,
+          "x1": 43,
+          "z1": 190
+        },
+        {
+          "name": "Garage",
+          "place": "underpass",
+          "minY": -1000.0,
+          "maxY": 21.0,
+          "x0": 143,
+          "z0": 49,
+          "x1": 117,
+          "z1": 80
+        }
+      ],
       "roads": [
         [
           14,
@@ -3495,6 +4253,24 @@
         }
       ],
       "areas": [],
+      "floors": [
+        {
+          "name": "Second Level",
+          "place": "",
+          "minY": 3.0,
+          "maxY": 10000.0,
+          "x0": -101,
+          "z0": -422,
+          "x1": -271,
+          "z1": -270
+        },
+        {
+          "name": "Technical",
+          "place": "",
+          "minY": -10000.0,
+          "maxY": -0.9
+        }
+      ],
       "roads": [
         [
           5,
@@ -3608,6 +4384,7 @@
       ],
       "labels": [],
       "areas": [],
+      "floors": [],
       "roads": [],
       "water": [],
       "ponds": [],
@@ -3640,6 +4417,7 @@
       ],
       "labels": [],
       "areas": [],
+      "floors": [],
       "roads": [],
       "water": [],
       "ponds": []

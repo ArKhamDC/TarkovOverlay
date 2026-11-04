@@ -302,6 +302,12 @@ public sealed class GpsController : IDisposable
         var meters = (int)Math.Round(nearest.DistanceMeters);
         var name = Pick(nearest.Extract.NameEn, nearest.Extract.NameRu);
         var mapName = Pick(map.NameEn, map.NameRu) + (uncertain ? "?" : "");
+        var underlay = MapUnderlayCatalog.Match(_underlays, map);
+        var floor = underlay is null
+            ? null
+            : MapUnderlayCatalog.FloorAt(underlay.Floors, fix.Position.X, fix.Position.Y, fix.Position.Z);
+        if (floor is not null)
+            mapName = mapName + " · " + FloorText(floor);
         return new GpsHud(true, rel, meters, Meters(meters), $"{name} · {mapName}");
     }
 
@@ -327,11 +333,16 @@ public sealed class GpsController : IDisposable
         }
 
         var mapName = Pick(map.NameEn, map.NameRu) + (uncertain ? "?" : "");
+        var underlay = MapUnderlayCatalog.Match(_underlays, map);
+        var floor = fix is null || underlay is null
+            ? null
+            : MapUnderlayCatalog.FloorAt(underlay.Floors, fix.Position.X, fix.Position.Y, fix.Position.Z);
+        if (floor is not null)
+            mapName = mapName + " · " + FloorText(floor);
         var title = nearest is null
             ? mapName
             : $"{mapName} · {Meters((int)Math.Round(nearest.DistanceMeters))} · {Pick(nearest.Extract.NameEn, nearest.Extract.NameRu)}";
         var heading = fix is null ? 0 : WorldMath.HeadingDegrees(fix.Rotation);
-        var underlay = MapUnderlayCatalog.Match(_underlays, map);
         if (underlay is not null)
         {
             return new MapView(
@@ -375,6 +386,22 @@ public sealed class GpsController : IDisposable
         => L.En ? (string.IsNullOrWhiteSpace(en) ? ru : en) : (string.IsNullOrWhiteSpace(ru) ? en : ru);
 
     private static string Meters(int meters) => L.T($"{meters} м", $"{meters} m");
+
+    private static string FloorText(MapFloor floor)
+    {
+        var name = floor.Name switch
+        {
+            "2nd Floor" => L.T("2-й этаж", "2nd floor"),
+            "3rd Floor" => L.T("3-й этаж", "3rd floor"),
+            "4th Floor" => L.T("4-й этаж", "4th floor"),
+            "5th Floor" => L.T("5-й этаж", "5th floor"),
+            "Underground" => L.T("подземный", "underground"),
+            "Bunkers" => L.T("бункеры", "bunkers"),
+            "Garage" => L.T("гараж", "garage"),
+            _ => floor.Name
+        };
+        return string.IsNullOrWhiteSpace(floor.Place) ? name : $"{name} · {floor.Place}";
+    }
 
     private async Task DeleteLater(string path, CancellationToken ct)
     {
