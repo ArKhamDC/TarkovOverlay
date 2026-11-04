@@ -1,0 +1,84 @@
+{
+  "map": "the-lab",
+  "bounds": {
+    "x0": -305.23,
+    "z0": -466.72,
+    "x1": -78.1,
+    "z1": -187.66
+  },
+  "coordinateRotation": 270,
+  "source": "json.tarkov.dev/regular/maps",
+  "note": "World x/y/z from https://json.tarkov.dev/regular/maps for laboratory. Y selects the floor (below -0.9 technical, below 3 first, otherwise second). Names are maps_en / maps_ru.",
+  "extracts": [
+    {
+      "id": "e4449767a7b69f57de8efbd2cf7dd5ee11a8468d",
+      "nameKey": "lab_Hangar_Gate",
+      "name": "Hangar Gate",
+      "nameRu": "Ангар",
+      "faction": "pmc",
+      "x": -170.49,
+      "y": 5.54,
+      "z": -218.87
+    },
+    {
+      "id": "9f0ea7a638bbcc3e2d855a66ef7a9f643cc06265",
+      "nameKey": "lab_Elevator_Med",
+      "name": "Medical Block Elevator",
+      "nameRu": "Лифт медблока",
+      "faction": "shared",
+      "x": -112.3,
+      "y": -3.11,
+      "z": -344.04
+    },
+    {
+      "id": "bb32a5dbbe8116e0765ed80a5ec7980e47676dc6",
+      "nameKey": "lab_Vent",
+      "name": "Ventilation Shaft",
+      "nameRu": "Вентиляционная шахта",
+      "faction": "pmc",
+      "x": -145.06,
+      "y": -2.46,
+      "z": -396.83
+    },
+    {
+      "id": "aecf93f8def45d42877594c4170f5a71b5b41b39",
+      "nameKey": "lab_Elevator_Cargo",
+      "name": "Cargo Elevator",
+      "nameRu": "Грузовой лифт",
+      "faction": "shared",
+      "x": -111.79,
+      "y": 5.38,
+      "z": -408.55
+    },
+    {
+      "id": "718b3e098cf256525a98ad84c481876082391b18",
+      "nameKey": "lab_Elevator_Main",
+      "name": "Main Elevator",
+      "nameRu": "Центральный лифт",
+      "faction": "shared",
+      "x": -282.69,
+      "y": -2.81,
+      "z": -334.73
+    },
+    {
+      "id": "99477cb352520521b92ba91a2c1cfd7fc219ad26",
+      "nameKey": "lab_Parking_Gate",
+      "name": "Parking Gate",
+      "nameRu": "Парковка",
+      "faction": "pmc",
+      "x": -231.46,
+      "y": 6.19,
+      "z": -457.77
+    },
+    {
+      "id": "70e59e240344a72e8dbb151c370f32851997fd50",
+      "nameKey": "lab_Under_Storage_Collector",
+      "name": "Sewage Conduit",
+      "nameRu": "Накопительный коллектор",
+      "faction": "pmc",
+      "x": -122.89,
+      "y": -3.66,
+      "z": -258.32
+    }
+  ]
+}

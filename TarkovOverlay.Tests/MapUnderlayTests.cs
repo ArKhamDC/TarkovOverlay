@@ -135,6 +135,64 @@ public class MapUnderlayTests
     }
 
     [Fact]
+    public void LabsRasterUsesTheFittedFrameAndKeycardColors()
+    {
+        var lab = Load().Single(m => m.Id == "the-lab");
+        Assert.Equal(270, lab.Rotation);
+        Assert.Equal(270, lab.CompassDegrees);
+        Assert.Equal(-305.23, lab.MinX, 3);
+        Assert.Equal(-78.1, lab.MaxX, 3);
+        Assert.Equal(-466.72, lab.MinZ, 3);
+        Assert.Equal(-187.66, lab.MaxZ, 3);
+        Assert.Contains("Shebuka", lab.Credit);
+        var (width, height) = PngSize(lab.ImagePath);
+        Assert.Equal(2880, width);
+        Assert.Equal(2344, height);
+
+        Assert.True(WorldMath.TryImageUv(-165.25, -349.22, lab.MinX, lab.MaxX, lab.MinZ, lab.MaxZ, lab.Rotation, out var u, out var v));
+        Assert.InRange(u, 303.2 / 720 - 0.004, 303.2 / 720 + 0.004);
+        Assert.InRange(v, 361.2 / 586 - 0.004, 361.2 / 586 + 0.004);
+
+        Assert.Equal(7, lab.Extracts.Length);
+        var hangar = lab.Extracts.Single(e => e.NameEn == "Hangar Gate");
+        Assert.Equal("Ангар", hangar.NameRu);
+        Assert.Equal("pmc", hangar.Faction);
+        Assert.Equal(5.54, hangar.Y, 2);
+        var medical = lab.Extracts.Single(e => e.NameEn == "Medical Block Elevator");
+        Assert.Equal("Лифт медблока", medical.NameRu);
+        Assert.Equal("shared", medical.Faction);
+        var sewage = lab.Extracts.Single(e => e.NameEn == "Sewage Conduit");
+        Assert.Equal("Накопительный коллектор", sewage.NameRu);
+        foreach (var extract in lab.Extracts)
+        {
+            Assert.True(WorldMath.TryImageUv(extract.X, extract.Z, lab.MinX, lab.MaxX, lab.MinZ, lab.MaxZ, lab.Rotation, out var eu, out var ev));
+            Assert.InRange(eu, 0, 1);
+            Assert.InRange(ev, 0, 1);
+            Assert.False(string.IsNullOrWhiteSpace(extract.NameRu));
+        }
+
+        Assert.Equal(12, lab.Keycards.Length);
+        var red = lab.Keycards.Single(k => k.Name == "Red");
+        var violet = lab.Keycards.Single(k => k.Name == "Violet");
+        Assert.Equal("#c53030", red.Fill);
+        Assert.Equal("#6b46c1", violet.Fill);
+        Assert.NotEqual(red.Fill, violet.Fill);
+        Assert.Equal("5c1d0efb86f7744baf2e7b7b", red.ItemId);
+        Assert.Equal("5c1e495a86f7743109743dfb", violet.ItemId);
+        Assert.Equal("#1a1a1a", lab.Keycards.Single(k => k.Name == "Black").Fill);
+        Assert.Equal(4, lab.Keycards.Single(k => k.Name == "Black").Count);
+        var unknown = lab.Keycards.Single(k => k.Name == "Unknown");
+        Assert.False(unknown.RoomFill);
+        Assert.Equal("#a0aec0", unknown.Fill);
+        Assert.Equal("6a33c17933cff6b88c08902e", unknown.ItemId);
+        Assert.Contains("low confidence", lab.Keycards.Single(k => k.Name == "Arsenal").Tip, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(lab.Keycards, k => k.Name.Contains("admin", StringComparison.OrdinalIgnoreCase));
+        Assert.Equal(
+            new[] { "#2b6cb0", "#2f855a", "#1a1a1a", "#c53030", "#6b46c1", "#d69e2e", "#d53f8c", "#63b3ed", "#dd6b20", "#8b5a2b", "#319795", "#a0aec0" },
+            lab.Keycards.Select(k => k.Fill).ToArray());
+    }
+
+    [Fact]
     public void ReserveTrainExtractLandsOnTheTrainDepot()
     {
         var reserve = Load().Single(m => m.Id == "reserve");
