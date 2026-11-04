@@ -468,8 +468,12 @@ def render(spec: dict, path: Path) -> tuple[int, int]:
         except OSError:
             pass
 
+    def is_zone(area: dict) -> bool:
+        return max(abs(area["x1"] - area["x0"]), abs(area["z1"] - area["z0"])) > 55
+
     for area in spec["areas"]:
-        if str(area["name"]).lower() == "dorms":
+        # Floor zones (the dorms yard, the skeleton complex) are not one building.
+        if str(area["name"]).lower() == "dorms" or is_zone(area):
             continue
         if str(area["name"]).lower() == "mall":
             plate = lighten(palette[0], 18)
@@ -490,15 +494,24 @@ def render(spec: dict, path: Path) -> tuple[int, int]:
             return 12, 9
         if spec["id"] == "interchange":
             return 16, 12
-        if any(word in lowered for word in ("dorm", "sawmill", "resort", "plant", "chalet", "depot", "warehouse", "bunker", "hotel", "construction", "knight", "bishop", "pawn", "king")):
+        if spec["id"] == "customs":
+            # half-width along X, half-depth along Z. Dorms are drawn separately, long axis north–south.
+            if any(word in lowered for word in ("crack", "fortress", "17")):
+                return 8, 16
+            if any(word in lowered for word in ("skeleton", "warehouse", "depot", "gas", "checkpoint", "storage", "trailer", "construction", "pump", "streamer")):
+                return 16, 8
+            return 10, 8
+        if any(word in lowered for word in ("sawmill", "resort", "plant", "chalet", "depot", "warehouse", "bunker", "hotel", "construction", "knight", "bishop", "pawn", "king")):
             return 34, 24
         if any(word in lowered for word in ("shack", "tent", "tree", "rock", "nest")):
             return 12, 10
         return 20, 15
 
-    blocking = [area for area in spec["areas"] if str(area["name"]).lower() != "mall"]
+    blocking = [area for area in spec["areas"] if str(area["name"]).lower() != "mall" and not is_zone(area)]
     for label in spec["labels"]:
         if any(token in label["text"] for token in ("St.", "Ave", "Alley")):
+            continue
+        if "dorm" in label["text"].lower():
             continue
         if inside_area(label["x"], label["z"], blocking):
             continue
