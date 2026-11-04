@@ -805,7 +805,7 @@ public partial class MapWindow : Window
         var has = view?.Legend is { Length: > 0 };
         if (_keysButton is null)
         {
-            _keysButton = ZoomButton("Keys", 40, "Keycard colors", ToggleLegend);
+            _keysButton = ZoomButton("Keys", 40, "Keys", ToggleLegend);
             ZoomBar.Children.Insert(0, _keysButton);
         }
 
@@ -855,7 +855,7 @@ public partial class MapWindow : Window
             Background = LabelBg,
             CornerRadius = new CornerRadius(4),
             IsHitTestVisible = true,
-            ToolTip = "Keycard colors"
+            ToolTip = "Keys"
         };
         panel.MouseLeftButtonDown += (_, e) => e.Handled = true;
         Canvas.SetLeft(panel, 8);

@@ -2,14 +2,14 @@
   "map": "reserve",
   "bounds": {
     "x0": 289,
-    "z0": -293,
+    "z0": -274,
     "x1": -303,
-    "z1": 244
+    "z1": 272
   },
   "coordinateRotation": 180,
   "source": "json.tarkov.dev/regular/maps",
   "apiNameId": "RezervBase",
-  "note": "Raster of tarkov.dev Reserve.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/reserve-extracts.json from json.tarkov.dev/regular/maps. Frame is the published rect x0=289 z0=-293 x1=-303 z1=244. Spawn and extract positions from json.tarkov.dev sit inside it.",
+  "note": "World x/y/z from https://json.tarkov.dev/regular/maps for reserve (UA TarkovOverlay/1.0). Names are maps_en / maps_ru. A tarkov.dev Bunkers extent (height y0 <= y < y1 and an XZ box) places the extract underground; otherwise surface. That classification is 3 underground and 8 surface. Frame is svgBounds, not the older published rect.",
   "extracts": [
     {
       "id": "bd1ef03f5270eb97daeb05b6e4f206895c17860d",
@@ -22,8 +22,8 @@
       "x": 140.83,
       "y": -3.92,
       "z": -146.25,
-      "px": 640.74,
-      "py": 634.55,
+      "px": 621.21,
+      "py": 534.16,
       "kind": "extract",
       "priority": 200
     },
@@ -38,8 +38,8 @@
       "x": -35.26,
       "y": -5.15,
       "z": -180.12,
-      "px": 1402.21,
-      "py": 488.1,
+      "px": 1359.48,
+      "py": 392.54,
       "kind": "extract",
       "priority": 200
     },
@@ -54,8 +54,8 @@
       "x": 36.53,
       "y": -5.97,
       "z": -221.56,
-      "px": 1091.76,
-      "py": 308.91,
+      "px": 1058.5,
+      "py": 219.27,
       "kind": "extract",
       "priority": 200
     },
@@ -70,8 +70,8 @@
       "x": -261.43,
       "y": -6.34,
       "z": 48.52,
-      "px": 2380.24,
-      "py": 1476.74,
+      "px": 2307.71,
+      "py": 1348.56,
       "kind": "extract",
       "priority": 200
     },
@@ -86,8 +86,8 @@
       "x": -9.24,
       "y": 20.93,
       "z": 208.43,
-      "px": 1289.69,
-      "py": 2168.19,
+      "px": 1250.39,
+      "py": 2017.19,
       "kind": "extract",
       "priority": 200
     },
@@ -102,8 +102,8 @@
       "x": 40.18,
       "y": -5.12,
       "z": 76.45,
-      "px": 1075.98,
-      "py": 1597.51,
+      "px": 1043.19,
+      "py": 1465.34,
       "kind": "extract",
       "priority": 200
     },
@@ -118,8 +118,8 @@
       "x": -121.48,
       "y": -17,
       "z": 172.25,
-      "px": 1775.05,
-      "py": 2011.75,
+      "px": 1720.97,
+      "py": 1865.91,
       "kind": "extract",
       "priority": 200
     },
@@ -134,8 +134,8 @@
       "x": 61.97,
       "y": -4.43,
       "z": 134.31,
-      "px": 981.75,
-      "py": 1847.7,
+      "px": 951.84,
+      "py": 1707.27,
       "kind": "extract",
       "priority": 200
     },
@@ -150,8 +150,8 @@
       "x": 61.92,
       "y": -5.26,
       "z": -190.54,
-      "px": 981.97,
-      "py": 443.04,
+      "px": 952.05,
+      "py": 348.97,
       "kind": "extract",
       "priority": 200
     },
@@ -166,8 +166,8 @@
       "x": -127.9,
       "y": -3.28,
       "z": -142.59,
-      "px": 1802.81,
-      "py": 650.38,
+      "px": 1747.88,
+      "py": 549.47,
       "kind": "extract",
       "priority": 200
     },
@@ -182,8 +182,8 @@
       "x": 120.78,
       "y": -10.27,
       "z": -120.35,
-      "px": 727.44,
-      "py": 746.54,
+      "px": 705.27,
+      "py": 642.46,
       "kind": "extract",
       "priority": 200
     }

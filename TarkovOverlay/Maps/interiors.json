@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "Customs interior floors are crops of Customs.svg by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), the same map as the Customs overview. EFT TarkDev allowed use of the site and its data for this program on 2026-11-04; see Maps/attribution/SOURCE.md. rectXZ x0/z0 is the image top-left and x1/z1 the bottom-right in the overview world frame (coordinateRotation 180). Floor 0 is underground. Dorm room numbers are verified placements in image pixels; only confidence verified is shipped. Stairs stay painted on the raster. Boiler is omitted: Customs.svg has no boiler group. The Lab is one underground complex from Labs.svg (same author and licence): there is no outdoor overview. rectXZ uses coordinateRotation 270. Height picks the floor: below -0.9 technical, below 3 first, otherwise second. Locked rooms are painted on the rasters in the keycard color. Factory is one indoor complex from Factory.svg (same author and licence) on the published frame, coordinateRotation 90. factory.png is the overview until a position arrives, then height picks the floor: below -1 basement, below 3 ground, below 6 second, otherwise third. Locks are door markers, not room fills. Ground Zero is the whole GroundZero.svg on the official frame (coordinateRotation 180). ground-zero.png is the overview until a position arrives, then height picks the floor: below 21 underground, below 28 ground, below 32.3 second, otherwise third. Door locks are painted markers, not room fills. The official bounds are not shifted.",
+  "source": "Customs interior floors are crops of Customs.svg by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), the same map as the Customs overview. EFT TarkDev allowed use of the site and its data for this program on 2026-11-04; see Maps/attribution/SOURCE.md. rectXZ x0/z0 is the image top-left and x1/z1 the bottom-right in the overview world frame (coordinateRotation 180). Floor 0 is underground. Dorm room numbers are verified placements in image pixels; only confidence verified is shipped. Stairs stay painted on the raster. Boiler is omitted: Customs.svg has no boiler group. The Lab is one underground complex from Labs.svg (same author and licence): there is no outdoor overview. rectXZ uses coordinateRotation 270. Height picks the floor: below -0.9 technical, below 3 first, otherwise second. Locked rooms are painted on the rasters in the keycard color. Factory is one indoor complex from Factory.svg (same author and licence) on the published frame, coordinateRotation 90. factory.png is the overview until a position arrives, then height picks the floor: below -1 basement, below 3 ground, below 6 second, otherwise third. Locks are door markers, not room fills. Ground Zero is the whole GroundZero.svg on the official frame (coordinateRotation 180). ground-zero.png is the overview until a position arrives, then height picks the floor: below 21 underground, below 28 ground, below 32.3 second, otherwise third. Door locks are painted markers, not room fills. The official bounds are not shifted. Reserve is the whole Reserve.svg frame (coordinateRotation 180, svgBounds x0=289 z0=-274 x1=-303 z1=272). Surface is floor 1 and the bunker layer is floor 0. A tarkov.dev Bunkers extent (y0 <= y < y1 and an XZ box) selects underground; every other position, including the dome and the pawn buildings, stays on the surface. Those buildings have no SVG floors of their own.",
   "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
   "maps": [
     {
@@ -1219,6 +1219,137 @@
               "image": "factory_third.png",
               "width": 1047,
               "height": 1130
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reserve",
+      "coordinateRotation": 180,
+      "aliases": [
+        "reserve",
+        "rezervbase",
+        "rezervbasepreset"
+      ],
+      "buildings": [
+        {
+          "id": "reserve",
+          "name": "Reserve",
+          "nameRu": "Резерв",
+          "coversMap": true,
+          "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+          "rectXZ": {
+            "x0": 289.0,
+            "z0": -274.0,
+            "x1": -303.0,
+            "z1": 272.0
+          },
+          "openFloor": 1,
+          "bunkerExtents": [
+            {
+              "y0": -10000,
+              "y1": -7.27,
+              "floor": 0,
+              "boxes": [
+                {
+                  "name": "storage bunker",
+                  "x0": 128,
+                  "z0": -208,
+                  "x1": 18,
+                  "z1": -33
+                },
+                {
+                  "name": "command bunkers",
+                  "x0": -46,
+                  "z0": -42,
+                  "x1": -176,
+                  "z1": 127
+                }
+              ]
+            },
+            {
+              "y0": -10000,
+              "y1": -12,
+              "floor": 0,
+              "boxes": [
+                {
+                  "name": "D2",
+                  "x0": -40,
+                  "z0": 124,
+                  "x1": -124,
+                  "z1": 189
+                }
+              ]
+            },
+            {
+              "y0": -10000,
+              "y1": 18,
+              "floor": 0,
+              "boxes": [
+                {
+                  "name": "dome tunnels",
+                  "x0": 23,
+                  "z0": 173,
+                  "x1": -65,
+                  "z1": 189
+                }
+              ]
+            },
+            {
+              "y0": -7.27,
+              "y1": -3.2,
+              "floor": 0,
+              "boxes": [
+                {
+                  "name": "bunker hermetic door bunkers",
+                  "x0": 74,
+                  "z0": -196,
+                  "x1": 19,
+                  "z1": -149
+                }
+              ]
+            },
+            {
+              "y0": -11,
+              "y1": -4.6,
+              "floor": 0,
+              "boxes": [
+                {
+                  "name": "E1 bunkers",
+                  "x0": -246,
+                  "z0": -79,
+                  "x1": -274,
+                  "z1": -53
+                },
+                {
+                  "name": "bunkers",
+                  "x0": 238,
+                  "z0": -26,
+                  "x1": 126,
+                  "z1": 45
+                }
+              ]
+            }
+          ],
+          "floors": [
+            {
+              "floor": 0,
+              "floorKey": "underground",
+              "caption": "U",
+              "tip": "Underground",
+              "image": "reserve_underground.png",
+              "width": 2482,
+              "height": 2283
+            },
+            {
+              "floor": 1,
+              "floorKey": "surface",
+              "caption": "S",
+              "tip": "Surface",
+              "image": "reserve_surface.png",
+              "width": 2482,
+              "height": 2283
             }
           ]
         }
