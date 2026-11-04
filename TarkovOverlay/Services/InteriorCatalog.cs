@@ -27,6 +27,12 @@ public sealed class InteriorFloor
 /// </summary>
 public readonly record struct FloorBand(double? Below, int Floor);
 
+/// <summary>
+/// Axis-aligned mall box. Inside it, <see cref="InteriorBuilding.FloorByY"/> picks the floor.
+/// Outside it the floor is <see cref="OutsideFloor"/> no matter the height. Bounds are inclusive.
+/// </summary>
+public readonly record struct FloorRegion(double MinX, double MaxX, double MinZ, double MaxZ, int OutsideFloor);
+
 /// <summary>Verified caption in floor-image pixels, origin top-left.</summary>
 public sealed class InteriorLabel
 {
@@ -71,6 +77,9 @@ public sealed class InteriorBuilding
 
     /// <summary>When set, height selects the floor unless the player pinned a floor on the current band.</summary>
     public FloorBand[]? FloorByY { get; init; }
+
+    /// <summary>When set, <see cref="FloorByY"/> applies only inside this box. Outside, the floor is <see cref="FloorRegion.OutsideFloor"/>.</summary>
+    public FloorRegion? Mall { get; init; }
 
     public double MinX => Math.Min(X0, X1);
     public double MaxX => Math.Max(X0, X1);
@@ -216,7 +225,8 @@ public static class InteriorCatalog
                     Floors = floors.ToArray(),
                     Credit = Str(building, "credit") ?? credit,
                     CoversMap = Bool(building, "coversMap"),
-                    FloorByY = ReadBands(building)
+                    FloorByY = ReadBands(building),
+                    Mall = ReadRegion(building)
                 });
             }
         }
@@ -272,7 +282,8 @@ public static class InteriorCatalog
     /// <summary>
     /// Entering a building opens floor 1, or the floor its height rule selects.
     /// A floor the player already picked is kept only while they stay in that building.
-    /// On a height-ruled building the pin lasts until Y moves into a different band.
+    /// On a height-ruled building the pin lasts until the band changes.
+    /// Outside a mall box the band is the outside floor, so leaving the mall counts as a change when the inside band was not that floor.
     /// Leaving every footprint returns to the overview.
     /// </summary>
     public static (InteriorFix State, InteriorBuilding? Building, InteriorFloor? Floor) Advance(
@@ -288,9 +299,9 @@ public static class InteriorCatalog
 
         var chosen = hit.Id == state.BuildingId ? state.Floor : DefaultFloor;
         int? held = null;
-        if (hit.FloorByY is { Length: > 0 })
+        if (HasFloorRule(hit))
         {
-            var band = FloorFromAltitude(hit, y);
+            var band = FloorFromPosition(hit, x, y, z);
             var same = hit.Id == state.BuildingId;
             if (same && state.LockBand is { } locked && (band is null || band.Value == locked))
             {
@@ -323,6 +334,11 @@ public static class InteriorCatalog
     /// and the next band change follows height again.
     /// </summary>
     public static InteriorFix PinFloor(IReadOnlyList<InteriorBuilding> buildings, InteriorFix state, int floor, double y)
+        => PinFloor(buildings, state, floor, double.NaN, y, double.NaN);
+
+    /// <summary>Same as the height-only pin, using x/z so a mall box can tell inside from outside.</summary>
+    public static InteriorFix PinFloor(
+        IReadOnlyList<InteriorBuilding> buildings, InteriorFix state, int floor, double x, double y, double z)
     {
         if (string.IsNullOrEmpty(state.BuildingId))
             return state with { Floor = floor };
@@ -334,9 +350,9 @@ public static class InteriorCatalog
             break;
         }
 
-        if (building?.FloorByY is not { Length: > 0 })
+        if (building is null || !HasFloorRule(building))
             return state with { Floor = floor, LockBand = null };
-        return new InteriorFix(state.BuildingId, floor, FloorFromAltitude(building, y));
+        return new InteriorFix(state.BuildingId, floor, FloorFromPosition(building, x, y, z));
     }
 
     /// <summary>Null when <paramref name="y"/> is missing or the building has no height rule.</summary>
@@ -353,11 +369,27 @@ public static class InteriorCatalog
         return rules[^1].Floor;
     }
 
+    /// <summary>
+    /// Floor the height rule would show at this point.
+    /// Outside <see cref="InteriorBuilding.Mall"/> that is the outside floor.
+    /// A missing x/z falls back to height alone, which is how a pin taken without a position still works.
+    /// </summary>
+    public static int? FloorFromPosition(InteriorBuilding building, double x, double y, double z)
+    {
+        if (building.Mall is { } mall && !double.IsNaN(x) && !double.IsNaN(z) && !Inside(mall, x, z))
+            return mall.OutsideFloor;
+        return FloorFromAltitude(building, y);
+    }
+
     /// <summary>Extracts on a height-ruled building are drawn only on the floor their Y selects. Other buildings show every extract inside the footprint.</summary>
     public static bool ExtractOnFloor(InteriorBuilding building, double y, int floor)
+        => ExtractOnFloor(building, double.NaN, y, double.NaN, floor);
+
+    /// <summary>Same as the height check, with x/z so a point outside the mall stays on the outside floor.</summary>
+    public static bool ExtractOnFloor(InteriorBuilding building, double x, double y, double z, int floor)
     {
-        if (building.FloorByY is not { Length: > 0 }) return true;
-        var band = FloorFromAltitude(building, y);
+        if (!HasFloorRule(building)) return true;
+        var band = FloorFromPosition(building, x, y, z);
         return band is null || band.Value == floor;
     }
 
@@ -381,6 +413,26 @@ public static class InteriorCatalog
 
     public static string FloorTip(int floor)
         => floor == 0 ? "Underground" : $"Floor {floor}";
+
+    private static bool HasFloorRule(InteriorBuilding building)
+        => building.FloorByY is { Length: > 0 } || building.Mall is not null;
+
+    private static bool Inside(FloorRegion region, double x, double z)
+        => x >= region.MinX && x <= region.MaxX && z >= region.MinZ && z <= region.MaxZ;
+
+    private static FloorRegion? ReadRegion(JsonElement building)
+    {
+        if (!building.TryGetProperty("floorRegion", out var region) || region.ValueKind != JsonValueKind.Object)
+            return null;
+        var minX = Num(region, "minX");
+        var maxX = Num(region, "maxX");
+        var minZ = Num(region, "minZ");
+        var maxZ = Num(region, "maxZ");
+        var outside = Num(region, "outside");
+        if (minX is null || maxX is null || minZ is null || maxZ is null || outside is null) return null;
+        if (maxX.Value < minX.Value || maxZ.Value < minZ.Value) return null;
+        return new FloorRegion(minX.Value, maxX.Value, minZ.Value, maxZ.Value, (int)outside.Value);
+    }
 
     private static FloorBand[]? ReadBands(JsonElement building)
     {

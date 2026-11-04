@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Overview rasters other than Labyrinth are Shebuka's SVGs from the-hideout/tarkov-dev-svg-maps (CC BY-NC-SA 4.0), used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. Factory ships Factory.svg on the published frame [[77,-64.5],[-65.5,67.4]], coordinateRotation 90: the overview is the ground floor, and basement, second, and third are separate rasters. Ground Zero ships GroundZero.svg on the official frame x0=249 z0=-124 x1=-99 z1=364, with one raster per height band and door locks painted as markers. The Lab ships Labs.svg on a fitted frame (tarkov.dev publishes no svgBounds for Labs), with locked rooms painted in the keycard color. Extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and the game's own map textures are not licensed for redistribution. Labyrinth has no SVG in that repo, so it stays an original frame drawing. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns.",
+  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Overview rasters other than Labyrinth are Shebuka's SVGs from the-hideout/tarkov-dev-svg-maps (CC BY-NC-SA 4.0), used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. Factory ships Factory.svg on the published frame [[77,-64.5],[-65.5,67.4]], coordinateRotation 90: the overview is the ground floor, and basement, second, and third are separate rasters. Ground Zero ships GroundZero.svg on the official frame x0=249 z0=-124 x1=-99 z1=364, with one raster per height band and door locks painted as markers. Interchange ships Interchange.svg on the published frame x0=598 z0=-442 x1=-433 z1=426: ground, second, and third, with the garage on ground. Path to River is drawn on that edge. The Lab ships Labs.svg on a fitted frame (tarkov.dev publishes no svgBounds for Labs), with locked rooms painted in the keycard color. Extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and the game's own map textures are not licensed for redistribution. Labyrinth has no SVG in that repo, so it stays an original frame drawing. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns.",
   "maps": [
     {
       "id": "customs",
@@ -2071,7 +2071,7 @@
         ]
       ],
       "bounds": {
-        "x0": 621.9,
+        "x0": 598,
         "z0": -442,
         "x1": -433,
         "z1": 426
@@ -2633,6 +2633,7 @@
       ],
       "water": [],
       "ponds": [],
+      "note": "Raster of tarkov.dev Interchange.svg (Shebuka), frame x0=598 z0=-442 x1=-433 z1=426, coordinateRotation 180. Floors are Maps/interiors/interchange_ground.png, interchange_second.png, and interchange_third.png. Inside the mall (x -222..120, z -327..218) height picks the floor: below 25 ground, including the garage, below 34 second, otherwise third. Outside the mall the floor is ground. There is no separate garage layer. Extracts come from Maps/interchange-extracts.json. Path to River sits just outside x0 and is drawn on that edge. Key colors are Maps/interchange-keycards.json (15 door markers, 13 keys).",
       "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
       "imageAttribution": {
         "author": "Shebuka",
@@ -2642,8 +2643,7 @@
         "permission": "EFT TarkDev Telegram 2026-11-04",
         "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
         "notes": "attribution/SOURCE.md"
-      },
-      "note": "Raster of tarkov.dev Interchange.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/interchange-extracts.json from json.tarkov.dev/regular/maps. Fitted frame x0=621.9 z0=-442 x1=-433 z1=426. publishedBounds max x is 598. The PMC sniper extract is about 16 m west of that edge (left of this 180 degree frame), so it was extended by 8 m."
+      }
     },
     {
       "id": "streets-of-tarkov",

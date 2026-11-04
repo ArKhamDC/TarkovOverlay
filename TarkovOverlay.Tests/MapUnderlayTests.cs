@@ -202,7 +202,6 @@ public class MapUnderlayTests
             ["lighthouse"] = (1575, 2560, 12),
             ["shoreline"] = (2560, 1695, 19),
             ["reserve"] = (2560, 2322, 11),
-            ["interchange"] = (2560, 2106, 9),
             ["streets-of-tarkov"] = (1867, 2560, 19),
             ["terminal"] = (2174, 2560, 0),
         };
@@ -323,6 +322,71 @@ public class MapUnderlayTests
         Assert.Contains("outside the frame", map.Keycards.Single(k => k.Name == "Factory exit").Tip, StringComparison.OrdinalIgnoreCase);
         Assert.Equal("658199aa38c79576a2569e13", map.Keycards.Single(k => k.Name == "Science office").ItemId);
         Assert.DoesNotContain(map.Keycards, k => k.Name.Contains("stairs", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void InterchangeRasterUsesThePublishedFrameAndKeyColors()
+    {
+        var map = Load().Single(m => m.Id == "interchange");
+        Assert.Equal(180, map.Rotation);
+        Assert.Equal(180, map.CompassDegrees);
+        Assert.Equal(-433, map.MinX);
+        Assert.Equal(598, map.MaxX);
+        Assert.Equal(-442, map.MinZ);
+        Assert.Equal(426, map.MaxZ);
+        Assert.Contains("Shebuka", map.Credit);
+        var (width, height) = PngSize(map.ImagePath);
+        Assert.Equal(3383, width);
+        Assert.Equal(2841, height);
+
+        Assert.Equal(9, map.Extracts.Length);
+        Assert.Equal(7, map.Labels.Length);
+        var river = map.Extracts.Single(e => e.Id == "1e65f8bedbd9322074ae387892f0972883bdb794");
+        Assert.Equal("Path to River (Flare)", river.NameEn);
+        Assert.Equal("Тропа к реке (Сигнал)", river.NameRu);
+        Assert.Equal("pmc", river.Faction);
+        Assert.Equal(613.9, river.X);
+        Assert.Equal(27.9, river.Y);
+        Assert.Equal(71.3, river.Z);
+        Assert.True(WorldMath.TryImageUv(river.X, river.Z, map.MinX, map.MaxX, map.MinZ, map.MaxZ, map.Rotation, out var ou, out var ov));
+        Assert.True(ou < 0 && ou > -0.04, $"sniper should sit just outside the frame, got {ou}");
+        Assert.InRange(ov, 0, 1);
+        var (cx, cz) = WorldMath.ClampNearFrame(river.X, river.Z, map.MinX, map.MaxX, map.MinZ, map.MaxZ, map.Rotation);
+        Assert.True(WorldMath.TryImageUv(cx, cz, map.MinX, map.MaxX, map.MinZ, map.MaxZ, map.Rotation, out var cu, out var cv));
+        Assert.Equal(0, cu, 6);
+        Assert.Equal(ov, cv, 6);
+        Assert.NotEqual(river.X, cx);
+        var far = WorldMath.ClampNearFrame(2000, 0, map.MinX, map.MaxX, map.MinZ, map.MaxZ, map.Rotation);
+        Assert.Equal(2000, far.X);
+        var inside = WorldMath.ClampNearFrame(0, 0, map.MinX, map.MaxX, map.MinZ, map.MaxZ, map.Rotation);
+        Assert.Equal(0, inside.X);
+        Assert.Equal(0, inside.Z);
+
+        foreach (var extract in map.Extracts)
+        {
+            Assert.False(string.IsNullOrWhiteSpace(extract.NameRu));
+            if (extract.Id == river.Id) continue;
+            Assert.True(WorldMath.TryImageUv(extract.X, extract.Z, map.MinX, map.MaxX, map.MinZ, map.MaxZ, map.Rotation, out var eu, out var ev));
+            Assert.InRange(eu, 0, 1);
+            Assert.InRange(ev, 0, 1);
+        }
+
+        var hole = map.Extracts.Single(e => e.NameEn == "Hole in the Fence");
+        Assert.Equal("Дыра в заборе", hole.NameRu);
+        var power = map.Extracts.Single(e => e.NameEn == "Power Station V-Ex");
+        Assert.Equal("А-Выход у ТЭЦ", power.NameRu);
+
+        Assert.Equal(13, map.Keycards.Length);
+        Assert.Equal(15, map.Keycards.Sum(k => k.Count));
+        Assert.All(map.Keycards, k => Assert.False(k.RoomFill));
+        var emercom = map.Keycards.Single(k => k.ItemId == "5ad5db3786f7743568421cce");
+        Assert.Equal("EMERCOM medical unit key", emercom.Name);
+        Assert.Equal(3, emercom.Count);
+        Assert.Equal("#3fffd2", emercom.Fill);
+        Assert.Equal("OLI administration office key", map.Keycards[0].Name);
+        Assert.Equal("#ff3f3f", map.Keycards[0].Fill);
+        Assert.Equal("5ad5ccd186f774446d5706e9", map.Keycards[0].ItemId);
+        Assert.DoesNotContain(map.Keycards, k => k.Name.Contains("extract", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]

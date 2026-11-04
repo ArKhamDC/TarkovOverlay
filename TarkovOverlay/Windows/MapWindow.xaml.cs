@@ -617,6 +617,10 @@ public partial class MapWindow : Window
         return button;
     }
 
+    /// <summary>
+    /// Camera identity is the world frame, not the bitmap.
+    /// Floors that share a rect (Interchange ground / second / third, and the overview) keep zoom and follow.
+    /// </summary>
     private static string FrameKey(MapView view)
         => FormattableString.Invariant(
             $"{view.Rotation:0.###}|{view.MinX:0.###}|{view.MaxX:0.###}|{view.MinZ:0.###}|{view.MaxZ:0.###}");
@@ -805,7 +809,7 @@ public partial class MapWindow : Window
         var has = view?.Legend is { Length: > 0 };
         if (_keysButton is null)
         {
-            _keysButton = ZoomButton("Keys", 40, "Keycard colors", ToggleLegend);
+            _keysButton = ZoomButton("Keys", 40, "Keys", ToggleLegend);
             ZoomBar.Children.Insert(0, _keysButton);
         }
 
@@ -855,7 +859,7 @@ public partial class MapWindow : Window
             Background = LabelBg,
             CornerRadius = new CornerRadius(4),
             IsHitTestVisible = true,
-            ToolTip = "Keycard colors"
+            ToolTip = "Keys"
         };
         panel.MouseLeftButtonDown += (_, e) => e.Handled = true;
         Canvas.SetLeft(panel, 8);

@@ -162,6 +162,7 @@ NOTES = {
     "factory": "A few spawns sit a few meters south of the published frame.",
     "the-labyrinth": "Frame rotation is 270, from tarkov.dev maps.json. json.tarkov.dev coordinateToCardinalRotation for Labyrinth is 180.",
     "customs": "Raster of tarkov.dev Customs.svg (Shebuka), frame x0=698 z0=-307 x1=-372 z1=237, coordinateRotation 180. Extract markers come from Maps/customs-extracts.json (json.tarkov.dev). ZB-1011 and ZB-1012 are on the left; Crossroads, Trailer Park, and RUAF are on the right.",
+    "interchange": "Raster of tarkov.dev Interchange.svg (Shebuka), frame x0=598 z0=-442 x1=-433 z1=426, coordinateRotation 180. Floors are Maps/interiors/interchange_*.png. Inside the mall (x -222..120, z -327..218) height picks the floor: below 25 ground, including the garage, below 34 second, otherwise third. Outside the mall the floor is ground. There is no separate garage layer. Extracts come from Maps/interchange-extracts.json. Path to River sits just outside x0 and is drawn on that edge. Key colors are Maps/interchange-keycards.json (15 door markers, 13 keys).",
 }
 
 # Shipped SVG rasters this script must not overwrite or rebuild.
@@ -471,12 +472,20 @@ def build(doc: list) -> list[dict]:
         }
         if map_id in NOTES:
             spec["note"] = NOTES[map_id]
-        if map_id == "customs":
+        svg_names = {
+            "customs": "Customs.svg",
+            "factory": "Factory.svg",
+            "ground-zero": "GroundZero.svg",
+            "interchange": "Interchange.svg",
+        }
+        if map_id in svg_names or map_id == "the-lab":
             spec["credit"] = CUSTOMS_CREDIT
+        if map_id in svg_names:
+            svg = svg_names[map_id]
             spec["imageAttribution"] = {
                 "author": "Shebuka",
                 "project": "the-hideout/tarkov-dev-svg-maps",
-                "sourceUrl": "https://assets.tarkov.dev/maps/svg/Customs.svg",
+                "sourceUrl": f"https://assets.tarkov.dev/maps/svg/{svg}",
                 "license": "CC BY-NC-SA 4.0",
                 "permission": "EFT TarkDev Telegram 2026-11-04",
                 "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
@@ -514,6 +523,8 @@ def main() -> None:
             "[[77,-64.5],[-65.5,67.4]], coordinateRotation 90: the overview is the ground floor, and basement, "
             "second, and third are separate rasters. Ground Zero ships GroundZero.svg on the official frame "
             "x0=249 z0=-124 x1=-99 z1=364, with one raster per height band and door locks painted as markers. "
+            "Interchange ships Interchange.svg on the published frame x0=598 z0=-442 x1=-433 z1=426: "
+            "ground, second, and third, with the garage on ground. "
             "The Lab ships Labs.svg on a fitted frame (tarkov.dev publishes no svgBounds for Labs), "
             "with locked rooms painted in the keycard color. Extract positions come from "
             "json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and "

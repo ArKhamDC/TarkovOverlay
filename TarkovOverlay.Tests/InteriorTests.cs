@@ -489,6 +489,132 @@ public class InteriorTests
         Assert.Empty(InteriorCatalog.Load("{}", dir));
     }
 
+    [Fact]
+    public void InterchangeFollowsTheMallBandAndKeepsAPinnedFloorUntilItChanges()
+    {
+        var mall = Load().Single(b => b.Id == "interchange");
+        Assert.Equal("interchange", mall.MapId);
+        Assert.True(mall.CoversMap);
+        Assert.Equal(180, mall.Rotation);
+        Assert.Equal(598, mall.X0);
+        Assert.Equal(-442, mall.Z0);
+        Assert.Equal(-433, mall.X1);
+        Assert.Equal(426, mall.Z1);
+        Assert.Equal(new[] { 1, 2, 3 }, mall.Floors.Select(f => f.Floor).ToArray());
+        Assert.Equal(new[] { "1", "2", "3" }, mall.Floors.Select(f => f.Caption).ToArray());
+        Assert.Equal(new[] { "Ground", "Second", "Third" }, mall.Floors.Select(f => f.Tip).ToArray());
+        Assert.Contains("Shebuka", mall.Credit);
+        var region = mall.Mall;
+        Assert.NotNull(region);
+        Assert.Equal(-222, region.Value.MinX);
+        Assert.Equal(120, region.Value.MaxX);
+        Assert.Equal(-327, region.Value.MinZ);
+        Assert.Equal(218, region.Value.MaxZ);
+        Assert.Equal(1, region.Value.OutsideFloor);
+        foreach (var plan in mall.Floors)
+        {
+            Assert.Equal(3383, plan.Width);
+            Assert.Equal(2841, plan.Height);
+            var (w, h) = PngSize(plan.ImagePath);
+            Assert.Equal(3383, w);
+            Assert.Equal(2841, h);
+        }
+
+        var overview = File.ReadAllBytes(Path.Combine(MapsDir(), "images", "interchange.png"));
+        Assert.Equal(overview, File.ReadAllBytes(mall.Floors.Single(f => f.Floor == 1).ImagePath));
+
+        Assert.Equal(1, InteriorCatalog.FloorFromPosition(mall, 0, 18, 0));
+        Assert.Equal(1, InteriorCatalog.FloorFromPosition(mall, 0, 24.999, 0));
+        Assert.Equal(2, InteriorCatalog.FloorFromPosition(mall, 0, 25, 0));
+        Assert.Equal(2, InteriorCatalog.FloorFromPosition(mall, 0, 33.999, 0));
+        Assert.Equal(3, InteriorCatalog.FloorFromPosition(mall, 0, 34, 0));
+        Assert.Equal(3, InteriorCatalog.FloorFromPosition(mall, -222, 40, 218));
+        Assert.Equal(3, InteriorCatalog.FloorFromPosition(mall, 120, 40, -327));
+        Assert.Equal(1, InteriorCatalog.FloorFromPosition(mall, 400, 40, 0));
+        Assert.Equal(1, InteriorCatalog.FloorFromPosition(mall, -222.01, 40, 0));
+        Assert.Equal(1, InteriorCatalog.FloorFromPosition(mall, 140.2, 25.21, 263.32));
+        Assert.Equal(1, InteriorCatalog.FloorFromPosition(mall, 613.9, 27.9, 71.3));
+        Assert.Null(InteriorCatalog.FloorFromPosition(mall, 0, double.NaN, 0));
+
+        var onMap = InteriorCatalog.ForMap(Load(), Game("Interchange", "interchange", "maps/shopping_mall.bundle"));
+        Assert.Single(onMap);
+
+        var state = InteriorFix.Overview;
+        (state, var building, var floor) = InteriorCatalog.Advance(onMap, state, 0, 22, 0);
+        Assert.Equal("interchange", building!.Id);
+        Assert.Equal(1, floor!.Floor);
+        Assert.Null(state.LockBand);
+        Assert.Equal(new[] { "1", "2", "3" }, InteriorCatalog.FloorOptions(building, 1)!.Select(o => o.Caption).ToArray());
+        Assert.Equal("Ground", InteriorCatalog.FloorOptions(building, 1)!.Single(o => o.Selected).Tip);
+
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 10, 28, -20);
+        Assert.Equal(2, floor!.Floor);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 67.53, 37.6, 40.89);
+        Assert.Equal(3, floor!.Floor);
+
+        (state, building, floor) = InteriorCatalog.Advance(onMap, state, 700, 40, 0);
+        Assert.Equal("interchange", building!.Id);
+        Assert.Equal(1, floor!.Floor);
+
+        state = InteriorCatalog.PinFloor(onMap, state, 3, 400, 40, 0);
+        Assert.Equal(1, state.LockBand);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 450, 36, 10);
+        Assert.Equal(3, floor!.Floor);
+        Assert.Equal(1, state.LockBand);
+
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 0, 40, 0);
+        Assert.Equal(3, floor!.Floor);
+        Assert.Null(state.LockBand);
+
+        state = InteriorCatalog.PinFloor(onMap, state, 1, 0, 28, 0);
+        Assert.Equal(2, state.LockBand);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 5, 30, 5);
+        Assert.Equal(1, floor!.Floor);
+        Assert.Equal(2, state.LockBand);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 400, 30, 0);
+        Assert.Equal(1, floor!.Floor);
+        Assert.Null(state.LockBand);
+
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 0, 28, 0);
+        Assert.Equal(2, floor!.Floor);
+        state = InteriorCatalog.PinFloor(onMap, state, 3, 0, 28, 0);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 20, 30, -40);
+        Assert.Equal(3, floor!.Floor);
+        Assert.Equal(2, state.LockBand);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 20, 20, -40);
+        Assert.Equal(1, floor!.Floor);
+        Assert.Null(state.LockBand);
+
+        var extracts = new[]
+        {
+            (474.57, 19.92, -433.74),
+            (-47.73, 22.97, 44.06),
+            (474.82, 20.92, -433.99),
+            (-321.56, 22.45, 266.74),
+            (-97.48, 18.12, -73.09),
+            (613.9, 27.9, 71.3),
+            (-321.56, 24.29, 266.74),
+            (-302.89, 21.65, -367.73),
+            (-219.92, 13.79, -37.02)
+        };
+        foreach (var (x, y, z) in extracts)
+        {
+            Assert.True(InteriorCatalog.ExtractOnFloor(mall, x, y, z, 1));
+            Assert.False(InteriorCatalog.ExtractOnFloor(mall, x, y, z, 2));
+            Assert.False(InteriorCatalog.ExtractOnFloor(mall, x, y, z, 3));
+        }
+
+        Assert.Equal(-433, mall.MinX);
+        Assert.Equal(598, mall.MaxX);
+        Assert.Equal(-442, mall.MinZ);
+        Assert.Equal(426, mall.MaxZ);
+        Assert.True(WorldMath.TryFit(mall.MinX, mall.MaxX, mall.MinZ, mall.MaxZ, mall.Rotation, 640, 480, out var basis));
+        var zoom = MapCamera.DefaultZoom(basis, 640, 480);
+        Assert.True(zoom > 1);
+        var frameShort = Math.Min(basis.UsedW, basis.UsedH) / basis.Scale;
+        Assert.True(frameShort > 800, $"interchange frame should stay the whole map, got {frameShort:0} m");
+    }
+
     private static IReadOnlyList<InteriorBuilding> For(string nameId, string normalized, string scene)
         => InteriorCatalog.ForMap(Load(), Game(nameId, normalized, scene));
 

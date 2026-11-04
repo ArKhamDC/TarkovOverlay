@@ -74,6 +74,47 @@ public static class WorldMath
         return true;
     }
 
+    /// <summary>Inverse of <see cref="TryImageUv"/>.</summary>
+    public static bool TryWorldFromImageUv(
+        double u, double v,
+        double minX, double maxX, double minZ, double maxZ, double rotationDegrees,
+        out double x, out double z)
+    {
+        var (minPX, maxPX, minPY, maxPY) = ProjectedBounds(minX, maxX, minZ, maxZ, rotationDegrees);
+        var spanX = maxPX - minPX;
+        var spanY = maxPY - minPY;
+        if (spanX < 1e-6 || spanY < 1e-6)
+        {
+            x = z = 0;
+            return false;
+        }
+
+        (x, z) = Unproject(minPX + u * spanX, maxPY - v * spanY, rotationDegrees);
+        return true;
+    }
+
+    /// <summary>
+    /// Pull a point that sits just outside a map frame onto the edge.
+    /// Points already inside, and points farther than <paramref name="slack"/> of the frame, stay put.
+    /// </summary>
+    public static (double X, double Z) ClampNearFrame(
+        double x, double z,
+        double minX, double maxX, double minZ, double maxZ, double rotationDegrees,
+        double slack = 0.04)
+    {
+        if (!TryImageUv(x, z, minX, maxX, minZ, maxZ, rotationDegrees, out var u, out var v))
+            return (x, z);
+        if (u >= -1e-9 && u <= 1 + 1e-9 && v >= -1e-9 && v <= 1 + 1e-9)
+            return (x, z);
+        if (u < -slack || u > 1 + slack || v < -slack || v > 1 + slack)
+            return (x, z);
+        var cu = Math.Clamp(u, 0, 1);
+        var cv = Math.Clamp(v, 0, 1);
+        return TryWorldFromImageUv(cu, cv, minX, maxX, minZ, maxZ, rotationDegrees, out var cx, out var cz)
+            ? (cx, cz)
+            : (x, z);
+    }
+
     /// <summary>
     /// Letterbox the world frame into a view. Matches the historical schematic fit:
     /// uniform scale, Y flipped so projected +Y is screen-up.

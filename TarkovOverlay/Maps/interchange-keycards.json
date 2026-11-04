@@ -1,0 +1,123 @@
+{
+  "map": "interchange",
+  "source": "Door colors from the Interchange v1 pack (json.tarkov.dev locks, key names from items normalizedName). Interchange.svg has no .locked room fills, so each color is a door square on the floor raster. 15 doors, 13 keys. EMERCOM is three doors. Extract colors are not keys.",
+  "entries": [
+    {
+      "key": "oli_admin",
+      "name": "OLI administration office key",
+      "fill": "#ff3f3f",
+      "itemId": "5ad5ccd186f774446d5706e9",
+      "count": 1,
+      "roomFill": false,
+      "tip": "OLI administration office key"
+    },
+    {
+      "key": "oli_logistics",
+      "name": "OLI logistics department office key",
+      "fill": "#ff983f",
+      "itemId": "5ad5cfbd86f7742c825d6104",
+      "count": 1,
+      "roomFill": false,
+      "tip": "OLI logistics department office key"
+    },
+    {
+      "key": "oli_outlet",
+      "name": "OLI outlet utility room key",
+      "fill": "#fff03f",
+      "itemId": "5ad5d20586f77449be26d877",
+      "count": 1,
+      "roomFill": false,
+      "tip": "OLI outlet utility room key"
+    },
+    {
+      "key": "power",
+      "name": "Power substation utility cabin key",
+      "fill": "#b5ff3f",
+      "itemId": "5ad5d49886f77455f9731921",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Power substation utility cabin key"
+    },
+    {
+      "key": "pharmacy",
+      "name": "Necruspharm pharmacy key",
+      "fill": "#5dff3f",
+      "itemId": "5ad5d64486f774079b080af8",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Necruspharm pharmacy key"
+    },
+    {
+      "key": "kiba_outer",
+      "name": "KIBA arms outer door key",
+      "fill": "#3fff7a",
+      "itemId": "5ad5d7d286f77450166e0a89",
+      "count": 1,
+      "roomFill": false,
+      "tip": "KIBA arms outer door key"
+    },
+    {
+      "key": "emercom",
+      "name": "EMERCOM medical unit key",
+      "fill": "#3fffd2",
+      "itemId": "5ad5db3786f7743568421cce",
+      "count": 3,
+      "roomFill": false,
+      "tip": "EMERCOM medical unit key"
+    },
+    {
+      "key": "kiba_inner",
+      "name": "KIBA arms inner grate door key",
+      "fill": "#3fd2ff",
+      "itemId": "5addaffe86f77470b455f900",
+      "count": 1,
+      "roomFill": false,
+      "tip": "KIBA arms inner grate door key"
+    },
+    {
+      "key": "ultra",
+      "name": "Ultra medical storage key",
+      "fill": "#3f7aff",
+      "itemId": "5e42c71586f7747f245e1343",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Ultra medical storage key"
+    },
+    {
+      "key": "object_11sr",
+      "name": "Object 11sr keycard",
+      "fill": "#5d3fff",
+      "itemId": "5e42c81886f7742a01529f57",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Object 11sr keycard"
+    },
+    {
+      "key": "object_21ws",
+      "name": "Object 21ws keycard",
+      "fill": "#b53fff",
+      "itemId": "5e42c83786f7742a021fdf3c",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Object 21ws keycard"
+    },
+    {
+      "key": "grumpy",
+      "name": "Grumpys hideout key",
+      "fill": "#ff3ff0",
+      "itemId": "664d3dd590294949fe2d81b7",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Grumpys hideout key"
+    },
+    {
+      "key": "station_14",
+      "name": "Station 14 4 kord arshavin k pass restored",
+      "fill": "#ff3f98",
+      "itemId": "68cc09872bdcc15c010c2668",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Station 14 4 kord arshavin k pass restored"
+    }
+  ]
+}

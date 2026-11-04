@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "Customs interior floors are crops of Customs.svg by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), the same map as the Customs overview. EFT TarkDev allowed use of the site and its data for this program on 2026-11-04; see Maps/attribution/SOURCE.md. rectXZ x0/z0 is the image top-left and x1/z1 the bottom-right in the overview world frame (coordinateRotation 180). Floor 0 is underground. Dorm room numbers are verified placements in image pixels; only confidence verified is shipped. Stairs stay painted on the raster. Boiler is omitted: Customs.svg has no boiler group. The Lab is one underground complex from Labs.svg (same author and licence): there is no outdoor overview. rectXZ uses coordinateRotation 270. Height picks the floor: below -0.9 technical, below 3 first, otherwise second. Locked rooms are painted on the rasters in the keycard color. Factory is one indoor complex from Factory.svg (same author and licence) on the published frame, coordinateRotation 90. factory.png is the overview until a position arrives, then height picks the floor: below -1 basement, below 3 ground, below 6 second, otherwise third. Locks are door markers, not room fills. Ground Zero is the whole GroundZero.svg on the official frame (coordinateRotation 180). ground-zero.png is the overview until a position arrives, then height picks the floor: below 21 underground, below 28 ground, below 32.3 second, otherwise third. Door locks are painted markers, not room fills. The official bounds are not shifted.",
+  "source": "Customs interior floors are crops of Customs.svg by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), the same map as the Customs overview. EFT TarkDev allowed use of the site and its data for this program on 2026-11-04; see Maps/attribution/SOURCE.md. rectXZ x0/z0 is the image top-left and x1/z1 the bottom-right in the overview world frame (coordinateRotation 180). Floor 0 is underground. Dorm room numbers are verified placements in image pixels; only confidence verified is shipped. Stairs stay painted on the raster. Boiler is omitted: Customs.svg has no boiler group. The Lab is one underground complex from Labs.svg (same author and licence): there is no outdoor overview. rectXZ uses coordinateRotation 270. Height picks the floor: below -0.9 technical, below 3 first, otherwise second. Locked rooms are painted on the rasters in the keycard color. Factory is one indoor complex from Factory.svg (same author and licence) on the published frame, coordinateRotation 90. factory.png is the overview until a position arrives, then height picks the floor: below -1 basement, below 3 ground, below 6 second, otherwise third. Locks are door markers, not room fills. Ground Zero is the whole GroundZero.svg on the official frame (coordinateRotation 180). ground-zero.png is the overview until a position arrives, then height picks the floor: below 21 underground, below 28 ground, below 32.3 second, otherwise third. Door locks are painted markers, not room fills. The official bounds are not shifted. Interchange is the full Interchange.svg frame, the same rect as the overview (coordinateRotation 180). Inside the mall, height picks the floor: below 25 ground (the garage is part of ground), below 34 second, otherwise third. Outside the mall the floor is ground. Door squares are colored on the rasters; the key list is interchange-keycards.json.",
   "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
   "maps": [
     {
@@ -1219,6 +1219,78 @@
               "image": "factory_third.png",
               "width": 1047,
               "height": 1130
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "interchange",
+      "coordinateRotation": 180,
+      "aliases": [
+        "interchange",
+        "shoppingmall"
+      ],
+      "buildings": [
+        {
+          "id": "interchange",
+          "name": "Interchange",
+          "nameRu": "Развязка",
+          "coversMap": true,
+          "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+          "rectXZ": {
+            "x0": 598,
+            "z0": -442,
+            "x1": -433,
+            "z1": 426
+          },
+          "floorRegion": {
+            "minX": -222,
+            "maxX": 120,
+            "minZ": -327,
+            "maxZ": 218,
+            "outside": 1
+          },
+          "floorByY": [
+            {
+              "below": 25,
+              "floor": 1
+            },
+            {
+              "below": 34,
+              "floor": 2
+            },
+            {
+              "floor": 3
+            }
+          ],
+          "floors": [
+            {
+              "floor": 1,
+              "floorKey": "ground",
+              "caption": "1",
+              "tip": "Ground",
+              "image": "interchange_ground.png",
+              "width": 3383,
+              "height": 2841
+            },
+            {
+              "floor": 2,
+              "floorKey": "second",
+              "caption": "2",
+              "tip": "Second",
+              "image": "interchange_second.png",
+              "width": 3383,
+              "height": 2841
+            },
+            {
+              "floor": 3,
+              "floorKey": "third",
+              "caption": "3",
+              "tip": "Third",
+              "image": "interchange_third.png",
+              "width": 3383,
+              "height": 2841
             }
           ]
         }

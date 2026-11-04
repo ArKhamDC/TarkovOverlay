@@ -100,8 +100,10 @@ public sealed class GpsController : IDisposable
     {
         lock (_gate)
         {
-            var y = _fix?.Position.Y ?? double.NaN;
-            _interior = InteriorCatalog.PinFloor(_interiors, _interior, floor, y);
+            var pos = _fix?.Position;
+            _interior = InteriorCatalog.PinFloor(
+                _interiors, _interior, floor,
+                pos?.X ?? double.NaN, pos?.Y ?? double.NaN, pos?.Z ?? double.NaN);
             _sig = "\0";
         }
         Publish();
@@ -358,7 +360,13 @@ public sealed class GpsController : IDisposable
 
         var markers = new List<MapMarker>(shown.Count);
         foreach (var e in shown)
-            markers.Add(new MapMarker(e.X, e.Z, Pick(e.NameEn, e.NameRu), e.Faction ?? "", nearest is not null && ReferenceEquals(e, nearest.Extract), e.Y));
+        {
+            var mx = e.X;
+            var mz = e.Z;
+            if (underlay is not null)
+                (mx, mz) = WorldMath.ClampNearFrame(e.X, e.Z, underlay.MinX, underlay.MaxX, underlay.MinZ, underlay.MaxZ, underlay.Rotation);
+            markers.Add(new MapMarker(mx, mz, Pick(e.NameEn, e.NameRu), e.Faction ?? "", nearest is not null && ReferenceEquals(e, nearest.Extract), e.Y));
+        }
 
         var mapName = Pick(map.NameEn, map.NameRu) + (uncertain ? "?" : "");
         var title = nearest is null
@@ -427,7 +435,7 @@ public sealed class GpsController : IDisposable
         foreach (var marker in markers)
         {
             if (!building.Contains(marker.X, marker.Z)) continue;
-            if (!InteriorCatalog.ExtractOnFloor(building, marker.Y, floor.Floor)) continue;
+            if (!InteriorCatalog.ExtractOnFloor(building, marker.X, marker.Y, marker.Z, floor.Floor)) continue;
             inside.Add(marker);
         }
 
