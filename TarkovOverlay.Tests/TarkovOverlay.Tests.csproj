@@ -21,6 +21,7 @@
     <Compile Include="..\TarkovOverlay\Services\MapDataParser.cs" Link="MapDataParser.cs" />
     <Compile Include="..\TarkovOverlay\Services\ExtractNav.cs" Link="ExtractNav.cs" />
     <Compile Include="..\TarkovOverlay\Services\MapUnderlayCatalog.cs" Link="MapUnderlayCatalog.cs" />
+    <Compile Include="..\TarkovOverlay\Services\InteriorCatalog.cs" Link="InteriorCatalog.cs" />
     <Compile Include="..\TarkovOverlay\Services\RaidLogTracker.cs" Link="RaidLogTracker.cs" />
   </ItemGroup>
 </Project>

@@ -13,7 +13,8 @@
         Width="420"
         Height="320"
         MouseMove="OnGestureMove"
-        MouseLeftButtonUp="OnGestureUp">
+        MouseLeftButtonUp="OnGestureUp"
+        MouseWheel="OnMapWheel">
     <Grid>
         <Border x:Name="Frame" CornerRadius="6" BorderThickness="1" SnapsToDevicePixels="True">
             <Border.Background>
@@ -30,6 +31,8 @@
                 <Grid x:Name="TitleBar" Background="#FF14181C" MouseLeftButtonDown="OnTitleDown" Cursor="SizeAll">
                     <TextBlock x:Name="TitleText" Margin="10,0,18,0" VerticalAlignment="Center"
                                Foreground="White" FontFamily="Segoe UI" FontSize="12" TextTrimming="CharacterEllipsis" />
+                    <StackPanel x:Name="FloorBar" Orientation="Horizontal" HorizontalAlignment="Right"
+                                VerticalAlignment="Center" Margin="0,0,6,0" Visibility="Collapsed" Background="Transparent" />
                 </Grid>
                 <Canvas x:Name="MapCanvas" Grid.Row="1" ClipToBounds="True" Background="Transparent" />
                 <Canvas Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="14" Height="14"

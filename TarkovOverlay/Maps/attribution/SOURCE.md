@@ -7,6 +7,7 @@ The Customs GPS underlay (`Maps/images/customs.png`) is a raster of the tarkov.d
 - Author: Shebuka / [the-hideout/tarkov-dev-svg-maps](https://github.com/the-hideout/tarkov-dev-svg-maps)
 - Licence upstream: [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). The upstream repo notes may restrict in-raid overlay use by default.
 - Frame: bounds `x0=698, z0=-307, x1=-372, z1=237`, `coordinateRotation` 180. Same projection as the other GPS underlays: `px=(x-x0)/(x1-x0)*W`, `py=(z-z0)/(z1-z0)*H`.
+- Interior floors (`Maps/interiors/`, `Maps/interiors.json`) are crops of the same Customs.svg, one raster per floor. The overlay draws dorm room numbers from that JSON; they are not baked into the images. Boiler has no SVG group and is not included.
 - Extract positions: https://json.tarkov.dev/regular/maps (`Maps/customs-extracts.json`). ZB-1011 and ZB-1012 are on the left of the raster; Crossroads, Trailer Park, and RUAF are on the right. Those world coordinates are used as published.
 
 ## Permission
