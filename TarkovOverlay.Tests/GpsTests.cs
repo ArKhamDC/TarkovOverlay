@@ -56,6 +56,19 @@ public class GpsTests
     }
 
     [Fact]
+    public void OverviewDefaultsToPmcAndShared()
+    {
+        Assert.True(ExtractNav.OverviewVisible("pmc", null));
+        Assert.True(ExtractNav.OverviewVisible("shared", null));
+        Assert.True(ExtractNav.OverviewVisible("PMC", "pmc"));
+        Assert.False(ExtractNav.OverviewVisible("scav", null));
+        Assert.False(ExtractNav.OverviewVisible("scav", "pmc"));
+        Assert.True(ExtractNav.OverviewVisible("scav", "scav"));
+        Assert.True(ExtractNav.OverviewVisible("shared", "scav"));
+        Assert.False(ExtractNav.OverviewVisible("pmc", "scav"));
+    }
+
+    [Fact]
     public void NearestExtractRespectsSide()
     {
         var maps = SampleMaps();

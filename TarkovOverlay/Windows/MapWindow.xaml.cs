@@ -303,13 +303,14 @@ public partial class MapWindow : Window
         Canvas.SetLeft(MapCanvas.Children[^1], fit.OriginX);
         Canvas.SetTop(MapCanvas.Children[^1], fit.OriginY);
 
-        if (underlay is not null)
-        {
-            DrawScale(fit);
-            DrawLabels(view, fit, ToScreen);
-            if (!double.IsNaN(view.CompassDegrees))
-                DrawNorth(fit, WorldMath.ScreenAngleDegrees(0, 0, view.CompassDegrees, view.Rotation));
-        }
+            if (underlay is not null)
+            {
+                DrawScale(fit);
+                DrawLabels(view, fit, ToScreen);
+                DrawCredit(view, fit);
+                if (!double.IsNaN(view.CompassDegrees))
+                    DrawNorth(fit, WorldMath.ScreenAngleDegrees(0, 0, view.CompassDegrees, view.Rotation));
+            }
 
         foreach (var marker in view.Markers.OrderBy(m => m.Nearest))
         {
@@ -441,9 +442,10 @@ public partial class MapWindow : Window
         if (labels is null || labels.Length == 0) return;
         var placed = new List<Rect>();
         var limit = 0;
-        foreach (var label in labels.OrderByDescending(l => l.Priority).ThenBy(l => l.Text.Length))
+        foreach (var label in labels.OrderByDescending(l => l.Priority).ThenBy(l => l.Display(L.En).Length))
         {
             if (limit >= 28) break;
+            var text = label.Display(L.En);
             var at = toScreen(label.X, label.Z);
             if (at.X < fit.OriginX + 4 || at.Y < fit.OriginY + 4
                 || at.X > fit.OriginX + fit.UsedW - 4 || at.Y > fit.OriginY + fit.UsedH - 4)
@@ -452,7 +454,7 @@ public partial class MapWindow : Window
 
             var block = new TextBlock
             {
-                Text = label.Text,
+                Text = text,
                 Foreground = LabelFg,
                 FontFamily = UiFont,
                 FontSize = 12,
@@ -469,7 +471,7 @@ public partial class MapWindow : Window
 
             var shadow = new TextBlock
             {
-                Text = label.Text,
+                Text = text,
                 Foreground = Brushes.Black,
                 FontFamily = UiFont,
                 FontSize = 12,
@@ -483,6 +485,26 @@ public partial class MapWindow : Window
             MapCanvas.Children.Add(block);
             limit++;
         }
+    }
+
+    private void DrawCredit(MapView view, MapProjection fit)
+    {
+        if (string.IsNullOrWhiteSpace(view.Credit) || fit.UsedW < 160 || fit.UsedH < 48) return;
+        var block = new TextBlock
+        {
+            Text = view.Credit,
+            Foreground = CreditFg,
+            FontFamily = UiFont,
+            FontSize = 10,
+            IsHitTestVisible = false
+        };
+        block.Measure(new Size(fit.UsedW, fit.UsedH));
+        var x = fit.OriginX + fit.UsedW - block.DesiredSize.Width - 8;
+        var y = fit.OriginY + fit.UsedH - block.DesiredSize.Height - 6;
+        if (x < fit.OriginX + 8) return;
+        Canvas.SetLeft(block, x);
+        Canvas.SetTop(block, y);
+        MapCanvas.Children.Add(block);
     }
 
     private static bool NearMarker(MapView view, Func<double, double, Point> toScreen, Point at)
@@ -568,6 +590,7 @@ public partial class MapWindow : Window
     private static readonly Brush LabelBg = Freeze(Color.FromArgb(210, 16, 19, 22));
     private static readonly Brush LabelFg = Freeze(Color.FromRgb(236, 232, 214));
     private static readonly Brush FrameStroke = Freeze(Color.FromArgb(50, 255, 255, 255));
+    private static readonly Brush CreditFg = Freeze(Color.FromArgb(180, 236, 232, 214));
     private static readonly FontFamily UiFont = new("Segoe UI");
 
     private static SolidColorBrush Freeze(Color color)

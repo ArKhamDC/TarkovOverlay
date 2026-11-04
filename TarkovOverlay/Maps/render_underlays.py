@@ -3,7 +3,8 @@
 
 Bounds and place-name positions come from the-hideout/tarkov-dev src/data/maps.json
 (MIT). The PNGs are original drawings aligned to those frames. This script does
-not read or copy the tarkov-dev SVG map art.
+not read or copy the tarkov-dev SVG map art. Customs.png is the shipped Shebuka
+raster and is left in place; extract positions live in customs-extracts.json.
 
 Usage:
   python3 render_underlays.py --maps /path/to/maps.json
@@ -160,8 +161,12 @@ NOTES = {
     "ground-zero": "East Gate, UN Roadblock, and the co-op exit lie outside this published frame. Spawns and the other extracts sit inside it.",
     "factory": "A few spawns sit a few meters south of the published frame.",
     "the-labyrinth": "Frame rotation is 270, from tarkov.dev maps.json. json.tarkov.dev coordinateToCardinalRotation for Labyrinth is 180.",
-    "customs": "Orientation matches the in-game compass: Big Red to the east, dorms to the south.",
+    "customs": "Raster of tarkov.dev Customs.svg (Shebuka), frame x0=698 z0=-307 x1=-372 z1=237, coordinateRotation 180. Extract markers come from Maps/customs-extracts.json (json.tarkov.dev). ZB-1011 and ZB-1012 are on the left; Crossroads, Trailer Park, and RUAF are on the right.",
 }
+
+# Shipped art this script must not overwrite. customs-extracts.json supplies extract positions.
+SHIPPED_RASTERS = {"customs"}
+CUSTOMS_CREDIT = "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0"
 
 
 def norm(value: str) -> str:
@@ -453,6 +458,17 @@ def build(doc: list) -> list[dict]:
         }
         if map_id in NOTES:
             spec["note"] = NOTES[map_id]
+        if map_id == "customs":
+            spec["credit"] = CUSTOMS_CREDIT
+            spec["imageAttribution"] = {
+                "author": "Shebuka",
+                "project": "the-hideout/tarkov-dev-svg-maps",
+                "sourceUrl": "https://assets.tarkov.dev/maps/svg/Customs.svg",
+                "license": "CC BY-NC-SA 4.0",
+                "permission": "EFT TarkDev Telegram 2026-11-04",
+                "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+                "notes": "attribution/SOURCE.md",
+            }
         specs.append(spec)
     return specs
 
@@ -476,10 +492,12 @@ def main() -> None:
             "the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels "
             "in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base "
             "location and is used only for the compass tick. "
-            "The tarkov.dev SVG maps (and the raster tiles made from them) are CC BY-NC-SA 4.0 and their "
-            "authors forbid using them in an in-raid overlay or radar, so they are not shipped. MapGenie "
+            "Customs ships the tarkov.dev Customs.svg raster by Shebuka "
+            "(the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), used with permission from EFT TarkDev on "
+            "2026-11-04; see Maps/attribution/SOURCE.md. Customs extract positions come from "
+            "json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie "
             "tiles and the game's own map textures are not licensed for redistribution. "
-            "The images here are original drawings on those same frames: roads join the published landmark "
+            "The other images are original drawings on those same frames: roads join the published landmark "
             "coordinates in the order those places connect, with water and building footprints. "
             "Frames were checked against spawn and extract coordinates from json.tarkov.dev. "
             "Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns. "
@@ -490,7 +508,11 @@ def main() -> None:
     out_json = ROOT / "underlays.json"
     out_json.write_text(json.dumps(payload, indent=2) + "\n")
     for spec in specs:
-        width, height = render(spec, ROOT / "images" / spec["image"])
+        image_path = ROOT / "images" / spec["image"]
+        if spec["id"] in SHIPPED_RASTERS and image_path.exists():
+            print(f"{spec['id']:20} kept shipped raster {image_path.name}")
+            continue
+        width, height = render(spec, image_path)
         print(f"{spec['id']:20} {width:4}x{height:<4} labels={len(spec['labels']):3} areas={len(spec['areas']):2}")
 
 
