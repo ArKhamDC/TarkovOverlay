@@ -29,7 +29,13 @@ public sealed record NearestExtract(MapExtract Extract, double DistanceMeters, d
 /// <summary>Arrow HUD on the price overlay. Separate from the map window.</summary>
 public sealed record GpsHud(bool HasBearing, double ArrowDegrees, int Meters, string Primary, string Secondary);
 
-public sealed record MapMarker(double X, double Z, string Name, string Faction, bool Nearest);
+public sealed record MapMarker(double X, double Z, string Name, string Faction, bool Nearest, double Y = 0);
+
+/// <summary>
+/// One keycard in a map legend. <paramref name="Fill"/> is <c>#RRGGBB</c>.
+/// <paramref name="RoomFill"/> is false when the map only draws a marker, not a painted room.
+/// </summary>
+public sealed record MapLegendEntry(string Name, string Fill, string? Tip, bool RoomFill, int Count = 0, string? ItemId = null);
 
 /// <summary>
 /// Place name drawn on top of a map underlay. <paramref name="Priority"/> is higher for larger landmarks.
@@ -70,4 +76,5 @@ public sealed record MapView(
     double CompassDegrees = double.NaN,
     string? Credit = null,
     MapImageLabel[]? ImageLabels = null,
-    MapFloorOption[]? Floors = null);
+    MapFloorOption[]? Floors = null,
+    MapLegendEntry[]? Legend = null);

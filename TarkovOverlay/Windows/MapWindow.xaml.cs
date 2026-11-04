@@ -41,6 +41,9 @@ public partial class MapWindow : Window
     public event Action<int>? FloorSelected;
 
     private string _floorSig = "";
+    private bool _legendOpen = true;
+    private Border? _keysButton;
+    private static readonly Dictionary<string, Brush> _swatches = new(StringComparer.OrdinalIgnoreCase);
     private string _frameKey = "";
     private bool _cameraReady;
     private double _zoom = 1;
@@ -99,6 +102,7 @@ public partial class MapWindow : Window
         _view = view;
         TitleText.Text = string.IsNullOrWhiteSpace(view?.Title) ? L.T("Карта", "Map") : view!.Title;
         UpdateFloors(view);
+        UpdateLegendButton(view);
         Draw();
     }
 
@@ -410,6 +414,8 @@ public partial class MapWindow : Window
             if (!double.IsNaN(view.CompassDegrees))
                 DrawNorth(w, WorldMath.ScreenAngleDegrees(0, 0, view.CompassDegrees, view.Rotation));
         }
+
+        DrawLegend(view, w, h);
     }
 
     private void UpdateCamera(MapView view, MapProjection basis, double w, double h)
@@ -792,6 +798,140 @@ public partial class MapWindow : Window
         foreach (var floor in floors)
             FloorBar.Children.Add(FloorButton(floor));
         FloorBar.Visibility = Visibility.Visible;
+    }
+
+    private void UpdateLegendButton(MapView? view)
+    {
+        var has = view?.Legend is { Length: > 0 };
+        if (_keysButton is null)
+        {
+            _keysButton = ZoomButton("Keys", 40, "Keycard colors", ToggleLegend);
+            ZoomBar.Children.Insert(0, _keysButton);
+        }
+
+        _keysButton.Visibility = has ? Visibility.Visible : Visibility.Collapsed;
+        _keysButton.Background = _legendOpen ? FloorOn : FloorOff;
+        _keysButton.BorderBrush = _legendOpen ? PmcBrush : FloorEdge;
+    }
+
+    private void ToggleLegend()
+    {
+        _legendOpen = !_legendOpen;
+        UpdateLegendButton(_view);
+        Draw();
+    }
+
+    private void DrawLegend(MapView view, double w, double h)
+    {
+        if (!_legendOpen || view.Legend is not { Length: > 0 } entries) return;
+        if (w < 140 || h < 70) return;
+
+        const double pad = 6;
+        const double sw = 10;
+        const double font = 10;
+        var captions = new string[entries.Length];
+        var textW = new double[entries.Length];
+        double maxText = 0;
+        for (var i = 0; i < entries.Length; i++)
+        {
+            var entry = entries[i];
+            captions[i] = entry.Count > 0 ? $"{entry.Name} ({entry.Count})" : entry.Name;
+            var probe = new TextBlock { Text = captions[i], FontFamily = UiFont, FontSize = font };
+            probe.Measure(new Size(w, h));
+            textW[i] = probe.DesiredSize.Width;
+            if (textW[i] > maxText) maxText = textW[i];
+        }
+
+        var colW = sw + 5 + maxText + 8;
+        var cols = entries.Length > 6 && colW * 2 + pad * 2 <= w - 12 ? 2 : 1;
+        var perCol = (int)Math.Ceiling(entries.Length / (double)cols);
+        var rowH = Math.Min(15, Math.Max(11, (h - 16 - pad * 2) / perCol));
+        var boxW = cols * colW + pad * 2;
+        var boxH = perCol * rowH + pad * 2;
+        var panel = new Border
+        {
+            Width = boxW,
+            Height = boxH,
+            Background = LabelBg,
+            CornerRadius = new CornerRadius(4),
+            IsHitTestVisible = true,
+            ToolTip = "Keycard colors"
+        };
+        panel.MouseLeftButtonDown += (_, e) => e.Handled = true;
+        Canvas.SetLeft(panel, 8);
+        Canvas.SetTop(panel, 8);
+        MapCanvas.Children.Add(panel);
+
+        for (var i = 0; i < entries.Length; i++)
+        {
+            var col = i / perCol;
+            var row = i % perCol;
+            var x = 8 + pad + col * colW;
+            var y = 8 + pad + row * rowH;
+            var entry = entries[i];
+            var tip = string.IsNullOrWhiteSpace(entry.Tip) ? captions[i] : entry.Tip;
+            var rect = new Rectangle
+            {
+                Width = sw,
+                Height = sw,
+                Fill = Swatch(entry.Fill),
+                Stroke = NeedsOutline(entry.Fill) ? Brushes.White : FrameStroke,
+                StrokeThickness = 1,
+                ToolTip = tip,
+                Cursor = Cursors.Hand
+            };
+            rect.MouseLeftButtonDown += (_, e) => e.Handled = true;
+            Canvas.SetLeft(rect, x);
+            Canvas.SetTop(rect, y + Math.Max(0, (rowH - sw) / 2));
+            MapCanvas.Children.Add(rect);
+
+            var block = new TextBlock
+            {
+                Text = captions[i],
+                Foreground = entry.RoomFill ? Brushes.White : LabelFg,
+                FontFamily = UiFont,
+                FontSize = font,
+                ToolTip = tip,
+                Cursor = Cursors.Hand
+            };
+            block.MouseLeftButtonDown += (_, e) => e.Handled = true;
+            Canvas.SetLeft(block, x + sw + 5);
+            Canvas.SetTop(block, y + Math.Max(0, (rowH - font - 2) / 2));
+            MapCanvas.Children.Add(block);
+        }
+    }
+
+    private static Brush Swatch(string hex)
+    {
+        if (_swatches.TryGetValue(hex, out var cached)) return cached;
+        var brush = TryHex(hex, out var color) ? Freeze(color) : OtherBrush;
+        _swatches[hex] = brush;
+        return brush;
+    }
+
+    private static bool NeedsOutline(string hex)
+        => TryHex(hex, out var color) && color.R + color.G + color.B < 90;
+
+    private static bool TryHex(string hex, out Color color)
+    {
+        color = default;
+        if (hex.Length != 7 || hex[0] != '#') return false;
+        try
+        {
+            var r = Convert.ToByte(hex.Substring(1, 2), 16);
+            var g = Convert.ToByte(hex.Substring(3, 2), 16);
+            var b = Convert.ToByte(hex.Substring(5, 2), 16);
+            color = Color.FromRgb(r, g, b);
+            return true;
+        }
+        catch (FormatException)
+        {
+            return false;
+        }
+        catch (OverflowException)
+        {
+            return false;
+        }
     }
 
     private Border FloorButton(MapFloorOption floor)

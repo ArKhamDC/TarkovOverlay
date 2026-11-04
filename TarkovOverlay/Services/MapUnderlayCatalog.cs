@@ -26,6 +26,9 @@ public sealed class MapUnderlay
 
     /// <summary>Short credit drawn on the map when the underlay is someone else's art.</summary>
     public string? Credit { get; init; }
+
+    /// <summary>Keycard colors for this map. Empty when the map has no locked-room legend.</summary>
+    public MapLegendEntry[] Keycards { get; init; } = [];
 }
 
 /// <summary>Loads <c>Maps/underlays.json</c> and keeps entries whose image file is present.</summary>
@@ -42,14 +45,19 @@ public static class MapUnderlayCatalog
     {
         var jsonPath = Path.Combine(mapsDirectory, "underlays.json");
         if (!File.Exists(jsonPath)) return [];
-        return Load(File.ReadAllText(jsonPath), Path.Combine(mapsDirectory, "images"), ReadShippedExtracts(mapsDirectory));
+        return Load(
+            File.ReadAllText(jsonPath),
+            Path.Combine(mapsDirectory, "images"),
+            ReadShippedExtracts(mapsDirectory),
+            ReadKeycards(mapsDirectory));
     }
 
     public static IReadOnlyList<MapUnderlay> Load(string json, string imageDirectory)
         => Load(json, imageDirectory, null);
 
     public static IReadOnlyList<MapUnderlay> Load(
-        string json, string imageDirectory, IReadOnlyDictionary<string, MapExtract[]>? shippedExtracts)
+        string json, string imageDirectory, IReadOnlyDictionary<string, MapExtract[]>? shippedExtracts,
+        IReadOnlyDictionary<string, MapLegendEntry[]>? keycards = null)
     {
         using var doc = JsonDocument.Parse(json);
         if (!doc.RootElement.TryGetProperty("maps", out var maps) || maps.ValueKind != JsonValueKind.Array)
@@ -120,7 +128,8 @@ public static class MapUnderlayCatalog
                 Aliases = aliases.ToArray(),
                 Labels = labels.ToArray(),
                 Extracts = extracts,
-                Credit = Str(map, "credit")
+                Credit = Str(map, "credit"),
+                Keycards = keycards is not null && keycards.TryGetValue(id, out var cards) ? cards : []
             });
         }
 
@@ -169,6 +178,63 @@ public static class MapUnderlayCatalog
         }
 
         return result;
+    }
+
+    private static Dictionary<string, MapLegendEntry[]> ReadKeycards(string mapsDirectory)
+    {
+        var result = new Dictionary<string, MapLegendEntry[]>(StringComparer.OrdinalIgnoreCase);
+        if (!Directory.Exists(mapsDirectory)) return result;
+        foreach (var path in Directory.EnumerateFiles(mapsDirectory, "*-keycards.json"))
+        {
+            var id = Path.GetFileName(path);
+            const string suffix = "-keycards.json";
+            if (id.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+                id = id[..^suffix.Length];
+            try
+            {
+                using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                if (doc.RootElement.TryGetProperty("map", out var mapId) && mapId.ValueKind == JsonValueKind.String
+                    && !string.IsNullOrWhiteSpace(mapId.GetString()))
+                    id = mapId.GetString()!;
+                var entries = ParseKeycards(doc.RootElement);
+                if (entries.Length > 0) result[id] = entries;
+            }
+            catch (JsonException)
+            {
+            }
+            catch (IOException)
+            {
+            }
+        }
+
+        return result;
+    }
+
+    private static MapLegendEntry[] ParseKeycards(JsonElement root)
+    {
+        if (!root.TryGetProperty("entries", out var node) || node.ValueKind != JsonValueKind.Array)
+            return [];
+        var list = new List<MapLegendEntry>();
+        foreach (var e in node.EnumerateArray())
+        {
+            var name = Str(e, "name");
+            var fill = Str(e, "fill");
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(fill)) continue;
+            var room = true;
+            if (e.TryGetProperty("roomFill", out var roomNode)
+                && roomNode.ValueKind is JsonValueKind.True or JsonValueKind.False)
+                room = roomNode.GetBoolean();
+            var count = Num(e, "count");
+            list.Add(new MapLegendEntry(
+                name,
+                fill,
+                Str(e, "tip"),
+                room,
+                count is null ? 0 : (int)count.Value,
+                Str(e, "itemId")));
+        }
+
+        return list.ToArray();
     }
 
     private static MapExtract[] ParseExtracts(JsonElement root)

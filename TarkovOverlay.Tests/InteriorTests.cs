@@ -9,9 +9,11 @@ public class InteriorTests
     [Fact]
     public void ShippedCustomsFloorsLoadWithoutABoiler()
     {
-        var buildings = Load();
+        var all = Load();
+        var buildings = all.Where(b => b.MapId == "customs").ToList();
         Assert.Equal(12, buildings.Count);
         Assert.Equal(25, buildings.Sum(b => b.Floors.Length));
+        Assert.Contains(all, b => b.Id == "labs");
         Assert.DoesNotContain(buildings, b => b.Id.Contains("boiler", StringComparison.OrdinalIgnoreCase));
         Assert.DoesNotContain(buildings, b => b.Id == "zb1011_building");
         Assert.Contains(buildings, b => b.Id == "zb1011_bunker");
@@ -86,8 +88,16 @@ public class InteriorTests
             foreach (var (x, z) in samples)
             {
                 Assert.True(building.TryUv(x, z, out var u, out var v), building.Id);
-                Assert.Equal((x - building.X0) / (building.X1 - building.X0), u, 6);
-                Assert.Equal((z - building.Z0) / (building.Z1 - building.Z0), v, 6);
+                if (building.Rotation == 270)
+                {
+                    Assert.Equal((z - building.Z0) / (building.Z1 - building.Z0), u, 6);
+                    Assert.Equal((x - building.X0) / (building.X1 - building.X0), v, 6);
+                }
+                else
+                {
+                    Assert.Equal((x - building.X0) / (building.X1 - building.X0), u, 6);
+                    Assert.Equal((z - building.Z0) / (building.Z1 - building.Z0), v, 6);
+                }
                 var (sx, sy) = fit.ToScreen(x, z);
                 Assert.Equal(fit.OriginX + u * fit.UsedW, sx, 5);
                 Assert.Equal(fit.OriginY + v * fit.UsedH, sy, 5);
@@ -95,8 +105,99 @@ public class InteriorTests
 
             Assert.True(building.Contains(building.X0, building.Z0));
             Assert.True(building.Contains(building.X1, building.Z1));
-            Assert.False(building.Contains(building.X0 + (building.X0 - building.X1), building.Z0));
+            var outsideX = building.X0 + (building.X0 - building.X1);
+            if (building.CoversMap)
+                Assert.True(building.Contains(outsideX, building.Z0));
+            else
+                Assert.False(building.Contains(outsideX, building.Z0));
         }
+    }
+
+    [Fact]
+    public void LabsFollowsHeightAndKeepsAPinnedFloorUntilTheBandChanges()
+    {
+        var labs = Load().Single(b => b.Id == "labs");
+        Assert.Equal("the-lab", labs.MapId);
+        Assert.True(labs.CoversMap);
+        Assert.Equal(270, labs.Rotation);
+        Assert.Equal(new[] { -1, 1, 2 }, labs.Floors.Select(f => f.Floor).ToArray());
+        Assert.Equal(new[] { "T", "1", "2" }, labs.Floors.Select(f => f.Caption).ToArray());
+        Assert.Equal(new[] { "Technical", "First", "Second" }, labs.Floors.Select(f => f.Tip).ToArray());
+        Assert.Contains("Shebuka", labs.Credit);
+        Assert.Equal(-305.23, labs.X0, 3);
+        Assert.Equal(-466.72, labs.Z0, 3);
+        Assert.Equal(-78.1, labs.X1, 3);
+        Assert.Equal(-187.66, labs.Z1, 3);
+        foreach (var plan in labs.Floors)
+        {
+            Assert.Equal(2880, plan.Width);
+            Assert.Equal(2344, plan.Height);
+            var (w, h) = PngSize(plan.ImagePath);
+            Assert.Equal(2880, w);
+            Assert.Equal(2344, h);
+        }
+
+        var overview = File.ReadAllBytes(Path.Combine(MapsDir(), "images", "the-lab.png"));
+        Assert.Equal(overview, File.ReadAllBytes(labs.Floors.Single(f => f.Floor == 1).ImagePath));
+
+        Assert.Equal(-1, InteriorCatalog.FloorFromAltitude(labs, -1));
+        Assert.Equal(-1, InteriorCatalog.FloorFromAltitude(labs, -0.900001));
+        Assert.Equal(1, InteriorCatalog.FloorFromAltitude(labs, -0.9));
+        Assert.Equal(1, InteriorCatalog.FloorFromAltitude(labs, 2.5));
+        Assert.Equal(2, InteriorCatalog.FloorFromAltitude(labs, 3));
+        Assert.Equal(2, InteriorCatalog.FloorFromAltitude(labs, 8.2));
+        Assert.Null(InteriorCatalog.FloorFromAltitude(labs, double.NaN));
+
+        var onMap = InteriorCatalog.ForMap(Load(), Game("laboratory", "the-lab", "maps/laboratory_preset.bundle"));
+        Assert.Single(onMap);
+        Assert.Single(InteriorCatalog.ForMap(Load(), Game("laboratory_dark", "the-lab-dark", "maps/laboratory_dark_preset.bundle")));
+        Assert.Single(InteriorCatalog.ForMap(Load(), Game("laboratory_event", "infected-lab", "maps/laboratory_event_preset.bundle")));
+
+        var state = InteriorFix.Overview;
+        (state, var building, var floor) = InteriorCatalog.Advance(onMap, state, -165.25, 1.2, -349.22);
+        Assert.Equal("labs", building!.Id);
+        Assert.Equal(1, floor!.Floor);
+        Assert.Null(state.LockBand);
+        Assert.Equal("First", InteriorCatalog.FloorOptions(building, floor.Floor)!.Single(o => o.Selected).Tip);
+        Assert.Equal(new[] { "T", "1", "2" }, InteriorCatalog.FloorOptions(building, 1)!.Select(o => o.Caption).ToArray());
+
+        // A point far outside the raster still stays on the complex, on the floor Y selects.
+        (state, building, floor) = InteriorCatalog.Advance(onMap, state, 0, -2, 0);
+        Assert.Equal(-1, floor!.Floor);
+
+        state = InteriorCatalog.PinFloor(onMap, state, 2, -2);
+        Assert.Equal(-1, state.LockBand);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 0, -3.5, 0);
+        Assert.Equal(2, floor!.Floor);
+        Assert.Equal(-1, state.LockBand);
+
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, -120, 0.4, -300);
+        Assert.Equal(1, floor!.Floor);
+        Assert.Null(state.LockBand);
+
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, -231.46, 6.19, -457.77);
+        Assert.Equal(2, floor!.Floor);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, -122.89, -3.66, -258.32);
+        Assert.Equal(-1, floor!.Floor);
+
+        Assert.True(InteriorCatalog.ExtractOnFloor(labs, -3.66, -1));
+        Assert.False(InteriorCatalog.ExtractOnFloor(labs, -3.66, 1));
+        Assert.True(InteriorCatalog.ExtractOnFloor(labs, 6.19, 2));
+        Assert.False(InteriorCatalog.ExtractOnFloor(labs, 5.54, -1));
+        var dorms = Load().Single(b => b.Id == "dorms_3story");
+        Assert.True(InteriorCatalog.ExtractOnFloor(dorms, 0, 1));
+        Assert.True(InteriorCatalog.ExtractOnFloor(dorms, 0, 3));
+
+        // Manager lock from the fitted frame lands on the same image point as the SVG.
+        Assert.True(labs.TryUv(-165.25, -349.22, out var u, out var v));
+        Assert.InRange(u, 303.2 / 720 - 0.004, 303.2 / 720 + 0.004);
+        Assert.InRange(v, 361.2 / 586 - 0.004, 361.2 / 586 + 0.004);
+
+        // Red is the small room east of the stair. Violet (R23) is north of it, not the same fill.
+        Assert.True(labs.TryUv(-261.34, -320.07, out var redU, out var redV));
+        Assert.True(labs.TryUv(-274.47, -316.97, out var violetU, out var violetV));
+        Assert.True(violetV < redV - 0.02, $"violet should sit above red, got {violetV} vs {redV}");
+        Assert.InRange(Math.Abs(violetU - redU), 0, 0.08);
     }
 
     [Fact]

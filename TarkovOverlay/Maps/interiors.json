@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "Customs interior floors are crops of Customs.svg by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), the same map as the Customs overview. EFT TarkDev allowed use of the site and its data for this program on 2026-11-04; see Maps/attribution/SOURCE.md. rectXZ x0/z0 is the image top-left and x1/z1 the bottom-right in the overview world frame (coordinateRotation 180). Floor 0 is underground. Dorm room numbers are verified placements in image pixels; only confidence verified is shipped. Stairs stay painted on the raster. Boiler is omitted: Customs.svg has no boiler group.",
+  "source": "Customs interior floors are crops of Customs.svg by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), the same map as the Customs overview. EFT TarkDev allowed use of the site and its data for this program on 2026-11-04; see Maps/attribution/SOURCE.md. rectXZ x0/z0 is the image top-left and x1/z1 the bottom-right in the overview world frame (coordinateRotation 180). Floor 0 is underground. Dorm room numbers are verified placements in image pixels; only confidence verified is shipped. Stairs stay painted on the raster. Boiler is omitted: Customs.svg has no boiler group. The Lab is one underground complex from Labs.svg (same author and licence): there is no outdoor overview. rectXZ uses coordinateRotation 270. Height picks the floor: below -0.9 technical, below 3 first, otherwise second. Locked rooms are painted on the rasters in the keycard color.",
   "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
   "maps": [
     {
@@ -975,6 +975,78 @@
               "image": "repair_shop_f1.png",
               "width": 384,
               "height": 304
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "the-lab",
+      "coordinateRotation": 270,
+      "aliases": [
+        "infectedlab",
+        "laboratory",
+        "laboratorydark",
+        "laboratorydarkpreset",
+        "laboratoryevent",
+        "laboratoryeventpreset",
+        "laboratorypreset",
+        "thelab",
+        "thelabdark"
+      ],
+      "buildings": [
+        {
+          "id": "labs",
+          "name": "The Lab",
+          "nameRu": "Лаборатория",
+          "coversMap": true,
+          "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+          "rectXZ": {
+            "x0": -305.23,
+            "z0": -466.72,
+            "x1": -78.1,
+            "z1": -187.66
+          },
+          "floorByY": [
+            {
+              "below": -0.9,
+              "floor": -1
+            },
+            {
+              "below": 3,
+              "floor": 1
+            },
+            {
+              "floor": 2
+            }
+          ],
+          "floors": [
+            {
+              "floor": -1,
+              "floorKey": "technical",
+              "caption": "T",
+              "tip": "Technical",
+              "image": "labs_technical.png",
+              "width": 2880,
+              "height": 2344
+            },
+            {
+              "floor": 1,
+              "floorKey": "first",
+              "caption": "1",
+              "tip": "First",
+              "image": "labs_first.png",
+              "width": 2880,
+              "height": 2344
+            },
+            {
+              "floor": 2,
+              "floorKey": "second",
+              "caption": "2",
+              "tip": "Second",
+              "image": "labs_second.png",
+              "width": 2880,
+              "height": 2344
             }
           ]
         }

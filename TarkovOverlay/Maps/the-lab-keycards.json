@@ -1,0 +1,114 @@
+{
+  "map": "the-lab",
+  "source": "Labs.svg room fills from the-hideout/tarkov-dev-svg-maps, colored by the keycard that opens the lock. unknown_new has no room fill. Arsenal is the low-confidence room kept from the v1 pack. No admin key lock is published, so none is listed.",
+  "entries": [
+    {
+      "key": "blue",
+      "name": "Blue",
+      "fill": "#2b6cb0",
+      "itemId": "5c1d0c5f86f7744bb2683cf0",
+      "count": 1,
+      "roomFill": true,
+      "tip": "TerraGroup Labs keycard (Blue)"
+    },
+    {
+      "key": "green",
+      "name": "Green",
+      "fill": "#2f855a",
+      "itemId": "5c1d0dc586f7744baf2e7b79",
+      "count": 1,
+      "roomFill": true,
+      "tip": "TerraGroup Labs keycard (Green)"
+    },
+    {
+      "key": "black",
+      "name": "Black",
+      "fill": "#1a1a1a",
+      "itemId": "5c1d0f4986f7744bb01837fa",
+      "count": 4,
+      "roomFill": true,
+      "tip": "TerraGroup Labs keycard (Black)"
+    },
+    {
+      "key": "red",
+      "name": "Red",
+      "fill": "#c53030",
+      "itemId": "5c1d0efb86f7744baf2e7b7b",
+      "count": 1,
+      "roomFill": true,
+      "tip": "TerraGroup Labs keycard (Red)"
+    },
+    {
+      "key": "violet",
+      "name": "Violet",
+      "fill": "#6b46c1",
+      "itemId": "5c1e495a86f7743109743dfb",
+      "count": 1,
+      "roomFill": true,
+      "tip": "TerraGroup Labs keycard (Violet)"
+    },
+    {
+      "key": "yellow",
+      "name": "Yellow",
+      "fill": "#d69e2e",
+      "itemId": "5c1d0d6d86f7744bb2683e1f",
+      "count": 1,
+      "roomFill": true,
+      "tip": "TerraGroup Labs keycard (Yellow)"
+    },
+    {
+      "key": "residential",
+      "name": "Residential",
+      "fill": "#d53f8c",
+      "itemId": "6711039f9e648049e50b3307",
+      "count": 1,
+      "roomFill": true,
+      "tip": "TerraGroup Labs residential unit keycard"
+    },
+    {
+      "key": "blue_marking",
+      "name": "Blue marking",
+      "fill": "#63b3ed",
+      "itemId": "5efde6b4f5448336730dbd61",
+      "count": 1,
+      "roomFill": true,
+      "tip": "Keycard with a blue marking"
+    },
+    {
+      "key": "manager",
+      "name": "Manager",
+      "fill": "#dd6b20",
+      "itemId": "5c1e2a1e86f77431ea0ea84c",
+      "count": 2,
+      "roomFill": true,
+      "tip": "Labs manager's office room key"
+    },
+    {
+      "key": "weapon_testing",
+      "name": "Weapon testing",
+      "fill": "#8b5a2b",
+      "itemId": "5c1e2d1f86f77431e9280bee",
+      "count": 2,
+      "roomFill": true,
+      "tip": "TerraGroup Labs weapon testing area key"
+    },
+    {
+      "key": "arsenal",
+      "name": "Arsenal",
+      "fill": "#319795",
+      "itemId": "5c1f79a086f7746ed066fb8f",
+      "count": 1,
+      "roomFill": true,
+      "tip": "TerraGroup Labs arsenal storage room key. Low confidence: the door sits in a corridor, so the room was picked by hand."
+    },
+    {
+      "key": "unknown_new",
+      "name": "Unknown",
+      "fill": "#a0aec0",
+      "itemId": "6a33c17933cff6b88c08902e",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Unidentified key. Gray marker only, no room fill."
+    }
+  ]
+}

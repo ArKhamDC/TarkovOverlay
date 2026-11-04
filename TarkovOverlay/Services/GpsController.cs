@@ -100,7 +100,8 @@ public sealed class GpsController : IDisposable
     {
         lock (_gate)
         {
-            _interior = InteriorCatalog.RememberFloor(_interior, floor);
+            var y = _fix?.Position.Y ?? double.NaN;
+            _interior = InteriorCatalog.PinFloor(_interiors, _interior, floor, y);
             _sig = "\0";
         }
         Publish();
@@ -357,7 +358,7 @@ public sealed class GpsController : IDisposable
 
         var markers = new List<MapMarker>(shown.Count);
         foreach (var e in shown)
-            markers.Add(new MapMarker(e.X, e.Z, Pick(e.NameEn, e.NameRu), e.Faction ?? "", nearest is not null && ReferenceEquals(e, nearest.Extract)));
+            markers.Add(new MapMarker(e.X, e.Z, Pick(e.NameEn, e.NameRu), e.Faction ?? "", nearest is not null && ReferenceEquals(e, nearest.Extract), e.Y));
 
         var mapName = Pick(map.NameEn, map.NameRu) + (uncertain ? "?" : "");
         var title = nearest is null
@@ -378,7 +379,8 @@ public sealed class GpsController : IDisposable
                 title, null, underlay.Rotation,
                 underlay.MinX, underlay.MaxX, underlay.MinZ, underlay.MaxZ,
                 fix?.Position.X, fix?.Position.Z, heading, markers.ToArray(),
-                underlay.ImagePath, labels, underlay.CompassDegrees, underlay.Credit);
+                underlay.ImagePath, labels, underlay.CompassDegrees, underlay.Credit,
+                Legend: LegendOf(underlay));
         }
 
         var minX = map.MinX;
@@ -411,7 +413,7 @@ public sealed class GpsController : IDisposable
     {
         var onMap = InteriorCatalog.ForMap(_interiors, map);
         var previous = _interior;
-        var (next, building, floor) = InteriorCatalog.Advance(onMap, _interior, fix.Position.X, fix.Position.Z);
+        var (next, building, floor) = InteriorCatalog.Advance(onMap, _interior, fix.Position.X, fix.Position.Y, fix.Position.Z);
         if (next.BuildingId != previous.BuildingId || (next.BuildingId is not null && next.Floor != previous.Floor))
         {
             AppLog.Info(next.BuildingId is null
@@ -424,11 +426,14 @@ public sealed class GpsController : IDisposable
         var inside = new List<MapMarker>();
         foreach (var marker in markers)
         {
-            if (building.Contains(marker.X, marker.Z)) inside.Add(marker);
+            if (!building.Contains(marker.X, marker.Z)) continue;
+            if (!InteriorCatalog.ExtractOnFloor(building, marker.Y, floor.Floor)) continue;
+            inside.Add(marker);
         }
 
-        var name = Pick(building.NameEn, building.NameRu) + (uncertain ? "?" : "");
-        var floorName = InteriorCatalog.FloorCaption(floor.Floor);
+        var name = (building.CoversMap ? Pick(map.NameEn, map.NameRu) : Pick(building.NameEn, building.NameRu))
+                   + (uncertain ? "?" : "");
+        var floorName = string.IsNullOrWhiteSpace(floor.Tip) ? InteriorCatalog.FloorCaption(floor.Floor) : floor.Tip!;
         var title = nearest is null
             ? $"{name} · {floorName}"
             : $"{name} · {floorName} · {Meters((int)Math.Round(nearest.DistanceMeters))} · {Pick(nearest.Extract.NameEn, nearest.Extract.NameRu)}";
@@ -441,8 +446,11 @@ public sealed class GpsController : IDisposable
             building.MinX, building.MaxX, building.MinZ, building.MaxZ,
             fix.Position.X, fix.Position.Z, heading, inside.ToArray(),
             floor.ImagePath, null, underlay?.CompassDegrees ?? double.NaN, building.Credit ?? underlay?.Credit,
-            labels, InteriorCatalog.FloorOptions(building, floor.Floor));
+            labels, InteriorCatalog.FloorOptions(building, floor.Floor), LegendOf(underlay));
     }
+
+    private static MapLegendEntry[]? LegendOf(MapUnderlay? underlay)
+        => underlay is { Keycards.Length: > 0 } ? underlay.Keycards : null;
 
     private static string Sig(GpsHud? hud, MapView? map, bool showMap, bool overlayVisible)
     {

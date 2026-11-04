@@ -4,7 +4,7 @@ using TarkovOverlay.Models;
 
 namespace TarkovOverlay.Services;
 
-/// <summary>One floor raster of a building. Floor 0 is underground; 1 is ground.</summary>
+/// <summary>One floor raster of a building. Floor 0 is underground; 1 is ground. A negative floor is a named level below that.</summary>
 public sealed class InteriorFloor
 {
     public required int Floor { get; init; }
@@ -13,7 +13,19 @@ public sealed class InteriorFloor
     public int Width { get; init; }
     public int Height { get; init; }
     public required InteriorLabel[] Labels { get; init; }
+
+    /// <summary>Short title-bar caption. Null uses <see cref="InteriorCatalog.FloorCaption"/>.</summary>
+    public string? Caption { get; init; }
+
+    /// <summary>Tooltip and map title. Null uses <see cref="InteriorCatalog.FloorTip"/>.</summary>
+    public string? Tip { get; init; }
 }
+
+/// <summary>
+/// First matching band wins. <see cref="Below"/> null matches every remaining height.
+/// Height is world Y from the screenshot name.
+/// </summary>
+public readonly record struct FloorBand(double? Below, int Floor);
 
 /// <summary>Verified caption in floor-image pixels, origin top-left.</summary>
 public sealed class InteriorLabel
@@ -54,6 +66,12 @@ public sealed class InteriorBuilding
     public required InteriorFloor[] Floors { get; init; }
     public string? Credit { get; init; }
 
+    /// <summary>The building is the whole map. The image still uses rectXZ, and the player never returns to a separate outdoor overview.</summary>
+    public bool CoversMap { get; init; }
+
+    /// <summary>When set, height selects the floor unless the player pinned a floor on the current band.</summary>
+    public FloorBand[]? FloorByY { get; init; }
+
     public double MinX => Math.Min(X0, X1);
     public double MaxX => Math.Max(X0, X1);
     public double MinZ => Math.Min(Z0, Z1);
@@ -65,11 +83,14 @@ public sealed class InteriorBuilding
         => WorldMath.TryImageUv(x, z, MinX, MaxX, MinZ, MaxZ, Rotation, out u, out v);
 
     public bool Contains(double x, double z)
-        => TryUv(x, z, out var u, out var v) && u >= -1e-9 && u <= 1 + 1e-9 && v >= -1e-9 && v <= 1 + 1e-9;
+        => CoversMap || (TryUv(x, z, out var u, out var v) && u >= -1e-9 && u <= 1 + 1e-9 && v >= -1e-9 && v <= 1 + 1e-9);
 }
 
-/// <summary>Which building and floor the GPS map is showing. A null building is the overview.</summary>
-public readonly record struct InteriorFix(string? BuildingId, int Floor)
+/// <summary>
+/// Which building and floor the GPS map is showing. A null building is the overview.
+/// <paramref name="LockBand"/> is the altitude band the player pinned a floor against. Null follows height, or the last manual floor when the building has no height rule.
+/// </summary>
+public readonly record struct InteriorFix(string? BuildingId, int Floor, int? LockBand = null)
 {
     public static InteriorFix Overview => new(null, InteriorCatalog.DefaultFloor);
 }
@@ -162,6 +183,8 @@ public static class InteriorCatalog
                     }
 
                     var key = Str(floor, "floorKey");
+                    var caption = Str(floor, "caption");
+                    var tip = Str(floor, "tip");
                     floors.Add(new InteriorFloor
                     {
                         Floor = (int)index.Value,
@@ -169,7 +192,9 @@ public static class InteriorCatalog
                         ImagePath = Path.GetFullPath(file),
                         Width = (int)width.Value,
                         Height = (int)height.Value,
-                        Labels = labels.ToArray()
+                        Labels = labels.ToArray(),
+                        Caption = string.IsNullOrWhiteSpace(caption) ? null : caption,
+                        Tip = string.IsNullOrWhiteSpace(tip) ? null : tip
                     });
                 }
 
@@ -189,7 +214,9 @@ public static class InteriorCatalog
                     Rotation = rotation.Value,
                     Aliases = aliases.ToArray(),
                     Floors = floors.ToArray(),
-                    Credit = Str(building, "credit") ?? credit
+                    Credit = Str(building, "credit") ?? credit,
+                    CoversMap = Bool(building, "coversMap"),
+                    FloorByY = ReadBands(building)
                 });
             }
         }
@@ -243,21 +270,96 @@ public static class InteriorCatalog
     }
 
     /// <summary>
-    /// Entering a building opens floor 1. A floor the player already picked is kept only while they stay in that building.
+    /// Entering a building opens floor 1, or the floor its height rule selects.
+    /// A floor the player already picked is kept only while they stay in that building.
+    /// On a height-ruled building the pin lasts until Y moves into a different band.
     /// Leaving every footprint returns to the overview.
     /// </summary>
     public static (InteriorFix State, InteriorBuilding? Building, InteriorFloor? Floor) Advance(
         IReadOnlyList<InteriorBuilding> onMap, InteriorFix state, double x, double z)
+        => Advance(onMap, state, x, double.NaN, z);
+
+    public static (InteriorFix State, InteriorBuilding? Building, InteriorFloor? Floor) Advance(
+        IReadOnlyList<InteriorBuilding> onMap, InteriorFix state, double x, double y, double z)
     {
         var hit = Hit(onMap, x, z);
         if (hit is null || hit.Floors.Length == 0)
             return (InteriorFix.Overview, null, null);
-        var preferred = hit.Id == state.BuildingId ? state.Floor : DefaultFloor;
-        var floor = SelectFloor(hit, preferred);
-        return (new InteriorFix(hit.Id, floor.Floor), hit, floor);
+
+        var chosen = hit.Id == state.BuildingId ? state.Floor : DefaultFloor;
+        int? held = null;
+        if (hit.FloorByY is { Length: > 0 })
+        {
+            var band = FloorFromAltitude(hit, y);
+            var same = hit.Id == state.BuildingId;
+            if (same && state.LockBand is { } locked && (band is null || band.Value == locked))
+            {
+                chosen = state.Floor;
+                held = locked;
+            }
+            else if (band is { } next)
+            {
+                chosen = next;
+            }
+            else if (same)
+            {
+                chosen = state.Floor;
+                held = state.LockBand;
+            }
+            else
+            {
+                chosen = DefaultFloor;
+            }
+        }
+
+        var floor = SelectFloor(hit, chosen);
+        return (new InteriorFix(hit.Id, floor.Floor, held), hit, floor);
     }
 
     public static InteriorFix RememberFloor(InteriorFix state, int floor) => state with { Floor = floor };
+
+    /// <summary>
+    /// Remember a title-bar floor. Buildings with a height rule pin that choice against the band Y is in now,
+    /// and the next band change follows height again.
+    /// </summary>
+    public static InteriorFix PinFloor(IReadOnlyList<InteriorBuilding> buildings, InteriorFix state, int floor, double y)
+    {
+        if (string.IsNullOrEmpty(state.BuildingId))
+            return state with { Floor = floor };
+        InteriorBuilding? building = null;
+        foreach (var candidate in buildings)
+        {
+            if (candidate.Id != state.BuildingId) continue;
+            building = candidate;
+            break;
+        }
+
+        if (building?.FloorByY is not { Length: > 0 })
+            return state with { Floor = floor, LockBand = null };
+        return new InteriorFix(state.BuildingId, floor, FloorFromAltitude(building, y));
+    }
+
+    /// <summary>Null when <paramref name="y"/> is missing or the building has no height rule.</summary>
+    public static int? FloorFromAltitude(InteriorBuilding building, double y)
+    {
+        var rules = building.FloorByY;
+        if (rules is not { Length: > 0 } || double.IsNaN(y)) return null;
+        foreach (var rule in rules)
+        {
+            if (rule.Below is null || y < rule.Below.Value)
+                return rule.Floor;
+        }
+
+        return rules[^1].Floor;
+    }
+
+    /// <summary>Extracts on a height-ruled building are drawn only on the floor their Y selects. Other buildings show every extract inside the footprint.</summary>
+    public static bool ExtractOnFloor(InteriorBuilding building, double y, int floor)
+    {
+        if (building.FloorByY is not { Length: > 0 }) return true;
+        var band = FloorFromAltitude(building, y);
+        return band is null || band.Value == floor;
+    }
 
     public static MapFloorOption[]? FloorOptions(InteriorBuilding building, int selected)
     {
@@ -265,8 +367,10 @@ public static class InteriorCatalog
         var options = new MapFloorOption[building.Floors.Length];
         for (var i = 0; i < building.Floors.Length; i++)
         {
-            var floor = building.Floors[i].Floor;
-            options[i] = new MapFloorOption(floor, FloorCaption(floor), FloorTip(floor), floor == selected);
+            var floor = building.Floors[i];
+            var caption = string.IsNullOrWhiteSpace(floor.Caption) ? FloorCaption(floor.Floor) : floor.Caption!;
+            var tip = string.IsNullOrWhiteSpace(floor.Tip) ? FloorTip(floor.Floor) : floor.Tip!;
+            options[i] = new MapFloorOption(floor.Floor, caption, tip, floor.Floor == selected);
         }
 
         return options;
@@ -277,6 +381,24 @@ public static class InteriorCatalog
 
     public static string FloorTip(int floor)
         => floor == 0 ? "Underground" : $"Floor {floor}";
+
+    private static FloorBand[]? ReadBands(JsonElement building)
+    {
+        if (!building.TryGetProperty("floorByY", out var bands) || bands.ValueKind != JsonValueKind.Array)
+            return null;
+        var list = new List<FloorBand>();
+        foreach (var band in bands.EnumerateArray())
+        {
+            var floor = Num(band, "floor");
+            if (floor is null) continue;
+            list.Add(new FloorBand(Num(band, "below"), (int)floor.Value));
+        }
+
+        return list.Count == 0 ? null : list.ToArray();
+    }
+
+    private static bool Bool(JsonElement e, string name)
+        => e.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.True;
 
     private static bool VerifiedRoom(JsonElement label)
     {

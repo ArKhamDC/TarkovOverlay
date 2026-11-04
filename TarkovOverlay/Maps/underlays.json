@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Customs ships the tarkov.dev Customs.svg raster by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. Customs extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and the game's own map textures are not licensed for redistribution. The other images are original drawings on those same frames: roads join the published landmark coordinates in the order those places connect, with water and building footprints. Frames were checked against spawn and extract coordinates from json.tarkov.dev. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns. Terminal and Labyrinth have no published road or landmark geometry, so they stay a plain frame.",
+  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Customs ships the tarkov.dev Customs.svg raster by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. The Lab ships Labs.svg from that same project on a fitted frame (tarkov.dev publishes no svgBounds for Labs), with locked rooms painted in the keycard color. Customs extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and the game's own map textures are not licensed for redistribution. Images other than Customs and The Lab are original drawings on those same frames: roads join the published landmark coordinates in the order those places connect, with water and building footprints. Frames were checked against spawn and extract coordinates from json.tarkov.dev. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns. Terminal and Labyrinth have no published road or landmark geometry, so they stay a plain frame.",
   "maps": [
     {
       "id": "customs",
@@ -3300,10 +3300,10 @@
         ]
       ],
       "bounds": {
-        "x0": -80,
-        "z0": -477,
-        "x1": -287,
-        "z1": -193
+        "x0": -305.23,
+        "z0": -466.72,
+        "x1": -78.1,
+        "z1": -187.66
       },
       "aliases": [
         "infectedlab",
@@ -3588,7 +3588,9 @@
         ]
       ],
       "water": [],
-      "ponds": []
+      "ponds": [],
+      "note": "Raster of tarkov.dev Labs.svg (Shebuka), fitted frame x0=-305.23 z0=-466.72 x1=-78.1 z1=-187.66, coordinateRotation 270. publishedBounds is the old interactive frame and is not this image. tarkov.dev has no svgBounds for Labs; the fit lands about 88% of lock positions on room fills, so expect a few metres of error. The image is the first floor with keycard rooms already painted. Extracts come from Maps/the-lab-extracts.json. Keycard colors are Maps/the-lab-keycards.json.",
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0"
     },
     {
       "id": "the-labyrinth",
