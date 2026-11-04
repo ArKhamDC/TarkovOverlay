@@ -23,6 +23,19 @@ The Lab GPS images (`Maps/images/the-lab.png`, `Maps/interiors/labs_*.png`) are 
 - Locked rooms are painted in the keycard color on the floor PNGs. The legend is `Maps/the-lab-keycards.json` (blue, green, black, red, violet, yellow, residential, blue marking, manager, weapon testing, arsenal, unknown). Red and violet are different rooms on the second floor. Arsenal is a low-confidence room and is kept as painted. The unidentified key is a gray marker with no room fill. Native SVG zone fills (olive, blue, cyan) were muted to floor gray and are not keycards.
 - Extract positions: https://json.tarkov.dev/regular/maps (`Maps/the-lab-extracts.json`), English and Russian names from `maps_en` / `maps_ru`. An extract is drawn on the floor its Y selects.
 
+## Factory.svg (tarkov.dev)
+
+The Factory GPS images (`Maps/images/factory.png`, `Maps/interiors/factory_*.png`) are rasters of the tarkov.dev Factory map. Factory is an indoor complex. `factory.png` is the overview, and it is the same picture as the ground floor. Basement, ground, second, and third are the four floor groups from the SVG. Until a position arrives the window shows the overview; after that it stays on the floor plan.
+
+- URL: https://raw.githubusercontent.com/the-hideout/tarkov-dev-svg-maps/master/Factory.svg
+- Also: https://assets.tarkov.dev/maps/svg/Factory.svg · https://tarkov.dev/map/factory
+- Author: Shebuka / [the-hideout/tarkov-dev-svg-maps](https://github.com/the-hideout/tarkov-dev-svg-maps)
+- Licence upstream: [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/), same permission as Customs below.
+- Frame: published bounds `[[77,-64.5],[-65.5,67.4]]`, `coordinateRotation` 90. Image top-left is `x=77, z=67.4` and bottom-right is `x=-65.5, z=-64.5`. `u=(67.4-z)/131.9`, `v=(77-x)/142.5`.
+- Floors follow world Y: below -1 basement, below 3 ground, below 6 second, otherwise third. Title-bar buttons are -1 / 1 / 2 / 3. A button holds until height enters another band. All four floors share this frame, so switching floors does not reset zoom or follow.
+- Locks are door markers. Factory.svg has no `.locked` room fills. The legend is `Maps/factory-keycards.json`: Factory emergency exit key (orange `#ff8c1a`, three doors) and TerraGroup storage room keycard (violet `#b05cff`, one basement door). Stairs stay yellow on the raster and are not a key.
+- Extract positions: https://json.tarkov.dev/regular/maps (`Maps/factory-extracts.json`), English and Russian names from `maps_en` / `maps_ru`. night-factory is an alias of this map. An extract is drawn on the floor its Y selects. Courtyard Gate sits just outside the published frame.
+
 ## Permission
 
 Telegram **EFT TarkDev**, 2026-11-04. The user asked whether they could use the site and its data for their own EFT program. The reply was yes, and asked that a link to the program be sent later. Screenshot: [permission-eft-tarkdev-telegram.png](permission-eft-tarkdev-telegram.png).
@@ -34,12 +47,11 @@ Telegram **EFT TarkDev**, 2026-11-04. The user asked whether they could use the 
 
 ## Other overview rasters
 
-Factory, Woods, Lighthouse, Shoreline, Reserve, Interchange, Streets of Tarkov, Ground Zero, and Terminal use the matching SVG from the same repository, rasterized as the ground overview only (the tarkov.dev base layer, plus any group marked to stay with it). Upper floors are not baked into these images.
+Woods, Lighthouse, Shoreline, Reserve, Interchange, Streets of Tarkov, Ground Zero, and Terminal use the matching SVG from the same repository, rasterized as the ground overview only (the tarkov.dev base layer, plus any group marked to stay with it). Upper floors are not baked into these images. Factory is the separate four-floor pack above, not one of these overviews.
 
-- Factory.svg, Woods.svg, Lighthouse.svg, Shoreline.svg, Reserve.svg, Interchange.svg, StreetsOfTarkov.svg, GroundZero.svg, Terminal.svg at https://github.com/the-hideout/tarkov-dev-svg-maps
+- Woods.svg, Lighthouse.svg, Shoreline.svg, Reserve.svg, Interchange.svg, StreetsOfTarkov.svg, GroundZero.svg, Terminal.svg at https://github.com/the-hideout/tarkov-dev-svg-maps
 - Author and licence: Shebuka / CC BY-NC-SA 4.0, same permission as Customs.
 - Lighthouse, Shoreline, Reserve, Streets of Tarkov, and Terminal use the published tarkov.dev frame. Spawns and extracts sit inside it. Terminal's API list has no extracts.
-- Factory's frame is wider in Z (`z0=-80.81`, `z1=76.94` against published `-64.5` / `67.4`) so Courtyard Gate (west edge) and the eastern player spawns land on the image. Night Factory keeps this image; the extract file is the day list, which includes Gate 2.
 - Woods extends max Z to `455.58` (published `442`) so RUAF Gate is inside the frame.
 - Interchange extends max X to `621.9` (published `598`) so Path to River (Flare) is inside the frame.
 - Ground Zero extends min X to `-121.71` (published `-99`) so Pinewood Basement (Co-Op) is inside the frame. Scav Bunker and UN Roadblock are hundreds of metres off the SVG, so the frame was not grown to reach them. Level 21 uses this same image.
