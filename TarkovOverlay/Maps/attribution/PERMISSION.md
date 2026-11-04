@@ -8,4 +8,4 @@ The user asked, in Russian, whether they could use the tarkov.dev site and its d
 
 Screenshot: [permission-eft-tarkdev-telegram.png](permission-eft-tarkdev-telegram.png)
 
-This covers the Customs.svg raster by Shebuka (`the-hideout/tarkov-dev-svg-maps`, CC BY-NC-SA 4.0) shipped as the Customs GPS underlay, the interior floor crops of that same SVG under `Maps/interiors/`, and extract positions from `https://json.tarkov.dev/regular/maps`. See [SOURCE.md](SOURCE.md).
+This covers the Shebuka rasters from `the-hideout/tarkov-dev-svg-maps` (CC BY-NC-SA 4.0) shipped as GPS underlays: Customs.svg (and its interior floor crops under `Maps/interiors/`), Labs.svg, and the ground overviews Factory, Woods, Lighthouse, Shoreline, Reserve, Interchange, Streets of Tarkov, Ground Zero, and Terminal. Extract positions come from `https://json.tarkov.dev/regular/maps`. See [SOURCE.md](SOURCE.md).

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Customs ships the tarkov.dev Customs.svg raster by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. The Lab ships Labs.svg from that same project on a fitted frame (tarkov.dev publishes no svgBounds for Labs), with locked rooms painted in the keycard color. Customs extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and the game's own map textures are not licensed for redistribution. Images other than Customs and The Lab are original drawings on those same frames: roads join the published landmark coordinates in the order those places connect, with water and building footprints. Frames were checked against spawn and extract coordinates from json.tarkov.dev. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns. Terminal and Labyrinth have no published road or landmark geometry, so they stay a plain frame.",
+  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Overview rasters other than Labyrinth are Shebuka's SVGs from the-hideout/tarkov-dev-svg-maps (CC BY-NC-SA 4.0), ground layer plus groups kept with that layer, used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. The Lab ships Labs.svg from that same project on a fitted frame (tarkov.dev publishes no svgBounds for Labs), with locked rooms painted in the keycard color. Extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and the game's own map textures are not licensed for redistribution. Labyrinth has no SVG in that repo, so it stays an original frame drawing. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns.",
   "maps": [
     {
       "id": "customs",
@@ -506,9 +506,9 @@
       ],
       "bounds": {
         "x0": 77,
-        "z0": -64.5,
+        "z0": -80.81,
         "x1": -65.5,
-        "z1": 67.4
+        "z1": 76.94
       },
       "aliases": [
         "factory",
@@ -780,7 +780,17 @@
       ],
       "water": [],
       "ponds": [],
-      "note": "A few spawns sit a few meters south of the published frame."
+      "note": "Raster of tarkov.dev Factory.svg (Shebuka), overview group Ground_Floor plus groups kept with it. coordinateRotation 90. Extracts are Maps/factory-extracts.json from json.tarkov.dev/regular/maps. Fitted frame x0=77 z0=-80.81 x1=-65.5 z1=76.94. publishedBounds x0=77 z0=-64.5 x1=-65.5 z1=67.4 leaves Courtyard Gate about 1.5 m west of z=67.4 (left edge at this 90 degree rotation) and six player spawns about 9 m east of z=-64.5 (right edge). Those Z edges were extended by 8 m. Night Factory uses this same image. The night API list omits Gate 2; this file is factory4_day.",
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+      "imageAttribution": {
+        "author": "Shebuka",
+        "project": "the-hideout/tarkov-dev-svg-maps",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/Factory.svg",
+        "license": "CC BY-NC-SA 4.0",
+        "permission": "EFT TarkDev Telegram 2026-11-04",
+        "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+        "notes": "attribution/SOURCE.md"
+      }
     },
     {
       "id": "woods",
@@ -801,7 +811,7 @@
         "x0": 646,
         "z0": -914,
         "x1": -761,
-        "z1": 442
+        "z1": 455.58
       },
       "aliases": [
         "woods",
@@ -1037,7 +1047,18 @@
           -470,
           28
         ]
-      ]
+      ],
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+      "imageAttribution": {
+        "author": "Shebuka",
+        "project": "the-hideout/tarkov-dev-svg-maps",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/Woods.svg",
+        "license": "CC BY-NC-SA 4.0",
+        "permission": "EFT TarkDev Telegram 2026-11-04",
+        "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+        "notes": "attribution/SOURCE.md"
+      },
+      "note": "Raster of tarkov.dev Woods.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/woods-extracts.json from json.tarkov.dev/regular/maps. Fitted frame x0=646 z0=-914 x1=-761 z1=455.58. publishedBounds max z is 442. RUAF Gate is about 6 m south of that edge (bottom of this 180 degree frame), so it was extended by 8 m. Every other spawn and extract already sat inside the published frame."
     },
     {
       "id": "lighthouse",
@@ -1311,7 +1332,18 @@
           -356,
           36
         ]
-      ]
+      ],
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+      "imageAttribution": {
+        "author": "Shebuka",
+        "project": "the-hideout/tarkov-dev-svg-maps",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/Lighthouse.svg",
+        "license": "CC BY-NC-SA 4.0",
+        "permission": "EFT TarkDev Telegram 2026-11-04",
+        "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+        "notes": "attribution/SOURCE.md"
+      },
+      "note": "Raster of tarkov.dev Lighthouse.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/lighthouse-extracts.json from json.tarkov.dev/regular/maps. Frame is the published rect x0=515 z0=-998 x1=-545 z1=725. Spawn and extract positions from json.tarkov.dev sit inside it."
     },
     {
       "id": "shoreline",
@@ -1634,7 +1666,18 @@
           -118,
           70
         ]
-      ]
+      ],
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+      "imageAttribution": {
+        "author": "Shebuka",
+        "project": "the-hideout/tarkov-dev-svg-maps",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/Shoreline.svg",
+        "license": "CC BY-NC-SA 4.0",
+        "permission": "EFT TarkDev Telegram 2026-11-04",
+        "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+        "notes": "attribution/SOURCE.md"
+      },
+      "note": "Raster of tarkov.dev Shoreline.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/shoreline-extracts.json from json.tarkov.dev/regular/maps. Frame is the published rect x0=504 z0=-415 x1=-1056 z1=618. Spawn and extract positions from json.tarkov.dev sit inside it."
     },
     {
       "id": "reserve",
@@ -2000,7 +2043,17 @@
       ],
       "water": [],
       "ponds": [],
-      "note": "Frame rotation is the tarkov.dev interactive map (180). json.tarkov.dev coordinateToCardinalRotation for Reserve is 195.209, so compass north is about 15 degrees clockwise of image up."
+      "note": "Raster of tarkov.dev Reserve.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/reserve-extracts.json from json.tarkov.dev/regular/maps. Frame is the published rect x0=289 z0=-293 x1=-303 z1=244. Spawn and extract positions from json.tarkov.dev sit inside it. json.tarkov.dev coordinateToCardinalRotation for Reserve is 195.209, so compass north is about 15 degrees clockwise of image up.",
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+      "imageAttribution": {
+        "author": "Shebuka",
+        "project": "the-hideout/tarkov-dev-svg-maps",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/Reserve.svg",
+        "license": "CC BY-NC-SA 4.0",
+        "permission": "EFT TarkDev Telegram 2026-11-04",
+        "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+        "notes": "attribution/SOURCE.md"
+      }
     },
     {
       "id": "interchange",
@@ -2018,7 +2071,7 @@
         ]
       ],
       "bounds": {
-        "x0": 598,
+        "x0": 621.9,
         "z0": -442,
         "x1": -433,
         "z1": 426
@@ -2579,7 +2632,18 @@
         ]
       ],
       "water": [],
-      "ponds": []
+      "ponds": [],
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+      "imageAttribution": {
+        "author": "Shebuka",
+        "project": "the-hideout/tarkov-dev-svg-maps",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/Interchange.svg",
+        "license": "CC BY-NC-SA 4.0",
+        "permission": "EFT TarkDev Telegram 2026-11-04",
+        "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+        "notes": "attribution/SOURCE.md"
+      },
+      "note": "Raster of tarkov.dev Interchange.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/interchange-extracts.json from json.tarkov.dev/regular/maps. Fitted frame x0=621.9 z0=-442 x1=-433 z1=426. publishedBounds max x is 598. The PMC sniper extract is about 16 m west of that edge (left of this 180 degree frame), so it was extended by 8 m."
     },
     {
       "id": "streets-of-tarkov",
@@ -3072,7 +3136,18 @@
         ]
       ],
       "water": [],
-      "ponds": []
+      "ponds": [],
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+      "imageAttribution": {
+        "author": "Shebuka",
+        "project": "the-hideout/tarkov-dev-svg-maps",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/StreetsOfTarkov.svg",
+        "license": "CC BY-NC-SA 4.0",
+        "permission": "EFT TarkDev Telegram 2026-11-04",
+        "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+        "notes": "attribution/SOURCE.md"
+      },
+      "note": "Raster of tarkov.dev StreetsOfTarkov.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/streets-of-tarkov-extracts.json from json.tarkov.dev/regular/maps. Frame is the published rect x0=323 z0=-295 x1=-280 z1=532. Spawn and extract positions from json.tarkov.dev sit inside it."
     },
     {
       "id": "ground-zero",
@@ -3092,7 +3167,7 @@
       "bounds": {
         "x0": 249,
         "z0": -124,
-        "x1": -99,
+        "x1": -121.71,
         "z1": 364
       },
       "aliases": [
@@ -3282,7 +3357,17 @@
       ],
       "water": [],
       "ponds": [],
-      "note": "East Gate, UN Roadblock, and the co-op exit lie outside this published frame. Spawns and the other extracts sit inside it."
+      "note": "Raster of tarkov.dev GroundZero.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/ground-zero-extracts.json from json.tarkov.dev/regular/maps. Fitted frame x0=249 z0=-124 x1=-121.71 z1=364. publishedBounds min x is -99. Pinewood Basement (Co-Op) is about 15 m east of that edge (right of this 180 degree frame), so it was extended by 8 m. Scav Bunker (API name East Gate) and UN Roadblock are hundreds of metres off this SVG (about 582 m and 429 m). Growing the frame to reach them would shrink the map to a corner, so those two stay in the extract file and off the art. Ground Zero level 21 uses this image; its API rows are the six in-frame extracts without factions. This file is the base Sandbox list.",
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+      "imageAttribution": {
+        "author": "Shebuka",
+        "project": "the-hideout/tarkov-dev-svg-maps",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/GroundZero.svg",
+        "license": "CC BY-NC-SA 4.0",
+        "permission": "EFT TarkDev Telegram 2026-11-04",
+        "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+        "notes": "attribution/SOURCE.md"
+      }
     },
     {
       "id": "the-lab",
@@ -3654,7 +3739,18 @@
       "areas": [],
       "roads": [],
       "water": [],
-      "ponds": []
+      "ponds": [],
+      "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+      "imageAttribution": {
+        "author": "Shebuka",
+        "project": "the-hideout/tarkov-dev-svg-maps",
+        "sourceUrl": "https://assets.tarkov.dev/maps/svg/Terminal.svg",
+        "license": "CC BY-NC-SA 4.0",
+        "permission": "EFT TarkDev Telegram 2026-11-04",
+        "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
+        "notes": "attribution/SOURCE.md"
+      },
+      "note": "Raster of tarkov.dev Terminal.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/terminal-extracts.json from json.tarkov.dev/regular/maps. Frame is the published rect x0=463 z0=-580 x1=-433 z1=475. json.tarkov.dev publishes no Terminal extracts. Player spawns sit inside the frame."
     }
   ]
 }

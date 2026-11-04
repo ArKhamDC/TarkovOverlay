@@ -32,4 +32,17 @@ Telegram **EFT TarkDev**, 2026-11-04. The user asked whether they could use the 
 > Здравствуйте. Да конечно)
 > Обязательно отправьте нам потом ссылку, возможно мы её подключим к нашей программе помощи новичкам!
 
-Other GPS underlays in this project are original drawings on the published tarkov.dev frames, not SVG rasters. Customs and The Lab are the two rasters from tarkov-dev-svg-maps.
+## Other overview rasters
+
+Factory, Woods, Lighthouse, Shoreline, Reserve, Interchange, Streets of Tarkov, Ground Zero, and Terminal use the matching SVG from the same repository, rasterized as the ground overview only (the tarkov.dev base layer, plus any group marked to stay with it). Upper floors are not baked into these images.
+
+- Factory.svg, Woods.svg, Lighthouse.svg, Shoreline.svg, Reserve.svg, Interchange.svg, StreetsOfTarkov.svg, GroundZero.svg, Terminal.svg at https://github.com/the-hideout/tarkov-dev-svg-maps
+- Author and licence: Shebuka / CC BY-NC-SA 4.0, same permission as Customs.
+- Lighthouse, Shoreline, Reserve, Streets of Tarkov, and Terminal use the published tarkov.dev frame. Spawns and extracts sit inside it. Terminal's API list has no extracts.
+- Factory's frame is wider in Z (`z0=-80.81`, `z1=76.94` against published `-64.5` / `67.4`) so Courtyard Gate (west edge) and the eastern player spawns land on the image. Night Factory keeps this image; the extract file is the day list, which includes Gate 2.
+- Woods extends max Z to `455.58` (published `442`) so RUAF Gate is inside the frame.
+- Interchange extends max X to `621.9` (published `598`) so Path to River (Flare) is inside the frame.
+- Ground Zero extends min X to `-121.71` (published `-99`) so Pinewood Basement (Co-Op) is inside the frame. Scav Bunker and UN Roadblock are hundreds of metres off the SVG, so the frame was not grown to reach them. Level 21 uses this same image.
+- Extract positions: https://json.tarkov.dev/regular/maps, English and Russian names from `maps_en` / `maps_ru`, one `Maps/<id>-extracts.json` per map.
+
+Labyrinth has no SVG in that repository. Its underlay stays the original frame drawing.
