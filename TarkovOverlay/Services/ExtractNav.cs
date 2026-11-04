@@ -7,12 +7,15 @@ public static class ExtractNav
     public static bool FactionVisible(string? faction, string? side)
     {
         if (side is not ("pmc" or "scav")) return true;
-        if (string.IsNullOrEmpty(faction) || faction is "shared") return true;
-        return string.Equals(faction, side, StringComparison.OrdinalIgnoreCase);
+        var kind = faction?.Trim().ToLowerInvariant();
+        if (string.IsNullOrEmpty(kind) || kind is "shared") return true;
+        // Map transits are PMC exits. A scav raid does not list them.
+        if (kind is "transit") return side == "pmc";
+        return kind == side;
     }
 
     /// <summary>
-    /// Extracts drawn on the map overview. PMC and shared are the default.
+    /// Extracts drawn on the map overview. PMC, shared, and transits are the default.
     /// A known scav raid shows scav and shared instead. The full list, including the other faction, stays on the map data.
     /// </summary>
     public static bool OverviewVisible(string? faction, string? side)
@@ -20,7 +23,7 @@ public static class ExtractNav
         if (string.Equals(side, "scav", StringComparison.OrdinalIgnoreCase))
             return FactionVisible(faction, "scav");
         var kind = faction?.Trim().ToLowerInvariant();
-        return string.IsNullOrEmpty(kind) || kind is "pmc" or "shared";
+        return string.IsNullOrEmpty(kind) || kind is "pmc" or "shared" or "transit";
     }
 
     public static NearestExtract? Nearest(GameMap map, Vec3 pos, string? side)

@@ -66,6 +66,12 @@ public class GpsTests
         Assert.True(ExtractNav.OverviewVisible("scav", "scav"));
         Assert.True(ExtractNav.OverviewVisible("shared", "scav"));
         Assert.False(ExtractNav.OverviewVisible("pmc", "scav"));
+        Assert.True(ExtractNav.OverviewVisible("transit", null));
+        Assert.True(ExtractNav.OverviewVisible("transit", "pmc"));
+        Assert.False(ExtractNav.OverviewVisible("transit", "scav"));
+        Assert.True(ExtractNav.FactionVisible("transit", "pmc"));
+        Assert.False(ExtractNav.FactionVisible("transit", "scav"));
+        Assert.True(ExtractNav.FactionVisible("PMC", "pmc"));
     }
 
     [Fact]

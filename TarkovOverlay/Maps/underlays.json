@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Overview rasters other than Labyrinth are Shebuka's SVGs from the-hideout/tarkov-dev-svg-maps (CC BY-NC-SA 4.0), used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. Factory ships Factory.svg on the published frame [[77,-64.5],[-65.5,67.4]], coordinateRotation 90: the overview is the ground floor, and basement, second, and third are separate rasters. Ground Zero ships GroundZero.svg on the official frame x0=249 z0=-124 x1=-99 z1=364, with one raster per height band and door locks painted as markers. The Lab ships Labs.svg on a fitted frame (tarkov.dev publishes no svgBounds for Labs), with locked rooms painted in the keycard color. Extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and the game's own map textures are not licensed for redistribution. Labyrinth has no SVG in that repo, so it stays an original frame drawing. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns.",
+  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Overview rasters other than Labyrinth are Shebuka's SVGs from the-hideout/tarkov-dev-svg-maps (CC BY-NC-SA 4.0), used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. Factory ships Factory.svg on the published frame [[77,-64.5],[-65.5,67.4]], coordinateRotation 90: the overview is the ground floor, and basement, second, and third are separate rasters. Ground Zero ships GroundZero.svg on the official frame x0=249 z0=-124 x1=-99 z1=364, with one raster per height band and door locks painted as markers. Woods ships the Woods v1 pack raster of Woods.svg: one ground layer, four door markers, and no floor switch. Max Z is 455.841605 so RUAF Gate sits inside; the SVG pixels stay on the published rect. The Lab ships Labs.svg on a fitted frame (tarkov.dev publishes no svgBounds for Labs), with locked rooms painted in the keycard color. Extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. Woods also ships four transits. MapGenie tiles and the game's own map textures are not licensed for redistribution. Labyrinth has no SVG in that repo, so it stays an original frame drawing. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns.",
   "maps": [
     {
       "id": "customs",
@@ -811,7 +811,7 @@
         "x0": 646,
         "z0": -914,
         "x1": -761,
-        "z1": 455.58
+        "z1": 455.841605
       },
       "aliases": [
         "woods",
@@ -1048,6 +1048,7 @@
           28
         ]
       ],
+      "note": "Raster of tarkov.dev Woods.svg (Shebuka) from the Woods v1 pack, published frame x0=646 z0=-914 x1=-761 z1=442, coordinateRotation 180. Image top-left is that x0/z0. Max Z is 455.841605 so RUAF Gate (published z=447.58) sits inside with a margin; the SVG pixels stay on the original rect and the extra strip is empty. One ground layer for every height: the SVG has no bunker or underground groups, so there is no floor switch. Four door markers are painted (no .locked room fills). Extracts and four transits come from Maps/woods-extracts.json (json.tarkov.dev, UA TarkovOverlay/1.0). Key colors are Maps/woods-keycards.json.",
       "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
       "imageAttribution": {
         "author": "Shebuka",
@@ -1057,8 +1058,7 @@
         "permission": "EFT TarkDev Telegram 2026-11-04",
         "permissionFile": "attribution/permission-eft-tarkdev-telegram.png",
         "notes": "attribution/SOURCE.md"
-      },
-      "note": "Raster of tarkov.dev Woods.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/woods-extracts.json from json.tarkov.dev/regular/maps. Fitted frame x0=646 z0=-914 x1=-761 z1=455.58. publishedBounds max z is 442. RUAF Gate is about 6 m south of that edge (bottom of this 180 degree frame), so it was extended by 8 m. Every other spawn and extract already sat inside the published frame."
+      }
     },
     {
       "id": "lighthouse",

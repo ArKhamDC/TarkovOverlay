@@ -198,7 +198,7 @@ public class MapUnderlayTests
         var maps = Load();
         var expected = new Dictionary<string, (int W, int H, int Extracts)>
         {
-            ["woods"] = (2560, 2492, 20),
+            ["woods"] = (2946, 2870, 24),
             ["lighthouse"] = (1575, 2560, 12),
             ["shoreline"] = (2560, 1695, 19),
             ["reserve"] = (2560, 2322, 11),
@@ -323,6 +323,95 @@ public class MapUnderlayTests
         Assert.Contains("outside the frame", map.Keycards.Single(k => k.Name == "Factory exit").Tip, StringComparison.OrdinalIgnoreCase);
         Assert.Equal("658199aa38c79576a2569e13", map.Keycards.Single(k => k.Name == "Science office").ItemId);
         Assert.DoesNotContain(map.Keycards, k => k.Name.Contains("stairs", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void WoodsRasterUsesThePackFrameAndDoorKeys()
+    {
+        var woods = Load().Single(m => m.Id == "woods");
+        Assert.Equal(180, woods.Rotation);
+        Assert.Equal(180, woods.CompassDegrees);
+        Assert.Equal(-761, woods.MinX);
+        Assert.Equal(646, woods.MaxX);
+        Assert.Equal(-914, woods.MinZ);
+        const double z1 = 455.841605;
+        Assert.Equal(z1, woods.MaxZ, 4);
+        Assert.Contains("Shebuka", woods.Credit);
+        var (width, height) = PngSize(woods.ImagePath);
+        Assert.Equal(2946, width);
+        Assert.Equal(2870, height);
+
+        using (var doc = JsonDocument.Parse(File.ReadAllText(Path.Combine(MapsDir(), "underlays.json"))))
+        {
+            var map = doc.RootElement.GetProperty("maps").EnumerateArray().Single(m => m.GetProperty("id").GetString() == "woods");
+            var published = map.GetProperty("publishedBounds");
+            Assert.Equal(442, published[1][1].GetDouble());
+            Assert.Equal(646, published[0][0].GetDouble());
+        }
+
+        // Published south edge stays on the original raster. The pad below it is empty.
+        var (_, edgeV) = Uv(woods, 0, 442);
+        Assert.Equal(2841.0 / 2870.0, edgeV, 4);
+
+        // Rotation 180: u=(646-x)/1407. ZB-014's door is the magenta marker.
+        Assert.True(WorldMath.TryImageUv(448.62, 65.58, woods.MinX, woods.MaxX, woods.MinZ, woods.MaxZ, woods.Rotation, out var lockU, out var lockV));
+        Assert.Equal((646 - 448.62) / 1407.0, lockU, 4);
+        Assert.InRange(lockU, 0, 1);
+        Assert.InRange(lockV, 0, 1);
+        var (_, shatunV) = Uv(woods, -513.13, -388.48);
+        Assert.True(shatunV < lockV);
+
+        Assert.Equal(24, woods.Extracts.Length);
+        Assert.Equal(20, woods.Extracts.Count(e => e.Faction is "pmc" or "scav" or "shared"));
+        Assert.Equal(4, woods.Extracts.Count(e => e.Faction == "transit"));
+        var gate = woods.Extracts.Single(e => e.NameEn == "RUAF Gate");
+        Assert.Equal("Ворота ВС РФ", gate.NameRu);
+        Assert.Equal("pmc", gate.Faction);
+        Assert.Equal(-142.5, gate.X);
+        Assert.Equal(-2.37, gate.Y, 2);
+        Assert.Equal(447.58, gate.Z);
+        var flare = woods.Extracts.Single(e => e.NameEn == "Power Line Passage (Flare)");
+        Assert.Equal("Проход у ЛЭП (Сигнал)", flare.NameRu);
+        Assert.Equal(-1.75, flare.Y, 2);
+        var bridge = woods.Extracts.Single(e => e.NameEn == "Friendship Bridge (Co-Op)");
+        Assert.Equal("Мост дружбы (Совм.)", bridge.NameRu);
+        Assert.Equal("shared", bridge.Faction);
+        var bunker = woods.Extracts.Single(e => e.NameEn == "Scav Bunker");
+        Assert.Equal("Бункер Диких", bunker.NameRu);
+        Assert.Equal("scav", bunker.Faction);
+        var customs = woods.Extracts.Single(e => e.NameEn == "Transit to Customs");
+        Assert.Equal("Переход на Таможню", customs.NameRu);
+        Assert.Equal("transit", customs.Faction);
+        Assert.Equal("41", customs.Id);
+        foreach (var extract in woods.Extracts)
+        {
+            Assert.False(string.IsNullOrWhiteSpace(extract.NameRu));
+            var (eu, ev) = Uv(woods, extract);
+            Assert.InRange(eu, 0, 1);
+            Assert.InRange(ev, 0, 1);
+            if (extract.NameEn == "RUAF Gate")
+                Assert.True(ev > edgeV, "RUAF Gate sits in the padded strip, past the published edge");
+            else
+                Assert.True(ev <= edgeV + 1e-4, extract.NameEn);
+        }
+
+        Assert.Equal(14, woods.Labels.Length);
+        Assert.Contains(woods.Labels, l => l.Text == "Power Line Passage (Flare)" && l.TextRu == "Проход у ЛЭП (Сигнал)");
+        Assert.Contains(woods.Labels, l => l.Text == "Transit to Factory" && l.TextRu == "Переход на Завод");
+        Assert.Single(woods.Labels, l => l.Text == "UN Roadblock");
+        Assert.Single(woods.Labels, l => l.Text == "Outskirts");
+        Assert.DoesNotContain(woods.Labels, l => l.Text is "Scav Bunker" or "Eastern Rocks" or "Sawmill" or "Cultist Village" or "wood_sniper_exit" or "East Gate");
+
+        Assert.Equal(4, woods.Keycards.Length);
+        Assert.Equal(
+            new[] { "#ff3f3f", "#3f77ff", "#afff3f", "#ff3fe7" },
+            woods.Keycards.Select(k => k.Fill).ToArray());
+        Assert.All(woods.Keycards, k => Assert.False(k.RoomFill));
+        Assert.All(woods.Keycards, k => Assert.Equal(1, k.Count));
+        Assert.Equal("6761a6ccd9bbb27ad703c48a", woods.Keycards.Single(k => k.Name == "Old house room").ItemId);
+        Assert.Equal("6939948dc2ceb9acd7082eb2", woods.Keycards.Single(k => k.Name == "Old house toilet").ItemId);
+        Assert.Equal("664d3db6db5dea2bad286955", woods.Keycards.Single(k => k.Name == "Shatun's hideout").ItemId);
+        Assert.Equal("591afe0186f77431bd616a11", woods.Keycards.Single(k => k.Name == "ZB-014").ItemId);
     }
 
     [Fact]

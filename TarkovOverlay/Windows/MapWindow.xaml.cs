@@ -1079,6 +1079,7 @@ public partial class MapWindow : Window
         "pmc" => PmcBrush,
         "scav" => ScavBrush,
         "shared" => SharedBrush,
+        "transit" => TransitBrush,
         _ => OtherBrush
     };
 
@@ -1093,6 +1094,7 @@ public partial class MapWindow : Window
     private static readonly Brush PmcBrush = Freeze(Color.FromRgb(90, 200, 120));
     private static readonly Brush ScavBrush = Freeze(Color.FromRgb(230, 180, 80));
     private static readonly Brush SharedBrush = Freeze(Color.FromRgb(142, 180, 255));
+    private static readonly Brush TransitBrush = Freeze(Color.FromRgb(255, 154, 60));
     private static readonly Brush OtherBrush = Freeze(Color.FromRgb(200, 205, 210));
     private static readonly Brush QuietBrush = Freeze(Color.FromRgb(230, 180, 70));
     private static readonly Brush LabelBg = Freeze(Color.FromArgb(210, 16, 19, 22));

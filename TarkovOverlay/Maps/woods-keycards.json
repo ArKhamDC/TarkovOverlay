@@ -1,0 +1,42 @@
+{
+  "map": "woods",
+  "source": "Door markers painted on the Woods.svg ground raster, colored by the key from json.tarkov.dev woods locks. Woods.svg defines .locked but no element uses it, so these are markers only. All four locks are on the single ground layer.",
+  "entries": [
+    {
+      "key": "old_house_room",
+      "name": "Old house room",
+      "fill": "#ff3f3f",
+      "itemId": "6761a6ccd9bbb27ad703c48a",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Old house room key. Red door marker on the ground layer. No room fill."
+    },
+    {
+      "key": "old_house_toilet",
+      "name": "Old house toilet",
+      "fill": "#3f77ff",
+      "itemId": "6939948dc2ceb9acd7082eb2",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Old house toilet key. Blue door marker beside the room key. No room fill."
+    },
+    {
+      "key": "shatun",
+      "name": "Shatun's hideout",
+      "fill": "#afff3f",
+      "itemId": "664d3db6db5dea2bad286955",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Shatun's hideout key. Green door marker at the scav village. No room fill."
+    },
+    {
+      "key": "zb014",
+      "name": "ZB-014",
+      "fill": "#ff3fe7",
+      "itemId": "591afe0186f77431bd616a11",
+      "count": 1,
+      "roomFill": false,
+      "tip": "ZB-014 key. Magenta door marker by the ZB-014 extract. No room fill."
+    }
+  ]
+}
