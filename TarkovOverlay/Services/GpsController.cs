@@ -23,6 +23,8 @@ public sealed class GpsController : IDisposable
 
     private List<GameMap> _maps = [];
     private IReadOnlyList<MapUnderlay> _underlays = [];
+    private IReadOnlyList<InteriorBuilding> _interiors = [];
+    private InteriorFix _interior = InteriorFix.Overview;
     private GameMap? _lastMap;
     private ScreenshotFix? _fix;
     private string? _watchFolder;
@@ -47,6 +49,7 @@ public sealed class GpsController : IDisposable
         _map.ApplyPlacement(settings.GpsMapLeft, settings.GpsMapTop, settings.GpsMapWidth, settings.GpsMapHeight, settings.GpsMapOpacity);
         _map.BoundsCommitted += OnBounds;
         _map.UserHid += OnUserHid;
+        _map.FloorSelected += OnFloorSelected;
     }
 
     public void SetOverlayVisible(bool visible)
@@ -93,6 +96,16 @@ public sealed class GpsController : IDisposable
         NotifySettingsChanged();
     }
 
+    private void OnFloorSelected(int floor)
+    {
+        lock (_gate)
+        {
+            _interior = InteriorCatalog.RememberFloor(_interior, floor);
+            _sig = "\0";
+        }
+        Publish();
+    }
+
     private async Task RunAsync(CancellationToken ct)
     {
         try { await _catalog.LoadAsync(ct); }
@@ -106,6 +119,16 @@ public sealed class GpsController : IDisposable
         {
             _underlays = [];
             AppLog.Error("[GPS] не удалось загрузить подложки карт", ex);
+        }
+        try
+        {
+            _interiors = InteriorCatalog.LoadFromAppDirectory();
+            AppLog.Info($"[GPS] интерьеры: {_interiors.Count}");
+        }
+        catch (Exception ex)
+        {
+            _interiors = [];
+            AppLog.Error("[GPS] не удалось загрузить интерьеры", ex);
         }
         lock (_gate) _maps = _catalog.Maps.ToList();
 
@@ -182,12 +205,14 @@ public sealed class GpsController : IDisposable
         {
             _fix = null;
             _lastMap = null;
+            _interior = InteriorFix.Overview;
             _announcedShot = false;
             _nextShot = DateTime.MinValue;
             AppLog.Info("[GPS] рейд завершён");
         }
         else if (!_wasInRaid && inRaid)
         {
+            _interior = InteriorFix.Overview;
             _nextShot = DateTime.MinValue;
             _nextAdopt = DateTime.MinValue;
             AppLog.Info("[GPS] рейд начался");
@@ -310,6 +335,7 @@ public sealed class GpsController : IDisposable
     {
         if (map is null)
         {
+            _interior = InteriorFix.Overview;
             var quiet = L.T("GPS · карта не определена", "GPS · map unknown");
             return new MapView(quiet, quiet, 0, 0, 1, 0, 1, null, null, 0, []);
         }
@@ -338,6 +364,11 @@ public sealed class GpsController : IDisposable
             ? mapName
             : $"{mapName} · {Meters((int)Math.Round(nearest.DistanceMeters))} · {Pick(nearest.Extract.NameEn, nearest.Extract.NameRu)}";
         var heading = fix is null ? 0 : WorldMath.HeadingDegrees(fix.Rotation);
+        if (fix is null)
+            _interior = InteriorFix.Overview;
+        else if (ResolveInterior(map, uncertain, nearest, fix, heading, markers, underlay) is { } interior)
+            return interior;
+
         if (underlay is not null)
         {
             var labels = shipped
@@ -370,13 +401,57 @@ public sealed class GpsController : IDisposable
             fix?.Position.X, fix?.Position.Z, heading, markers.ToArray());
     }
 
+    /// <summary>
+    /// Floor plan when the player is inside a shipped footprint. Overview markers and labels stay on the overview path.
+    /// Extracts that fall inside the footprint are still drawn with the same world projection.
+    /// </summary>
+    private MapView? ResolveInterior(
+        GameMap map, bool uncertain, NearestExtract? nearest, ScreenshotFix fix, double heading,
+        List<MapMarker> markers, MapUnderlay? underlay)
+    {
+        var onMap = InteriorCatalog.ForMap(_interiors, map);
+        var previous = _interior;
+        var (next, building, floor) = InteriorCatalog.Advance(onMap, _interior, fix.Position.X, fix.Position.Z);
+        if (next.BuildingId != previous.BuildingId || (next.BuildingId is not null && next.Floor != previous.Floor))
+        {
+            AppLog.Info(next.BuildingId is null
+                ? "[GPS] интерьер: обзор"
+                : $"[GPS] интерьер: {next.BuildingId} этаж {next.Floor}");
+        }
+        _interior = next;
+        if (building is null || floor is null) return null;
+
+        var inside = new List<MapMarker>();
+        foreach (var marker in markers)
+        {
+            if (building.Contains(marker.X, marker.Z)) inside.Add(marker);
+        }
+
+        var name = Pick(building.NameEn, building.NameRu) + (uncertain ? "?" : "");
+        var floorName = InteriorCatalog.FloorCaption(floor.Floor);
+        var title = nearest is null
+            ? $"{name} · {floorName}"
+            : $"{name} · {floorName} · {Meters((int)Math.Round(nearest.DistanceMeters))} · {Pick(nearest.Extract.NameEn, nearest.Extract.NameRu)}";
+        var labels = new MapImageLabel[floor.Labels.Length];
+        for (var i = 0; i < floor.Labels.Length; i++)
+            labels[i] = floor.Labels[i].ToImage(floor.Width, floor.Height, L.En);
+
+        return new MapView(
+            title, null, building.Rotation,
+            building.MinX, building.MaxX, building.MinZ, building.MaxZ,
+            fix.Position.X, fix.Position.Z, heading, inside.ToArray(),
+            floor.ImagePath, null, underlay?.CompassDegrees ?? double.NaN, building.Credit ?? underlay?.Credit,
+            labels, InteriorCatalog.FloorOptions(building, floor.Floor));
+    }
+
     private static string Sig(GpsHud? hud, MapView? map, bool showMap, bool overlayVisible)
     {
         var h = hud is null ? "-" : $"{hud.HasBearing}|{hud.ArrowDegrees:0.0}|{hud.Meters}|{hud.Primary}|{hud.Secondary}";
         var nearest = map?.Markers.FirstOrDefault(m => m.Nearest)?.Name ?? "";
+        var floor = map?.Floors?.FirstOrDefault(f => f.Selected)?.Caption ?? "";
         var m = map is null
             ? "-"
-            : $"{showMap}|{map.Title}|{map.UnderlayImage}|{map.PlayerX:0.#}|{map.PlayerZ:0.#}|{map.Heading:0.#}|{map.Markers.Length}|{nearest}";
+            : $"{showMap}|{map.Title}|{map.UnderlayImage}|{floor}|{map.PlayerX:0.#}|{map.PlayerZ:0.#}|{map.Heading:0.#}|{map.Markers.Length}|{nearest}|{map.ImageLabels?.Length ?? 0}";
         return (overlayVisible ? "1" : "0") + h + m;
     }
 

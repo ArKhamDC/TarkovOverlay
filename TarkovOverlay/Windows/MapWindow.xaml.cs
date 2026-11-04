@@ -37,6 +37,9 @@ public partial class MapWindow : Window
 
     public event Action<double, double, double, double>? BoundsCommitted;
     public event Action? UserHid;
+    public event Action<int>? FloorSelected;
+
+    private string _floorSig = "";
 
     public MapWindow()
     {
@@ -74,6 +77,7 @@ public partial class MapWindow : Window
     {
         _view = view;
         TitleText.Text = string.IsNullOrWhiteSpace(view?.Title) ? L.T("Карта", "Map") : view!.Title;
+        UpdateFloors(view);
         Draw();
     }
 
@@ -303,14 +307,15 @@ public partial class MapWindow : Window
         Canvas.SetLeft(MapCanvas.Children[^1], fit.OriginX);
         Canvas.SetTop(MapCanvas.Children[^1], fit.OriginY);
 
-            if (underlay is not null)
-            {
-                DrawScale(fit);
-                DrawLabels(view, fit, ToScreen);
-                DrawCredit(view, fit);
-                if (!double.IsNaN(view.CompassDegrees))
-                    DrawNorth(fit, WorldMath.ScreenAngleDegrees(0, 0, view.CompassDegrees, view.Rotation));
-            }
+        if (underlay is not null)
+        {
+            DrawScale(fit);
+            DrawLabels(view, fit, ToScreen);
+            DrawImageLabels(view, fit);
+            DrawCredit(view, fit);
+            if (!double.IsNaN(view.CompassDegrees))
+                DrawNorth(fit, WorldMath.ScreenAngleDegrees(0, 0, view.CompassDegrees, view.Rotation));
+        }
 
         foreach (var marker in view.Markers.OrderBy(m => m.Nearest))
         {
@@ -374,7 +379,7 @@ public partial class MapWindow : Window
     private void DrawScale(MapProjection fit)
     {
         var meters = 100;
-        while (meters > 25 && meters * fit.Scale > fit.UsedW * 0.4) meters /= 2;
+        while (meters > 5 && meters * fit.Scale > fit.UsedW * 0.4) meters /= 2;
         var length = meters * fit.Scale;
         if (length < 8 || fit.UsedH < 36) return;
         var x = fit.OriginX + 10;
@@ -487,6 +492,124 @@ public partial class MapWindow : Window
         }
     }
 
+    private void DrawImageLabels(MapView view, MapProjection fit)
+    {
+        var labels = view.ImageLabels;
+        if (labels is null || labels.Length == 0) return;
+        foreach (var label in labels)
+        {
+            if (string.IsNullOrWhiteSpace(label.Text)) continue;
+            if (label.U < -0.02 || label.U > 1.02 || label.V < -0.02 || label.V > 1.02) continue;
+            var atX = fit.OriginX + label.U * fit.UsedW;
+            var atY = fit.OriginY + label.V * fit.UsedH;
+            var block = new TextBlock
+            {
+                Text = label.Text,
+                Foreground = LabelFg,
+                FontFamily = UiFont,
+                FontSize = 11,
+                FontWeight = FontWeights.SemiBold,
+                IsHitTestVisible = false
+            };
+            block.Measure(new Size(fit.UsedW, fit.UsedH));
+            var x = atX - block.DesiredSize.Width / 2;
+            var y = atY - block.DesiredSize.Height / 2;
+            x = Math.Clamp(x, fit.OriginX + 1, Math.Max(fit.OriginX + 1, fit.OriginX + fit.UsedW - block.DesiredSize.Width - 1));
+            y = Math.Clamp(y, fit.OriginY + 1, Math.Max(fit.OriginY + 1, fit.OriginY + fit.UsedH - block.DesiredSize.Height - 1));
+            var shadow = new TextBlock
+            {
+                Text = label.Text,
+                Foreground = Brushes.Black,
+                FontFamily = UiFont,
+                FontSize = 11,
+                FontWeight = FontWeights.SemiBold,
+                IsHitTestVisible = false
+            };
+            Canvas.SetLeft(shadow, x + 1);
+            Canvas.SetTop(shadow, y + 1);
+            MapCanvas.Children.Add(shadow);
+            Canvas.SetLeft(block, x);
+            Canvas.SetTop(block, y);
+            MapCanvas.Children.Add(block);
+        }
+    }
+
+    private void UpdateFloors(MapView? view)
+    {
+        var floors = view?.Floors;
+        if (floors is null || floors.Length < 2)
+        {
+            _floorSig = "";
+            FloorBar.Children.Clear();
+            FloorBar.Visibility = Visibility.Collapsed;
+            TitleText.Margin = new Thickness(10, 0, 18, 0);
+            return;
+        }
+
+        TitleText.Margin = new Thickness(10, 0, 16 + floors.Length * 30, 0);
+        var sig = string.Join("|", floors.Select(f => f.Selected ? f.Floor + "*" : f.Floor.ToString()));
+        if (sig == _floorSig && FloorBar.Children.Count == floors.Length) return;
+        _floorSig = sig;
+        FloorBar.Children.Clear();
+        foreach (var floor in floors)
+            FloorBar.Children.Add(FloorButton(floor));
+        FloorBar.Visibility = Visibility.Visible;
+    }
+
+    private Border FloorButton(MapFloorOption floor)
+    {
+        var button = new Border
+        {
+            Width = 26,
+            Height = 18,
+            Margin = new Thickness(2, 0, 0, 0),
+            CornerRadius = new CornerRadius(3),
+            Background = floor.Selected ? FloorOn : FloorOff,
+            BorderBrush = floor.Selected ? PmcBrush : FloorEdge,
+            BorderThickness = new Thickness(1),
+            Cursor = Cursors.Hand,
+            ToolTip = floor.Tip,
+            Tag = floor.Floor,
+            Child = new TextBlock
+            {
+                Text = floor.Caption,
+                Foreground = Brushes.White,
+                FontFamily = UiFont,
+                FontSize = 11,
+                FontWeight = FontWeights.SemiBold,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                IsHitTestVisible = false
+            }
+        };
+        button.MouseLeftButtonDown += OnFloorDown;
+        return button;
+    }
+
+    private void OnFloorDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: int floor })
+            FloorSelected?.Invoke(floor);
+        e.Handled = true;
+    }
+
+    /// <summary>
+    /// Wheel events reach this window only when it is focused. The title-bar buttons are the control that
+    /// still works while the game stays in front.
+    /// </summary>
+    private void OnMapWheel(object sender, MouseWheelEventArgs e)
+    {
+        var floors = _view?.Floors;
+        if (floors is null || floors.Length < 2 || e.Delta == 0) return;
+        var ordered = floors.OrderBy(f => f.Floor).ToArray();
+        var index = Array.FindIndex(ordered, f => f.Selected);
+        if (index < 0) index = 0;
+        var next = index + (e.Delta > 0 ? 1 : -1);
+        if ((uint)next < (uint)ordered.Length)
+            FloorSelected?.Invoke(ordered[next].Floor);
+        e.Handled = true;
+    }
+
     private void DrawCredit(MapView view, MapProjection fit)
     {
         if (string.IsNullOrWhiteSpace(view.Credit) || fit.UsedW < 160 || fit.UsedH < 48) return;
@@ -590,6 +713,9 @@ public partial class MapWindow : Window
     private static readonly Brush LabelBg = Freeze(Color.FromArgb(210, 16, 19, 22));
     private static readonly Brush LabelFg = Freeze(Color.FromRgb(236, 232, 214));
     private static readonly Brush FrameStroke = Freeze(Color.FromArgb(50, 255, 255, 255));
+    private static readonly Brush FloorOn = Freeze(Color.FromRgb(28, 64, 42));
+    private static readonly Brush FloorOff = Freeze(Color.FromRgb(32, 36, 40));
+    private static readonly Brush FloorEdge = Freeze(Color.FromArgb(140, 255, 255, 255));
     private static readonly Brush CreditFg = Freeze(Color.FromArgb(180, 236, 232, 214));
     private static readonly FontFamily UiFont = new("Segoe UI");
 

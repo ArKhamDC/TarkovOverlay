@@ -41,10 +41,17 @@ public sealed record MapLabel(double X, double Z, string Text, double Priority, 
         => english || string.IsNullOrWhiteSpace(TextRu) ? Text : TextRu;
 }
 
+/// <summary>Room number (or other verified caption) drawn in floor-image space. U and V run 0–1 from the top-left.</summary>
+public sealed record MapImageLabel(double U, double V, string Text);
+
+/// <summary>Floor button while an interior plan is showing. <paramref name="Caption"/> is the English control label (U, 1, 2, 3).</summary>
+public sealed record MapFloorOption(int Floor, string Caption, string Tip, bool Selected);
+
 /// <summary>
 /// Map window contents. When <paramref name="UnderlayImage"/> is set, the bounds are that image's
 /// world frame and <paramref name="Rotation"/> is its coordinateRotation. Otherwise this is the
-/// extract schematic fitted around the player.
+/// extract schematic fitted around the player. <paramref name="ImageLabels"/> and <paramref name="Floors"/>
+/// are set only for a building floor plan.
 /// </summary>
 public sealed record MapView(
     string Title,
@@ -61,4 +68,6 @@ public sealed record MapView(
     string? UnderlayImage = null,
     MapLabel[]? Labels = null,
     double CompassDegrees = double.NaN,
-    string? Credit = null);
+    string? Credit = null,
+    MapImageLabel[]? ImageLabels = null,
+    MapFloorOption[]? Floors = null);

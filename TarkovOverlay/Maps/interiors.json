@@ -1,0 +1,984 @@
+{
+  "version": 1,
+  "source": "Customs interior floors are crops of Customs.svg by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), the same map as the Customs overview. EFT TarkDev allowed use of the site and its data for this program on 2026-11-04; see Maps/attribution/SOURCE.md. rectXZ x0/z0 is the image top-left and x1/z1 the bottom-right in the overview world frame (coordinateRotation 180). Floor 0 is underground. Dorm room numbers are verified placements in image pixels; only confidence verified is shipped. Stairs stay painted on the raster. Boiler is omitted: Customs.svg has no boiler group.",
+  "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+  "maps": [
+    {
+      "id": "customs",
+      "coordinateRotation": 180,
+      "aliases": [
+        "bigmap",
+        "customs",
+        "customspreset"
+      ],
+      "buildings": [
+        {
+          "id": "dorms_3story",
+          "name": "3-Story Dormitory",
+          "nameRu": "Общежитие 3эт",
+          "rectXZ": {
+            "x0": 201.51,
+            "z0": 144.32,
+            "x1": 164.25,
+            "z1": 191.08
+          },
+          "floors": [
+            {
+              "floor": 1,
+              "floorKey": "f1",
+              "image": "dorms_3story_f1.png",
+              "width": 592,
+              "height": 736,
+              "labels": [
+                {
+                  "text": "101",
+                  "u": 369,
+                  "v": 63,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "103",
+                  "u": 357,
+                  "v": 112,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "105",
+                  "u": 346,
+                  "v": 161,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "102",
+                  "u": 486,
+                  "v": 80,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "104",
+                  "u": 474,
+                  "v": 128,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "106",
+                  "u": 463,
+                  "v": 177,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "107",
+                  "u": 290,
+                  "v": 390,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "108",
+                  "u": 369,
+                  "v": 559,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "109",
+                  "u": 359,
+                  "v": 601,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "110",
+                  "u": 347,
+                  "v": 649,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "114",
+                  "u": 213,
+                  "v": 466,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "116",
+                  "u": 173,
+                  "v": 460,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "118",
+                  "u": 135,
+                  "v": 455,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "111",
+                  "u": 255,
+                  "v": 630,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "112",
+                  "u": 214,
+                  "v": 624,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "113",
+                  "u": 177,
+                  "v": 619,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "115",
+                  "u": 136,
+                  "v": 613,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "117",
+                  "u": 97,
+                  "v": 608,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "119",
+                  "u": 59,
+                  "v": 602,
+                  "kind": "room",
+                  "confidence": "verified"
+                }
+              ]
+            },
+            {
+              "floor": 2,
+              "floorKey": "f2",
+              "image": "dorms_3story_f2.png",
+              "width": 592,
+              "height": 736,
+              "labels": [
+                {
+                  "text": "201",
+                  "u": 368,
+                  "v": 63,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "203",
+                  "u": 356,
+                  "v": 112,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "205",
+                  "u": 344,
+                  "v": 160,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "207",
+                  "u": 334,
+                  "v": 202,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "209",
+                  "u": 323,
+                  "v": 247,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "Overseer",
+                  "u": 304,
+                  "v": 327,
+                  "kind": "overseer",
+                  "confidence": "verified",
+                  "textRu": "Смотритель"
+                },
+                {
+                  "text": "211",
+                  "u": 287,
+                  "v": 397,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "202",
+                  "u": 488,
+                  "v": 80,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "204",
+                  "u": 476,
+                  "v": 128,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "206",
+                  "u": 464,
+                  "v": 177,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "208",
+                  "u": 454,
+                  "v": 219,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "210",
+                  "u": 370,
+                  "v": 559,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "212",
+                  "u": 360,
+                  "v": 601,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "214",
+                  "u": 348,
+                  "v": 650,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "220",
+                  "u": 137,
+                  "v": 455,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "218",
+                  "u": 174,
+                  "v": 460,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "216",
+                  "u": 213,
+                  "v": 466,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "223",
+                  "u": 55,
+                  "v": 602,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "221",
+                  "u": 100,
+                  "v": 608,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "219",
+                  "u": 137,
+                  "v": 613,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "217",
+                  "u": 176,
+                  "v": 619,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "215",
+                  "u": 215,
+                  "v": 624,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "213",
+                  "u": 254,
+                  "v": 629,
+                  "kind": "room",
+                  "confidence": "verified"
+                }
+              ]
+            },
+            {
+              "floor": 3,
+              "floorKey": "f3",
+              "image": "dorms_3story_f3.png",
+              "width": 592,
+              "height": 736,
+              "labels": [
+                {
+                  "text": "301",
+                  "u": 370,
+                  "v": 64,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "303",
+                  "u": 359,
+                  "v": 112,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "305",
+                  "u": 347,
+                  "v": 161,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "307",
+                  "u": 337,
+                  "v": 203,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "309",
+                  "u": 301,
+                  "v": 348,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "311",
+                  "u": 290,
+                  "v": 394,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "313",
+                  "u": 279,
+                  "v": 439,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "315",
+                  "u": 268,
+                  "v": 483,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "316",
+                  "u": 243,
+                  "v": 585,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "314",
+                  "u": 231,
+                  "v": 633,
+                  "kind": "marked",
+                  "confidence": "verified",
+                  "textRu": "Помеченная 314"
+                },
+                {
+                  "text": "302",
+                  "u": 476,
+                  "v": 128,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "304",
+                  "u": 464,
+                  "v": 177,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "306",
+                  "u": 454,
+                  "v": 219,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "308",
+                  "u": 370,
+                  "v": 559,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "310",
+                  "u": 360,
+                  "v": 601,
+                  "kind": "room",
+                  "confidence": "verified"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "dorms_2story",
+          "name": "2-Story Dormitory",
+          "nameRu": "Общежитие 2эт",
+          "rectXZ": {
+            "x0": 243.81,
+            "z0": 127.04,
+            "x1": 218.63,
+            "z1": 173.8
+          },
+          "floors": [
+            {
+              "floor": 1,
+              "floorKey": "f1",
+              "image": "dorms_2story_f1.png",
+              "width": 400,
+              "height": 736,
+              "labels": [
+                {
+                  "text": "102",
+                  "u": 166,
+                  "v": 108,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "104",
+                  "u": 160,
+                  "v": 156,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "106",
+                  "u": 154,
+                  "v": 203,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "101",
+                  "u": 312,
+                  "v": 80,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "103",
+                  "u": 305,
+                  "v": 127,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "105",
+                  "u": 299,
+                  "v": 175,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "107",
+                  "u": 279,
+                  "v": 320,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "108",
+                  "u": 273,
+                  "v": 365,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "109",
+                  "u": 267,
+                  "v": 413,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "114",
+                  "u": 108,
+                  "v": 541,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "113",
+                  "u": 102,
+                  "v": 587,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "110",
+                  "u": 247,
+                  "v": 560,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "111",
+                  "u": 241,
+                  "v": 606,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "112",
+                  "u": 235,
+                  "v": 654,
+                  "kind": "room",
+                  "confidence": "verified"
+                }
+              ]
+            },
+            {
+              "floor": 2,
+              "floorKey": "f2",
+              "image": "dorms_2story_f2.png",
+              "width": 400,
+              "height": 736,
+              "labels": [
+                {
+                  "text": "202",
+                  "u": 166,
+                  "v": 108,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "204",
+                  "u": 160,
+                  "v": 156,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "206",
+                  "u": 154,
+                  "v": 203,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "218",
+                  "u": 121,
+                  "v": 446,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "217",
+                  "u": 115,
+                  "v": 492,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "216",
+                  "u": 108,
+                  "v": 541,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "215",
+                  "u": 102,
+                  "v": 587,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "201",
+                  "u": 312,
+                  "v": 80,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "203",
+                  "u": 306,
+                  "v": 127,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "205",
+                  "u": 300,
+                  "v": 175,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "207",
+                  "u": 293,
+                  "v": 222,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "208",
+                  "u": 287,
+                  "v": 270,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "209",
+                  "u": 280,
+                  "v": 318,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "210",
+                  "u": 274,
+                  "v": 366,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "211",
+                  "u": 268,
+                  "v": 413,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "212",
+                  "u": 248,
+                  "v": 560,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "213",
+                  "u": 242,
+                  "v": 606,
+                  "kind": "room",
+                  "confidence": "verified"
+                },
+                {
+                  "text": "214",
+                  "u": 235,
+                  "v": 654,
+                  "kind": "room",
+                  "confidence": "verified"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "big_red",
+          "name": "Big Red",
+          "nameRu": "Биг Ред",
+          "rectXZ": {
+            "x0": -197.29,
+            "z0": -154.53,
+            "x1": -227.5,
+            "z1": -89.47
+          },
+          "floors": [
+            {
+              "floor": 1,
+              "floorKey": "f1",
+              "image": "big_red_f1.png",
+              "width": 480,
+              "height": 1024
+            },
+            {
+              "floor": 2,
+              "floorKey": "f2",
+              "image": "big_red_f2.png",
+              "width": 480,
+              "height": 1024
+            }
+          ]
+        },
+        {
+          "id": "fortress",
+          "name": "Fortress",
+          "nameRu": "Крепость",
+          "rectXZ": {
+            "x0": 221.65,
+            "z0": -162.66,
+            "x1": 184.39,
+            "z1": -94.55
+          },
+          "floors": [
+            {
+              "floor": 0,
+              "floorKey": "u",
+              "image": "fortress_u.png",
+              "width": 592,
+              "height": 1072
+            },
+            {
+              "floor": 1,
+              "floorKey": "f1",
+              "image": "fortress_f1.png",
+              "width": 592,
+              "height": 1072
+            },
+            {
+              "floor": 2,
+              "floorKey": "f2",
+              "image": "fortress_f2.png",
+              "width": 592,
+              "height": 1072
+            }
+          ]
+        },
+        {
+          "id": "crackhouse",
+          "name": "Crackhouse",
+          "nameRu": "Наркопритон",
+          "rectXZ": {
+            "x0": 93.75,
+            "z0": -170.79,
+            "x1": 72.61,
+            "z1": -141.31
+          },
+          "floors": [
+            {
+              "floor": 1,
+              "floorKey": "f1",
+              "image": "crackhouse_f1.png",
+              "width": 336,
+              "height": 464
+            },
+            {
+              "floor": 2,
+              "floorKey": "f2",
+              "image": "crackhouse_f2.png",
+              "width": 336,
+              "height": 464
+            }
+          ]
+        },
+        {
+          "id": "new_gas",
+          "name": "New Gas Station",
+          "nameRu": "Новая заправка",
+          "rectXZ": {
+            "x0": 422.06,
+            "z0": 17.26,
+            "x1": 405.95,
+            "z1": 44.71
+          },
+          "floors": [
+            {
+              "floor": 1,
+              "floorKey": "f1",
+              "image": "new_gas_f1.png",
+              "width": 256,
+              "height": 432
+            }
+          ]
+        },
+        {
+          "id": "streamer_house",
+          "name": "Streamer House",
+          "nameRu": "Дом стримера",
+          "rectXZ": {
+            "x0": 585.21,
+            "z0": -94.55,
+            "x1": 555.0,
+            "z1": -44.75
+          },
+          "floors": [
+            {
+              "floor": 1,
+              "floorKey": "f1",
+              "image": "streamer_house_f1.png",
+              "width": 480,
+              "height": 784
+            },
+            {
+              "floor": 2,
+              "floorKey": "f2",
+              "image": "streamer_house_f2.png",
+              "width": 480,
+              "height": 784
+            }
+          ]
+        },
+        {
+          "id": "warehouse4",
+          "name": "Warehouse 4 (USEC stash)",
+          "nameRu": "Склад 4",
+          "rectXZ": {
+            "x0": 357.61,
+            "z0": -100.65,
+            "x1": 314.3,
+            "z1": -25.43
+          },
+          "floors": [
+            {
+              "floor": 0,
+              "floorKey": "u",
+              "image": "warehouse4_u.png",
+              "width": 688,
+              "height": 1184
+            },
+            {
+              "floor": 1,
+              "floorKey": "f1",
+              "image": "warehouse4_f1.png",
+              "width": 688,
+              "height": 1184
+            },
+            {
+              "floor": 2,
+              "floorKey": "f2",
+              "image": "warehouse4_f2.png",
+              "width": 688,
+              "height": 1184
+            }
+          ]
+        },
+        {
+          "id": "zb1011_bunker",
+          "name": "ZB-1011 bunker",
+          "nameRu": "Бункер ZB-1011",
+          "rectXZ": {
+            "x0": 636.57,
+            "z0": -141.31,
+            "x1": 597.29,
+            "z1": -118.95
+          },
+          "floors": [
+            {
+              "floor": 0,
+              "floorKey": "u",
+              "image": "zb1011_bunker_u.png",
+              "width": 624,
+              "height": 352
+            },
+            {
+              "floor": 1,
+              "floorKey": "f1",
+              "image": "zb1011_bunker_f1.png",
+              "width": 624,
+              "height": 352
+            },
+            {
+              "floor": 2,
+              "floorKey": "f2",
+              "image": "zb1011_bunker_f2.png",
+              "width": 624,
+              "height": 352
+            }
+          ]
+        },
+        {
+          "id": "depot_zb1012",
+          "name": "Depot / ZB-1012",
+          "nameRu": "Депо / ЗБ-1012",
+          "rectXZ": {
+            "x0": 491.55,
+            "z0": -116.92,
+            "x1": 456.3,
+            "z1": -38.65
+          },
+          "floors": [
+            {
+              "floor": 0,
+              "floorKey": "u",
+              "image": "depot_zb1012_u.png",
+              "width": 560,
+              "height": 1232
+            },
+            {
+              "floor": 1,
+              "floorKey": "f1",
+              "image": "depot_zb1012_f1.png",
+              "width": 560,
+              "height": 1232
+            }
+          ]
+        },
+        {
+          "id": "warehouse3",
+          "name": "Warehouse 3",
+          "nameRu": "Склад 3",
+          "rectXZ": {
+            "x0": 422.06,
+            "z0": -116.92,
+            "x1": 360.63,
+            "z1": -76.26
+          },
+          "floors": [
+            {
+              "floor": 1,
+              "floorKey": "f1",
+              "image": "warehouse3_f1.png",
+              "width": 976,
+              "height": 640
+            }
+          ]
+        },
+        {
+          "id": "repair_shop",
+          "name": "Repair Shop",
+          "nameRu": "Ремонтка",
+          "rectXZ": {
+            "x0": 119.94,
+            "z0": -101.67,
+            "x1": 95.77,
+            "z1": -82.36
+          },
+          "floors": [
+            {
+              "floor": 1,
+              "floorKey": "f1",
+              "image": "repair_shop_f1.png",
+              "width": 384,
+              "height": 304
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
