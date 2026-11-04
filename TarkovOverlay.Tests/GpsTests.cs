@@ -66,6 +66,26 @@ public class GpsTests
         Assert.True(ExtractNav.OverviewVisible("scav", "scav"));
         Assert.True(ExtractNav.OverviewVisible("shared", "scav"));
         Assert.False(ExtractNav.OverviewVisible("pmc", "scav"));
+        Assert.True(ExtractNav.OverviewVisible("transit", null));
+        Assert.True(ExtractNav.OverviewVisible("Transit", "pmc"));
+        Assert.True(ExtractNav.OverviewVisible("transit", "scav"));
+        Assert.False(ExtractNav.FactionVisible("transit", "pmc"));
+        Assert.False(ExtractNav.FactionVisible("transit", "scav"));
+    }
+
+    [Fact]
+    public void TransitStaysOnTheMapAndOffTheArrow()
+    {
+        var map = new GameMap(
+            "lighthouse", "Lighthouse", "maps/lighthouse_preset.bundle", "Lighthouse", "Маяк", 180,
+            -545, 515, -998, 725, ["lighthouse"],
+            [
+                new MapExtract("Armored Train", "Бронепоезд", "shared", 6.27, 13.34, -869.48),
+                new MapExtract("Transit to Shoreline", "Переход на Берег", "transit", -338.35, 17.54, -165.53)
+            ]);
+        var nearest = ExtractNav.Nearest(map, new Vec3(-338, 17, -165), "pmc");
+        Assert.Equal("Armored Train", nearest!.Extract.NameEn);
+        Assert.True(nearest.DistanceMeters > 100);
     }
 
     [Fact]

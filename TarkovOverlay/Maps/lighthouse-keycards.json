@@ -1,0 +1,205 @@
+{
+  "map": "lighthouse",
+  "source": "Door markers from json.tarkov.dev lighthouse locks, colored by key-legend.json in the Lighthouse v1 pack. Lighthouse.svg defines .locked but no element uses it, so these are markers only. Eight locks share the Factory emergency exit key; that grouping is kept as published and may need a raid check. The last four rows are the extract and transit colors painted on the overview, not door keys.",
+  "entries": [
+    {
+      "key": "cold_storage_room_key",
+      "name": "Cold storage room key",
+      "fill": "#ff3f3f",
+      "itemId": "61a6446f4b5f8b70f451b166",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Cold storage room key. Door marker on the ground overview. No room fill."
+    },
+    {
+      "key": "conference_room_key",
+      "name": "Conference room key",
+      "fill": "#3f77ff",
+      "itemId": "62987cb98081af308d7558c8",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Conference room key. Door marker on the ground overview. No room fill."
+    },
+    {
+      "key": "convenience_store_storage_room_key",
+      "name": "Convenience store storage room key",
+      "fill": "#afff3f",
+      "itemId": "61a64428a8c6aa1b795f0ba1",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Convenience store storage room key. Door marker on the ground overview. No room fill."
+    },
+    {
+      "key": "factory_emergency_exit_key",
+      "name": "Factory emergency exit key",
+      "fill": "#ff3fe7",
+      "itemId": "5448ba0b4bdc2d02308b456c",
+      "count": 8,
+      "roomFill": false,
+      "tip": "Factory emergency exit key. Eight published locks share this key. Kept as published; may need a raid check. No room fill."
+    },
+    {
+      "key": "hillside_house_key",
+      "name": "Hillside house key",
+      "fill": "#3fffde",
+      "itemId": "61a6444b8c141d68246e2d2f",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Hillside house key. Door marker on the ground overview. No room fill."
+    },
+    {
+      "key": "leons_hideout_key",
+      "name": "Leon's hideout key",
+      "fill": "#ffa73f",
+      "itemId": "664d3de85f2355673b09aed5",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Leon's hideout key. Door marker on the ground overview. No room fill."
+    },
+    {
+      "key": "lighthouse_island_stash_key",
+      "name": "Lighthouse island stash key",
+      "fill": "#6f3fff",
+      "itemId": "6a8d581fe74010bf70069d83",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Lighthouse island stash key. Door marker on the ground overview. No room fill."
+    },
+    {
+      "key": "merin_car_trunk_key",
+      "name": "Merin car trunk key",
+      "fill": "#48ff3f",
+      "itemId": "61aa5b518f5e7a39b41416e2",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Merin car trunk key. Door marker on the ground overview. No room fill."
+    },
+    {
+      "key": "operating_room_key",
+      "name": "Operating room key",
+      "fill": "#ff3f80",
+      "itemId": "62987da96188c076bc0d8c51",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Operating room key. Door marker on the ground overview. No room fill."
+    },
+    {
+      "key": "police_truck_cabin_key",
+      "name": "Police truck cabin key",
+      "fill": "#3fb7ff",
+      "itemId": "61aa5aed32a4743c3453d319",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Police truck cabin key. Door marker on the ground overview. No room fill."
+    },
+    {
+      "key": "radar_station_commandant_room_key",
+      "name": "Radar station commandant room key",
+      "fill": "#efff3f",
+      "itemId": "62987c658081af308d7558c6",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Radar station commandant room key. Door marker on the ground overview. No room fill."
+    },
+    {
+      "key": "rogue_usec_barrack_key",
+      "name": "Rogue USEC barrack key",
+      "fill": "#d63fff",
+      "itemId": "62a9cb937377a65d7b070cef",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Rogue USEC barrack key. Door marker on the ground overview. No room fill."
+    },
+    {
+      "key": "rogue_usec_stash_key",
+      "name": "Rogue USEC stash key",
+      "fill": "#3fff9e",
+      "itemId": "61a64492ba05ef10d62adcc1",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Rogue USEC stash key. Door marker on the ground overview. No room fill."
+    },
+    {
+      "key": "rogue_usec_workshop_key",
+      "name": "Rogue USEC workshop key",
+      "fill": "#ff663f",
+      "itemId": "61aa81fcb225ac1ead7957c3",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Rogue USEC workshop key. Door marker on the ground overview. No room fill."
+    },
+    {
+      "key": "substation_marked_key",
+      "name": "Substation marked key",
+      "fill": "#3f50ff",
+      "itemId": "62987dfc402c7f69bf010923",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Substation marked key. Door marker on the ground overview. No room fill."
+    },
+    {
+      "key": "usec_cottage_first_safe_key",
+      "name": "USEC cottage first safe key",
+      "fill": "#88ff3f",
+      "itemId": "61aa5b7db225ac1ead7957c1",
+      "count": 1,
+      "roomFill": false,
+      "tip": "USEC cottage first safe key. Door marker on the ground overview. No room fill."
+    },
+    {
+      "key": "usec_cottage_room_key",
+      "name": "USEC cottage room key",
+      "fill": "#ff3fc0",
+      "itemId": "66265d7be65f224b2e17c6aa",
+      "count": 1,
+      "roomFill": false,
+      "tip": "USEC cottage room key. Door marker on the ground overview. No room fill."
+    },
+    {
+      "key": "usec_cottage_second_safe_key",
+      "name": "USEC cottage second safe key",
+      "fill": "#3ff8ff",
+      "itemId": "61aa5ba8018e9821b7368da9",
+      "count": 1,
+      "roomFill": false,
+      "tip": "USEC cottage second safe key. Door marker on the ground overview. No room fill."
+    },
+    {
+      "key": "water_treatment_plant_storage_room_key",
+      "name": "Water treatment plant storage room key",
+      "fill": "#ffce3f",
+      "itemId": "62987e26a77ec735f90a2995",
+      "count": 1,
+      "roomFill": false,
+      "tip": "Water treatment plant storage room key. Door marker on the ground overview. No room fill."
+    },
+    {
+      "key": "pmc_extract",
+      "name": "PMC extract",
+      "fill": "#3ddc5a",
+      "roomFill": false,
+      "tip": "PMC extract circle painted on the Lighthouse overview. Not a door key."
+    },
+    {
+      "key": "scav_extract",
+      "name": "Scav extract",
+      "fill": "#e6e65a",
+      "roomFill": false,
+      "tip": "Scav extract circle painted on the Lighthouse overview. Not a door key."
+    },
+    {
+      "key": "shared_extract",
+      "name": "Shared extract",
+      "fill": "#5ad0e6",
+      "roomFill": false,
+      "tip": "Shared extract circle painted on the Lighthouse overview. Not a door key."
+    },
+    {
+      "key": "transit",
+      "name": "Transit",
+      "fill": "#ff9a3c",
+      "roomFill": false,
+      "tip": "Transit circle painted on the Lighthouse overview. Not a door key."
+    }
+  ]
+}

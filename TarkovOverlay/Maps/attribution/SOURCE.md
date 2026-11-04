@@ -62,6 +62,18 @@ The Reserve GPS images (`Maps/images/reserve.png`, `Maps/interiors/reserve_surfa
 - Locked doors are painted as colored squares (Reserve.svg has no locked-room fills). The legend is `Maps/reserve-keycards.json`: 31 RB keys, 34 locks.
 - Extract positions: https://json.tarkov.dev/regular/maps (`Maps/reserve-extracts.json`), English and Russian names from `maps_en` / `maps_ru`. An extract is drawn on the layer its height and bunker extent select (3 underground, 8 surface).
 
+## Lighthouse.svg (tarkov.dev)
+
+The Lighthouse GPS image (`Maps/images/lighthouse.png`) is the ground-floor raster of the tarkov.dev Lighthouse map. The SVG only has `Ground_Level`, so there is one floor for every height. Water treatment and the rogue camp are not separate interiors.
+
+- URL: https://raw.githubusercontent.com/the-hideout/tarkov-dev-svg-maps/master/Lighthouse.svg
+- Also: https://assets.tarkov.dev/maps/svg/Lighthouse.svg · https://tarkov.dev/map/lighthouse
+- Author: Shebuka / [the-hideout/tarkov-dev-svg-maps](https://github.com/the-hideout/tarkov-dev-svg-maps)
+- Licence upstream: [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/), same permission as Customs below.
+- Frame: published rect `x0=515, z0=-998, x1=-545, z1=725`, `coordinateRotation` 180. tarkov.dev publishes no svgBounds for Lighthouse. Image top-left is `(x0, z0)` and bottom-right is `(x1, z1)`. `u=(515-x)/1060`, `v=(z+998)/1723`.
+- Locks are door markers. Lighthouse.svg defines `.locked` but no element uses it, so there are no room fills. The overview paints 26 markers for 19 keys. Eight of those locks share the Factory emergency exit key. That grouping is kept as published and may need a raid check. The legend is `Maps/lighthouse-keycards.json`: those 19 keys, then the PMC, scav, shared, and transit colors painted on the same picture.
+- Extract positions: https://json.tarkov.dev/regular/maps (`Maps/lighthouse-extracts.json`), English and Russian names from `maps_en` / `maps_ru`, fetched 2026-11-04 with User-Agent `TarkovOverlay/1.0`. 12 extracts plus 4 transits (Shoreline, Reserve, Woods, Icebreaker). Transits stay on the map and are not targets for the extract arrow. The raster also paints the raw captions.
+
 ## Permission
 
 Telegram **EFT TarkDev**, 2026-11-04. The user asked whether they could use the site and its data for their own EFT program. The reply was yes, and asked that a link to the program be sent later. Screenshot: [permission-eft-tarkdev-telegram.png](permission-eft-tarkdev-telegram.png).
@@ -73,11 +85,11 @@ Telegram **EFT TarkDev**, 2026-11-04. The user asked whether they could use the 
 
 ## Other overview rasters
 
-Woods, Lighthouse, Shoreline, Interchange, Streets of Tarkov, and Terminal use the matching SVG from the same repository, rasterized as the ground overview only (the tarkov.dev base layer, plus any group marked to stay with it). Upper floors are not baked into these images. Factory, Ground Zero, and Reserve are the floor packs above, not these overviews.
+Woods, Shoreline, Interchange, Streets of Tarkov, and Terminal use the matching SVG from the same repository, rasterized as the ground overview only (the tarkov.dev base layer, plus any group marked to stay with it). Upper floors are not baked into these images. Factory, Ground Zero, and Reserve are the floor packs above, not these overviews. Lighthouse is the painted ground overview in its own section above, not this plain raster.
 
-- Woods.svg, Lighthouse.svg, Shoreline.svg, Interchange.svg, StreetsOfTarkov.svg, Terminal.svg at https://github.com/the-hideout/tarkov-dev-svg-maps
+- Woods.svg, Shoreline.svg, Interchange.svg, StreetsOfTarkov.svg, Terminal.svg at https://github.com/the-hideout/tarkov-dev-svg-maps
 - Author and licence: Shebuka / CC BY-NC-SA 4.0, same permission as Customs.
-- Lighthouse, Shoreline, Streets of Tarkov, and Terminal use the published tarkov.dev frame. Spawns and extracts sit inside it. Terminal's API list has no extracts.
+- Shoreline, Streets of Tarkov, and Terminal use the published tarkov.dev frame. Spawns and extracts sit inside it. Terminal's API list has no extracts.
 - Woods extends max Z to `455.58` (published `442`) so RUAF Gate is inside the frame.
 - Interchange extends max X to `621.9` (published `598`) so Path to River (Flare) is inside the frame.
 - Extract positions: https://json.tarkov.dev/regular/maps, English and Russian names from `maps_en` / `maps_ru`, one `Maps/<id>-extracts.json` per map.
