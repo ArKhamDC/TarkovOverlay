@@ -489,6 +489,127 @@ public class InteriorTests
         Assert.Empty(InteriorCatalog.Load("{}", dir));
     }
 
+    [Fact]
+    public void ReserveFollowsBunkerExtentsAndKeepsAPinnedLayerUntilTheRuleChanges()
+    {
+        var reserve = Load().Single(b => b.Id == "reserve");
+        Assert.Equal("reserve", reserve.MapId);
+        Assert.True(reserve.CoversMap);
+        Assert.Equal(180, reserve.Rotation);
+        Assert.Equal(289, reserve.X0, 3);
+        Assert.Equal(-274, reserve.Z0, 3);
+        Assert.Equal(-303, reserve.X1, 3);
+        Assert.Equal(272, reserve.Z1, 3);
+        Assert.Equal(1, reserve.OpenFloor);
+        Assert.Null(reserve.FloorByY);
+        Assert.Equal(new[] { 0, 1 }, reserve.Floors.Select(f => f.Floor).ToArray());
+        Assert.Equal(new[] { "U", "S" }, reserve.Floors.Select(f => f.Caption).ToArray());
+        Assert.Equal(new[] { "Underground", "Surface" }, reserve.Floors.Select(f => f.Tip).ToArray());
+        Assert.Contains("Shebuka", reserve.Credit);
+        Assert.NotNull(reserve.BunkerExtents);
+        Assert.Equal(5, reserve.BunkerExtents!.Length);
+        Assert.Equal(7, reserve.BunkerExtents.Sum(e => e.Boxes.Length));
+        Assert.All(reserve.BunkerExtents, e => Assert.Equal(0, e.Floor));
+        Assert.Contains(reserve.BunkerExtents.SelectMany(e => e.Boxes), b => b.Name == "D2");
+        Assert.Contains(reserve.BunkerExtents.SelectMany(e => e.Boxes), b => b.Name == "dome tunnels");
+        Assert.Single(Load(), b => b.MapId == "reserve");
+        Assert.Null(Load().Single(b => b.Id == "dorms_3story").BunkerExtents);
+        Assert.Null(Load().Single(b => b.Id == "labs").BunkerExtents);
+        Assert.Null(Load().Single(b => b.Id == "labs").OpenFloor);
+
+        foreach (var plan in reserve.Floors)
+        {
+            Assert.Empty(plan.Labels);
+            Assert.Equal(2482, plan.Width);
+            Assert.Equal(2283, plan.Height);
+            var (w, h) = PngSize(plan.ImagePath);
+            Assert.Equal(2482, w);
+            Assert.Equal(2283, h);
+        }
+
+        var overview = File.ReadAllBytes(Path.Combine(MapsDir(), "images", "reserve.png"));
+        Assert.Equal(overview, File.ReadAllBytes(reserve.Floors.Single(f => f.Floor == 1).ImagePath));
+        Assert.NotEqual(overview, File.ReadAllBytes(reserve.Floors.Single(f => f.Floor == 0).ImagePath));
+
+        // Storage bunker is closed at its ceiling. The hermetic-door band starts at that same height.
+        Assert.Equal(0, InteriorCatalog.FloorFromRule(reserve, 18, -8, -33));
+        Assert.Equal(0, InteriorCatalog.FloorFromRule(reserve, 128, -100, -208));
+        Assert.Equal(1, InteriorCatalog.FloorFromRule(reserve, 18, -7.27, -33));
+        Assert.Equal(1, InteriorCatalog.FloorFromRule(reserve, 17.999, -8, -100));
+        Assert.Equal(0, InteriorCatalog.FloorFromRule(reserve, 19, -7.27, -196));
+        Assert.Equal(1, InteriorCatalog.FloorFromRule(reserve, 19, -3.2, -170));
+        Assert.Equal(0, InteriorCatalog.FloorFromRule(reserve, -80, -12.0001, 150));
+        Assert.Equal(1, InteriorCatalog.FloorFromRule(reserve, -80, -12, 150));
+        // Dome and the pawn buildings have no floor art. Only the bunker volume under them switches layers.
+        Assert.Equal(1, InteriorCatalog.FloorFromRule(reserve, -8.5, 20, 180));
+        Assert.Equal(0, InteriorCatalog.FloorFromRule(reserve, -8.5, 10, 180));
+        Assert.Equal(1, InteriorCatalog.FloorFromRule(reserve, -165, 2, 57));
+        Assert.Equal(0, InteriorCatalog.FloorFromRule(reserve, -165, -8, 57));
+        Assert.Equal(1, InteriorCatalog.FloorFromRule(reserve, 0, -100, 0));
+        Assert.Null(InteriorCatalog.FloorFromRule(reserve, 0, double.NaN, 0));
+
+        var samples = new (double X, double Y, double Z, int Floor)[]
+        {
+            (140.83, -3.92, -146.25, 1),
+            (-35.26, -5.15, -180.12, 1),
+            (36.53, -5.97, -221.56, 1),
+            (-261.43, -6.34, 48.52, 1),
+            (-9.24, 20.93, 208.43, 1),
+            (40.18, -5.12, 76.45, 1),
+            (-121.48, -17, 172.25, 0),
+            (61.97, -4.43, 134.31, 1),
+            (61.92, -5.26, -190.54, 0),
+            (-127.9, -3.28, -142.59, 1),
+            (120.78, -10.27, -120.35, 0)
+        };
+        Assert.Equal(8, samples.Count(s => s.Floor == 1));
+        Assert.Equal(3, samples.Count(s => s.Floor == 0));
+        foreach (var sample in samples)
+        {
+            Assert.Equal(sample.Floor, InteriorCatalog.FloorFromRule(reserve, sample.X, sample.Y, sample.Z));
+            Assert.True(InteriorCatalog.ExtractOnFloor(reserve, sample.X, sample.Y, sample.Z, sample.Floor));
+            Assert.False(InteriorCatalog.ExtractOnFloor(reserve, sample.X, sample.Y, sample.Z, sample.Floor == 0 ? 1 : 0));
+        }
+
+        var onMap = InteriorCatalog.ForMap(Load(), Game("RezervBase", "reserve", "maps/rezerv_base_preset.bundle"));
+        Assert.Single(onMap);
+
+        var state = InteriorFix.Overview;
+        (state, var building, var floor) = InteriorCatalog.Advance(onMap, state, 140.83, -3.92, -146.25);
+        Assert.Equal("reserve", building!.Id);
+        Assert.Equal(1, floor!.Floor);
+        Assert.Null(state.LockBand);
+        Assert.Equal(new[] { "U", "S" }, InteriorCatalog.FloorOptions(building, 1)!.Select(o => o.Caption).ToArray());
+        Assert.Equal("Surface", InteriorCatalog.FloorOptions(building, 1)!.Single(o => o.Selected).Tip);
+
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 5000, 0, 5000);
+        Assert.Equal(1, floor!.Floor);
+
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, -121.48, -17, 172.25);
+        Assert.Equal(0, floor!.Floor);
+        Assert.Null(state.LockBand);
+
+        state = InteriorCatalog.PinFloor(onMap, state, 1, -121.48, -17, 172.25);
+        Assert.Equal(0, state.LockBand);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, -100, -16, 160);
+        Assert.Equal(1, floor!.Floor);
+        Assert.Equal(0, state.LockBand);
+
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, -9.24, 20.93, 208.43);
+        Assert.Equal(1, floor!.Floor);
+        Assert.Null(state.LockBand);
+
+        state = InteriorCatalog.PinFloor(onMap, state, 0, -9.24, 20.93, 208.43);
+        Assert.Equal(1, state.LockBand);
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 140.83, -3.92, -146.25);
+        Assert.Equal(0, floor!.Floor);
+        Assert.Equal(1, state.LockBand);
+
+        (state, _, floor) = InteriorCatalog.Advance(onMap, state, 61.92, -5.26, -190.54);
+        Assert.Equal(0, floor!.Floor);
+        Assert.Null(state.LockBand);
+    }
+
     private static IReadOnlyList<InteriorBuilding> For(string nameId, string normalized, string scene)
         => InteriorCatalog.ForMap(Load(), Game(nameId, normalized, scene));
 

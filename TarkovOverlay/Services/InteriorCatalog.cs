@@ -27,6 +27,35 @@ public sealed class InteriorFloor
 /// </summary>
 public readonly record struct FloorBand(double? Below, int Floor);
 
+/// <summary>XZ footprint of one bunker volume. Corners are opposite; order does not matter.</summary>
+public readonly record struct BunkerBox(double X0, double Z0, double X1, double Z1, string? Name)
+{
+    public bool Contains(double x, double z)
+        => x >= Math.Min(X0, X1) && x <= Math.Max(X0, X1)
+           && z >= Math.Min(Z0, Z1) && z <= Math.Max(Z0, Z1);
+}
+
+/// <summary>
+/// One tarkov.dev Bunkers extent. Height is half-open: <c>Y0 &lt;= y &lt; Y1</c>.
+/// Any box in that band selects <see cref="Floor"/>.
+/// </summary>
+public sealed class BunkerExtent
+{
+    public double Y0 { get; init; }
+    public double Y1 { get; init; }
+    public int Floor { get; init; }
+    public required BunkerBox[] Boxes { get; init; }
+
+    public bool Contains(double x, double y, double z)
+    {
+        if (double.IsNaN(x) || double.IsNaN(y) || double.IsNaN(z)) return false;
+        if (!(y >= Y0 && y < Y1)) return false;
+        foreach (var box in Boxes)
+            if (box.Contains(x, z)) return true;
+        return false;
+    }
+}
+
 /// <summary>Verified caption in floor-image pixels, origin top-left.</summary>
 public sealed class InteriorLabel
 {
@@ -72,6 +101,15 @@ public sealed class InteriorBuilding
     /// <summary>When set, height selects the floor unless the player pinned a floor on the current band.</summary>
     public FloorBand[]? FloorByY { get; init; }
 
+    /// <summary>
+    /// Tarkov.dev Bunkers volumes. A position inside any volume uses that extent's floor.
+    /// Everywhere else uses <see cref="OpenFloor"/>. Null when this building is not split that way.
+    /// </summary>
+    public BunkerExtent[]? BunkerExtents { get; init; }
+
+    /// <summary>Floor used when <see cref="BunkerExtents"/> is set and the position matches none of them.</summary>
+    public int? OpenFloor { get; init; }
+
     public double MinX => Math.Min(X0, X1);
     public double MaxX => Math.Max(X0, X1);
     public double MinZ => Math.Min(Z0, Z1);
@@ -88,7 +126,9 @@ public sealed class InteriorBuilding
 
 /// <summary>
 /// Which building and floor the GPS map is showing. A null building is the overview.
-/// <paramref name="LockBand"/> is the altitude band the player pinned a floor against. Null follows height, or the last manual floor when the building has no height rule.
+/// <paramref name="LockBand"/> is the floor the building's rule selected when the player pinned a choice.
+/// Null follows the rule, or the last manual floor when the building has no rule.
+/// The pin lasts until that rule selects a different floor.
 /// </summary>
 public readonly record struct InteriorFix(string? BuildingId, int Floor, int? LockBand = null)
 {
@@ -216,7 +256,9 @@ public static class InteriorCatalog
                     Floors = floors.ToArray(),
                     Credit = Str(building, "credit") ?? credit,
                     CoversMap = Bool(building, "coversMap"),
-                    FloorByY = ReadBands(building)
+                    FloorByY = ReadBands(building),
+                    BunkerExtents = ReadBunkers(building, out var openFloor),
+                    OpenFloor = openFloor
                 });
             }
         }
@@ -288,9 +330,9 @@ public static class InteriorCatalog
 
         var chosen = hit.Id == state.BuildingId ? state.Floor : DefaultFloor;
         int? held = null;
-        if (hit.FloorByY is { Length: > 0 })
+        if (HasFloorRule(hit))
         {
-            var band = FloorFromAltitude(hit, y);
+            var band = FloorFromRule(hit, x, y, z);
             var same = hit.Id == state.BuildingId;
             if (same && state.LockBand is { } locked && (band is null || band.Value == locked))
             {
@@ -323,6 +365,13 @@ public static class InteriorCatalog
     /// and the next band change follows height again.
     /// </summary>
     public static InteriorFix PinFloor(IReadOnlyList<InteriorBuilding> buildings, InteriorFix state, int floor, double y)
+        => PinFloor(buildings, state, floor, double.NaN, y, double.NaN);
+
+    /// <summary>
+    /// Remember a title-bar floor against the rule's current result.
+    /// Height rules use Y. Bunker rules use the full position. The next time the rule selects a different floor, it wins.
+    /// </summary>
+    public static InteriorFix PinFloor(IReadOnlyList<InteriorBuilding> buildings, InteriorFix state, int floor, double x, double y, double z)
     {
         if (string.IsNullOrEmpty(state.BuildingId))
             return state with { Floor = floor };
@@ -334,9 +383,9 @@ public static class InteriorCatalog
             break;
         }
 
-        if (building?.FloorByY is not { Length: > 0 })
+        if (building is null || !HasFloorRule(building))
             return state with { Floor = floor, LockBand = null };
-        return new InteriorFix(state.BuildingId, floor, FloorFromAltitude(building, y));
+        return new InteriorFix(state.BuildingId, floor, FloorFromRule(building, x, y, z));
     }
 
     /// <summary>Null when <paramref name="y"/> is missing or the building has no height rule.</summary>
@@ -353,6 +402,23 @@ public static class InteriorCatalog
         return rules[^1].Floor;
     }
 
+    /// <summary>
+    /// Floor the building's rule selects. Bunker extents win over height bands.
+    /// Null when the position is incomplete or the building has no rule.
+    /// </summary>
+    public static int? FloorFromRule(InteriorBuilding building, double x, double y, double z)
+    {
+        if (building.BunkerExtents is { Length: > 0 } && building.OpenFloor is int open)
+        {
+            if (double.IsNaN(x) || double.IsNaN(y) || double.IsNaN(z)) return null;
+            foreach (var extent in building.BunkerExtents)
+                if (extent.Contains(x, y, z)) return extent.Floor;
+            return open;
+        }
+
+        return FloorFromAltitude(building, y);
+    }
+
     /// <summary>Extracts on a height-ruled building are drawn only on the floor their Y selects. Other buildings show every extract inside the footprint.</summary>
     public static bool ExtractOnFloor(InteriorBuilding building, double y, int floor)
     {
@@ -360,6 +426,25 @@ public static class InteriorCatalog
         var band = FloorFromAltitude(building, y);
         return band is null || band.Value == floor;
     }
+
+    /// <summary>
+    /// Height-ruled buildings use Y. Bunker-ruled buildings use the full position:
+    /// an extract is drawn only on the floor its extent selects.
+    /// </summary>
+    public static bool ExtractOnFloor(InteriorBuilding building, double x, double y, double z, int floor)
+    {
+        if (building.BunkerExtents is { Length: > 0 } && building.OpenFloor is not null)
+        {
+            var band = FloorFromRule(building, x, y, z);
+            return band is null || band.Value == floor;
+        }
+
+        return ExtractOnFloor(building, y, floor);
+    }
+
+    private static bool HasFloorRule(InteriorBuilding building)
+        => building.FloorByY is { Length: > 0 }
+           || (building.BunkerExtents is { Length: > 0 } && building.OpenFloor is not null);
 
     public static MapFloorOption[]? FloorOptions(InteriorBuilding building, int selected)
     {
@@ -395,6 +480,50 @@ public static class InteriorCatalog
         }
 
         return list.Count == 0 ? null : list.ToArray();
+    }
+
+    private static BunkerExtent[]? ReadBunkers(JsonElement building, out int? openFloor)
+    {
+        openFloor = null;
+        if (!building.TryGetProperty("bunkerExtents", out var node) || node.ValueKind != JsonValueKind.Array)
+            return null;
+        var open = Num(building, "openFloor");
+        if (open is null) return null;
+
+        var list = new List<BunkerExtent>();
+        foreach (var extent in node.EnumerateArray())
+        {
+            var y0 = Num(extent, "y0");
+            var y1 = Num(extent, "y1");
+            var floor = Num(extent, "floor");
+            if (y0 is null || y1 is null || floor is null) continue;
+            if (!extent.TryGetProperty("boxes", out var boxes) || boxes.ValueKind != JsonValueKind.Array)
+                continue;
+
+            var boxList = new List<BunkerBox>();
+            foreach (var box in boxes.EnumerateArray())
+            {
+                var x0 = Num(box, "x0");
+                var z0 = Num(box, "z0");
+                var x1 = Num(box, "x1");
+                var z1 = Num(box, "z1");
+                if (x0 is null || z0 is null || x1 is null || z1 is null) continue;
+                boxList.Add(new BunkerBox(x0.Value, z0.Value, x1.Value, z1.Value, Str(box, "name")));
+            }
+
+            if (boxList.Count == 0) continue;
+            list.Add(new BunkerExtent
+            {
+                Y0 = y0.Value,
+                Y1 = y1.Value,
+                Floor = (int)floor.Value,
+                Boxes = boxList.ToArray()
+            });
+        }
+
+        if (list.Count == 0) return null;
+        openFloor = (int)open.Value;
+        return list.ToArray();
     }
 
     private static bool Bool(JsonElement e, string name)

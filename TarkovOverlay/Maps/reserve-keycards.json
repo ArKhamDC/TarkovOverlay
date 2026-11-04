@@ -1,0 +1,285 @@
+{
+  "map": "reserve",
+  "source": "Reserve.svg has no locked-room groups. 34 door locks from json.tarkov.dev/regular/maps (UA TarkovOverlay/1.0, 2026-11-04) are painted as colored squares on the floor that bunkerExtents selects. 31 RB keys. Colors are one hue per key.",
+  "entries": [
+    {
+      "key": "5d80c60f86f77440373c4ece",
+      "name": "RB-BK marked key",
+      "fill": "#ff3f3f",
+      "itemId": "5d80c60f86f77440373c4ece",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-BK marked key"
+    },
+    {
+      "key": "5d80c62a86f7744036212b3f",
+      "name": "RB-VO marked key",
+      "fill": "#ff643f",
+      "itemId": "5d80c62a86f7744036212b3f",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-VO marked key"
+    },
+    {
+      "key": "5d80c66d86f774405611c7d6",
+      "name": "RB-AO key",
+      "fill": "#ff893f",
+      "itemId": "5d80c66d86f774405611c7d6",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-AO key"
+    },
+    {
+      "key": "5d80c6c586f77440351beef1",
+      "name": "RB-OB key",
+      "fill": "#ffae3f",
+      "itemId": "5d80c6c586f77440351beef1",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-OB key"
+    },
+    {
+      "key": "5d80c6fc86f774403a401e3c",
+      "name": "RB-TB key",
+      "fill": "#ffd33f",
+      "itemId": "5d80c6fc86f774403a401e3c",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-TB key"
+    },
+    {
+      "key": "5d80c78786f774403a401e3e",
+      "name": "RB-AK key",
+      "fill": "#fff83f",
+      "itemId": "5d80c78786f774403a401e3e",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-AK key"
+    },
+    {
+      "key": "5d80c88d86f77440556dbf07",
+      "name": "RB-AM key",
+      "fill": "#e0ff3f",
+      "itemId": "5d80c88d86f77440556dbf07",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-AM key"
+    },
+    {
+      "key": "5d80c8f586f77440373c4ed0",
+      "name": "RB-OP key",
+      "fill": "#bbff3f",
+      "itemId": "5d80c8f586f77440373c4ed0",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-OP key"
+    },
+    {
+      "key": "5d80c93086f7744036212b41",
+      "name": "RB-MP11 key",
+      "fill": "#96ff3f",
+      "itemId": "5d80c93086f7744036212b41",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-MP11 key"
+    },
+    {
+      "key": "5d80c95986f77440351beef3",
+      "name": "RB-MP12 key",
+      "fill": "#71ff3f",
+      "itemId": "5d80c95986f77440351beef3",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-MP12 key"
+    },
+    {
+      "key": "5d80ca9086f774403a401e40",
+      "name": "RB-MP21 key",
+      "fill": "#4cff3f",
+      "itemId": "5d80ca9086f774403a401e40",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-MP21 key"
+    },
+    {
+      "key": "5d80cab086f77440535be201",
+      "name": "RB-MP22 key",
+      "fill": "#3fff58",
+      "itemId": "5d80cab086f77440535be201",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-MP22 key"
+    },
+    {
+      "key": "5d80cb3886f77440556dbf09",
+      "name": "RB-PSP1 key",
+      "fill": "#3fff7d",
+      "itemId": "5d80cb3886f77440556dbf09",
+      "count": 2,
+      "roomFill": true,
+      "tip": "RB-PSP1 key"
+    },
+    {
+      "key": "5d80cb5686f77440545d1286",
+      "name": "RB-PSV1 key",
+      "fill": "#3fffa2",
+      "itemId": "5d80cb5686f77440545d1286",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-PSV1 key"
+    },
+    {
+      "key": "5d80cbd886f77470855c26c2",
+      "name": "RB-MP13 key",
+      "fill": "#3fffc7",
+      "itemId": "5d80cbd886f77470855c26c2",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-MP13 key"
+    },
+    {
+      "key": "5d80ccac86f77470841ff452",
+      "name": "RB-ORB1 key",
+      "fill": "#3fffec",
+      "itemId": "5d80ccac86f77470841ff452",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-ORB1 key"
+    },
+    {
+      "key": "5d80ccdd86f77474f7575e02",
+      "name": "RB-ORB2 key",
+      "fill": "#3fecff",
+      "itemId": "5d80ccdd86f77474f7575e02",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-ORB2 key"
+    },
+    {
+      "key": "5d80cd1a86f77402aa362f42",
+      "name": "RB-ORB3 key",
+      "fill": "#3fc7ff",
+      "itemId": "5d80cd1a86f77402aa362f42",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-ORB3 key"
+    },
+    {
+      "key": "5d8e0db586f7744450412a42",
+      "name": "RB-KORL key",
+      "fill": "#3fa2ff",
+      "itemId": "5d8e0db586f7744450412a42",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-KORL key"
+    },
+    {
+      "key": "5d8e0e0e86f774321140eb56",
+      "name": "RB-KPRL key",
+      "fill": "#3f7dff",
+      "itemId": "5d8e0e0e86f774321140eb56",
+      "count": 2,
+      "roomFill": true,
+      "tip": "RB-KPRL key"
+    },
+    {
+      "key": "5d8e3ecc86f774414c78d05e",
+      "name": "RB-GN key",
+      "fill": "#3f58ff",
+      "itemId": "5d8e3ecc86f774414c78d05e",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-GN key"
+    },
+    {
+      "key": "5d947d3886f774447b415893",
+      "name": "RB-SMP key",
+      "fill": "#4c3fff",
+      "itemId": "5d947d3886f774447b415893",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-SMP key"
+    },
+    {
+      "key": "5d947d4e86f774447b415895",
+      "name": "RB-KSM key",
+      "fill": "#713fff",
+      "itemId": "5d947d4e86f774447b415895",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-KSM key"
+    },
+    {
+      "key": "5d95d6be86f77424444eb3a7",
+      "name": "RB-PSV2 key",
+      "fill": "#963fff",
+      "itemId": "5d95d6be86f77424444eb3a7",
+      "count": 2,
+      "roomFill": true,
+      "tip": "RB-PSV2 key"
+    },
+    {
+      "key": "5d95d6fa86f77424484aa5e9",
+      "name": "RB-PSP2 key",
+      "fill": "#bb3fff",
+      "itemId": "5d95d6fa86f77424484aa5e9",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-PSP2 key"
+    },
+    {
+      "key": "5d9f1fa686f774726974a992",
+      "name": "RB-ST key",
+      "fill": "#e03fff",
+      "itemId": "5d9f1fa686f774726974a992",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-ST key"
+    },
+    {
+      "key": "5da46e3886f774653b7a83fe",
+      "name": "RB-RS key",
+      "fill": "#ff3ff8",
+      "itemId": "5da46e3886f774653b7a83fe",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-RS key"
+    },
+    {
+      "key": "5da5cdcd86f774529238fb9b",
+      "name": "RB-RH key",
+      "fill": "#ff3fd3",
+      "itemId": "5da5cdcd86f774529238fb9b",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-RH key"
+    },
+    {
+      "key": "5ede7a8229445733cb4c18e2",
+      "name": "RB-PKPM marked key",
+      "fill": "#ff3fae",
+      "itemId": "5ede7a8229445733cb4c18e2",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-PKPM marked key"
+    },
+    {
+      "key": "5ede7b0c6d23e5473e6e8c66",
+      "name": "RB-RLSA key",
+      "fill": "#ff3f89",
+      "itemId": "5ede7b0c6d23e5473e6e8c66",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-RLSA key"
+    },
+    {
+      "key": "68e9654d72488961110dbf69",
+      "name": "RB-PKPTS key",
+      "fill": "#ff3f64",
+      "itemId": "68e9654d72488961110dbf69",
+      "count": 1,
+      "roomFill": true,
+      "tip": "RB-PKPTS key"
+    }
+  ]
+}

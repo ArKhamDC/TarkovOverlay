@@ -201,7 +201,7 @@ public class MapUnderlayTests
             ["woods"] = (2560, 2492, 20),
             ["lighthouse"] = (1575, 2560, 12),
             ["shoreline"] = (2560, 1695, 19),
-            ["reserve"] = (2560, 2322, 11),
+            ["reserve"] = (2482, 2283, 11),
             ["interchange"] = (2560, 2106, 9),
             ["streets-of-tarkov"] = (1867, 2560, 19),
             ["terminal"] = (2174, 2560, 0),
@@ -323,6 +323,63 @@ public class MapUnderlayTests
         Assert.Contains("outside the frame", map.Keycards.Single(k => k.Name == "Factory exit").Tip, StringComparison.OrdinalIgnoreCase);
         Assert.Equal("658199aa38c79576a2569e13", map.Keycards.Single(k => k.Name == "Science office").ItemId);
         Assert.DoesNotContain(map.Keycards, k => k.Name.Contains("stairs", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void ReserveRasterUsesSvgBoundsAndRbKeys()
+    {
+        var reserve = Load().Single(m => m.Id == "reserve");
+        Assert.Equal(180, reserve.Rotation);
+        Assert.Equal(195.209, reserve.CompassDegrees, 3);
+        Assert.Equal(-303, reserve.MinX, 3);
+        Assert.Equal(289, reserve.MaxX, 3);
+        Assert.Equal(-274, reserve.MinZ, 3);
+        Assert.Equal(272, reserve.MaxZ, 3);
+        Assert.Contains("Shebuka", reserve.Credit);
+        var (width, height) = PngSize(reserve.ImagePath);
+        Assert.Equal(2482, width);
+        Assert.Equal(2283, height);
+
+        Assert.Equal(11, reserve.Extracts.Length);
+        var train = reserve.Extracts.Single(e => e.NameEn == "Armored Train");
+        Assert.Equal("Бронепоезд", train.NameRu);
+        Assert.Equal("shared", train.Faction);
+        Assert.Equal(140.83, train.X, 2);
+        var d2 = reserve.Extracts.Single(e => e.NameEn == "D-2");
+        Assert.Equal("Д-2", d2.NameRu);
+        Assert.Equal("pmc", d2.Faction);
+        Assert.Equal(-17, d2.Y, 2);
+        var hermetic = reserve.Extracts.Single(e => e.NameEn == "Bunker Hermetic Door");
+        Assert.Equal("Гермозатвор бункера", hermetic.NameRu);
+        Assert.Equal("shared", hermetic.Faction);
+        var depot = reserve.Extracts.Single(e => e.NameEn == "Depot Hermetic Door");
+        Assert.Equal("Гермодверь к депо", depot.NameRu);
+        Assert.Equal("scav", depot.Faction);
+        var cliff = reserve.Extracts.Single(e => e.NameEn == "Cliff Descent");
+        Assert.Equal("Спуск со скалы", cliff.NameRu);
+        Assert.Equal("pmc", cliff.Faction);
+        foreach (var extract in reserve.Extracts)
+        {
+            Assert.False(string.IsNullOrWhiteSpace(extract.NameRu));
+            Assert.True(WorldMath.TryImageUv(extract.X, extract.Z, reserve.MinX, reserve.MaxX, reserve.MinZ, reserve.MaxZ, reserve.Rotation, out var u, out var v), extract.NameEn);
+            Assert.InRange(u, 0, 1);
+            Assert.InRange(v, 0, 1);
+        }
+
+        Assert.Equal(31, reserve.Keycards.Length);
+        Assert.Equal(34, reserve.Keycards.Sum(k => k.Count));
+        Assert.Equal(31, reserve.Keycards.Select(k => k.Fill).Distinct().Count());
+        Assert.All(reserve.Keycards, k =>
+        {
+            Assert.StartsWith("RB-", k.Name);
+            Assert.True(k.RoomFill);
+            Assert.Matches("^#[0-9a-f]{6}$", k.Fill);
+            Assert.False(string.IsNullOrWhiteSpace(k.ItemId));
+        });
+        Assert.Equal(2, reserve.Keycards.Single(k => k.Name == "RB-PSV2 key").Count);
+        Assert.Equal(2, reserve.Keycards.Single(k => k.Name == "RB-PSP1 key").Count);
+        Assert.Equal(2, reserve.Keycards.Single(k => k.Name == "RB-KPRL key").Count);
+        Assert.DoesNotContain(reserve.Keycards, k => k.Name.Contains("extract", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]

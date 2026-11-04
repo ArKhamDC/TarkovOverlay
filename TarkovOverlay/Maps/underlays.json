@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Overview rasters other than Labyrinth are Shebuka's SVGs from the-hideout/tarkov-dev-svg-maps (CC BY-NC-SA 4.0), used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. Factory ships Factory.svg on the published frame [[77,-64.5],[-65.5,67.4]], coordinateRotation 90: the overview is the ground floor, and basement, second, and third are separate rasters. Ground Zero ships GroundZero.svg on the official frame x0=249 z0=-124 x1=-99 z1=364, with one raster per height band and door locks painted as markers. The Lab ships Labs.svg on a fitted frame (tarkov.dev publishes no svgBounds for Labs), with locked rooms painted in the keycard color. Extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and the game's own map textures are not licensed for redistribution. Labyrinth has no SVG in that repo, so it stays an original frame drawing. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns.",
+  "source": "World bounds and coordinateRotation are the interactive frames in the-hideout/tarkov-dev src/data/maps.json (MIT License). Place-name positions are the labels in that file. cardinalRotation is json.tarkov.dev coordinateToCardinalRotation for the base location and is used only for the compass tick. Overview rasters other than Labyrinth are Shebuka's SVGs from the-hideout/tarkov-dev-svg-maps (CC BY-NC-SA 4.0), used with permission from EFT TarkDev on 2026-11-04; see Maps/attribution/SOURCE.md. Factory ships Factory.svg on the published frame [[77,-64.5],[-65.5,67.4]], coordinateRotation 90: the overview is the ground floor, and basement, second, and third are separate rasters. Ground Zero ships GroundZero.svg on the official frame x0=249 z0=-124 x1=-99 z1=364, with one raster per height band and door locks painted as markers. The Lab ships Labs.svg on a fitted frame (tarkov.dev publishes no svgBounds for Labs), with locked rooms painted in the keycard color. Reserve ships Reserve.svg on tarkov.dev svgBounds (x0=289, z0=-274, x1=-303, z1=272): surface, plus the bunker layer where a Bunkers extent matches. Extract positions come from json.tarkov.dev/regular/maps and are not moved onto landmark names. MapGenie tiles and the game's own map textures are not licensed for redistribution. Labyrinth has no SVG in that repo, so it stays an original frame drawing. Icebreaker is omitted: its published bounds match Factory and do not contain Icebreaker spawns.",
   "maps": [
     {
       "id": "customs",
@@ -1696,9 +1696,9 @@
       ],
       "bounds": {
         "x0": 289,
-        "z0": -293,
+        "z0": -274,
         "x1": -303,
-        "z1": 244
+        "z1": 272
       },
       "aliases": [
         "reserve",
@@ -2043,7 +2043,7 @@
       ],
       "water": [],
       "ponds": [],
-      "note": "Raster of tarkov.dev Reserve.svg (Shebuka), overview group Ground_Level plus groups kept with it. coordinateRotation 180. Extracts are Maps/reserve-extracts.json from json.tarkov.dev/regular/maps. Frame is the published rect x0=289 z0=-293 x1=-303 z1=244. Spawn and extract positions from json.tarkov.dev sit inside it. json.tarkov.dev coordinateToCardinalRotation for Reserve is 195.209, so compass north is about 15 degrees clockwise of image up.",
+      "note": "Raster of tarkov.dev Reserve.svg (Shebuka). Image frame is svgBounds x0=289 z0=-274 x1=-303 z1=272, coordinateRotation 180. publishedBounds is the interactive game frame [[289,-293],[-303,244]] and is not this image. Surface is the overview; the bunker layer is Maps/interiors/reserve_underground.png. Locked doors are colored squares (Maps/reserve-keycards.json, 31 RB keys, 34 locks). Extracts come from Maps/reserve-extracts.json and are drawn on the layer their bunker extent selects. json.tarkov.dev coordinateToCardinalRotation for Reserve is 195.209, so compass north is about 15 degrees clockwise of image up.",
       "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
       "imageAttribution": {
         "author": "Shebuka",
