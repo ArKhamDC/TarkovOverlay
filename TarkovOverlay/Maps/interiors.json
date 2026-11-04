@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "Customs interior floors are crops of Customs.svg by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), the same map as the Customs overview. EFT TarkDev allowed use of the site and its data for this program on 2026-11-04; see Maps/attribution/SOURCE.md. rectXZ x0/z0 is the image top-left and x1/z1 the bottom-right in the overview world frame (coordinateRotation 180). Floor 0 is underground. Dorm room numbers are verified placements in image pixels; only confidence verified is shipped. Stairs stay painted on the raster. Boiler is omitted: Customs.svg has no boiler group. The Lab is one underground complex from Labs.svg (same author and licence): there is no outdoor overview. rectXZ uses coordinateRotation 270. Height picks the floor: below -0.9 technical, below 3 first, otherwise second. Locked rooms are painted on the rasters in the keycard color.",
+  "source": "Customs interior floors are crops of Customs.svg by Shebuka (the-hideout/tarkov-dev-svg-maps, CC BY-NC-SA 4.0), the same map as the Customs overview. EFT TarkDev allowed use of the site and its data for this program on 2026-11-04; see Maps/attribution/SOURCE.md. rectXZ x0/z0 is the image top-left and x1/z1 the bottom-right in the overview world frame (coordinateRotation 180). Floor 0 is underground. Dorm room numbers are verified placements in image pixels; only confidence verified is shipped. Stairs stay painted on the raster. Boiler is omitted: Customs.svg has no boiler group. The Lab is one underground complex from Labs.svg (same author and licence): there is no outdoor overview. rectXZ uses coordinateRotation 270. Height picks the floor: below -0.9 technical, below 3 first, otherwise second. Locked rooms are painted on the rasters in the keycard color. Factory is one indoor complex from Factory.svg (same author and licence) on the published frame, coordinateRotation 90. factory.png is the overview until a position arrives, then height picks the floor: below -1 basement, below 3 ground, below 6 second, otherwise third. Locks are door markers, not room fills.",
   "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
   "maps": [
     {
@@ -1047,6 +1047,93 @@
               "image": "labs_second.png",
               "width": 2880,
               "height": 2344
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "factory",
+      "coordinateRotation": 90,
+      "aliases": [
+        "factory",
+        "factory4day",
+        "factory4night",
+        "factoryday",
+        "factorydaypreset",
+        "factoryevent",
+        "factoryeventpreset",
+        "factorynight",
+        "factorynightpreset",
+        "infectedfactory",
+        "nightfactory"
+      ],
+      "buildings": [
+        {
+          "id": "factory",
+          "name": "Factory",
+          "nameRu": "Завод",
+          "coversMap": true,
+          "credit": "Shebuka / tarkov-dev-svg-maps · CC BY-NC-SA 4.0",
+          "rectXZ": {
+            "x0": 77,
+            "z0": 67.4,
+            "x1": -65.5,
+            "z1": -64.5
+          },
+          "floorByY": [
+            {
+              "below": -1,
+              "floor": -1
+            },
+            {
+              "below": 3,
+              "floor": 1
+            },
+            {
+              "below": 6,
+              "floor": 2
+            },
+            {
+              "floor": 3
+            }
+          ],
+          "floors": [
+            {
+              "floor": -1,
+              "floorKey": "basement",
+              "caption": "-1",
+              "tip": "Basement",
+              "image": "factory_basement.png",
+              "width": 1047,
+              "height": 1130
+            },
+            {
+              "floor": 1,
+              "floorKey": "ground",
+              "caption": "1",
+              "tip": "Ground",
+              "image": "factory_ground.png",
+              "width": 1047,
+              "height": 1130
+            },
+            {
+              "floor": 2,
+              "floorKey": "second",
+              "caption": "2",
+              "tip": "Second",
+              "image": "factory_second.png",
+              "width": 1047,
+              "height": 1130
+            },
+            {
+              "floor": 3,
+              "floorKey": "third",
+              "caption": "3",
+              "tip": "Third",
+              "image": "factory_third.png",
+              "width": 1047,
+              "height": 1130
             }
           ]
         }
